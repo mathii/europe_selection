@@ -27,3 +27,17 @@ convert <- function(freq){
     return(freq)
 }
 
+
+################################################################################
+## Read in snp count/total data generated with spinfridt/Freq.py
+## root: file root
+################################################################################
+
+read.counts.and.data <- function(root){    
+    counts <- read.table(paste0(root, ".count"), header=TRUE, as.is=TRUE)
+    totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
+    data <- counts[,1:5]
+    counts <- data.matrix(counts[,6:NCOL(counts)])
+    totals <- data.matrix(totals[,6:NCOL(totals)])
+    return(list(data=data, counts=counts, totals=totals))
+}
