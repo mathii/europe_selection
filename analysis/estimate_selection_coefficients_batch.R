@@ -69,4 +69,4 @@ for(i in 1:NROW(data)){
     }
 }
 
-write.table(results, paste0("~/selection_remote/results/s_estimates_", tag, ".txt"), row.names=TRUE, col.names=FALSE, sep="\t", quote=FALSE)
+write.table(results, paste0("~/selection/analysis/s_estimates/s_estimates_", tag, ".txt"), row.names=TRUE, col.names=FALSE, sep="\t", quote=FALSE)
