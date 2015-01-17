@@ -1,6 +1,7 @@
 #Estimate selection coefficients
 
 args <- commandArgs(TRUE)
+print(args)
 from <- as.numeric(args[1])
 to <- as.numeric(args[2])
 tag <- args[3]
@@ -10,7 +11,6 @@ tag <- args[3]
 root <- "~/selection/counts/all"
 datefile <- "~/data/v6/use/population_dates.txt"
 include <- "~/data/v6/use/used_series.txt"
-max.gen.ago <- 250
 gen.time <- 29
 Ne <- 6000                             #TODO!
 include.ci <- TRUE
@@ -41,6 +41,9 @@ totals <- totals[,include]
 dates <- read.table(datefile, as.is=TRUE, header=FALSE)
 dd <- dates[,2]*1000
 names(dd) <- dates[,1]
+dd <- dd[include]
+
+max.gen.ago <- ceiling(max(dd)/gen.time)
 
 results <- matrix(NA, ncol=2, nrow=NROW(data))
 if(include.ci){results <- matrix(NA, ncol=4, nrow=NROW(data))}
@@ -56,17 +59,20 @@ for(i in 1:NROW(data)){
         this.traj$N[gen] <- this.traj$N[gen]+totals[i,j]
         this.traj$N.A[gen] <- this.traj$N.A[gen]+counts[i,j]
     }
-
-    if(sum(this.traj$N[1:(NROW(this.traj)-1)]>1)>2){
-        this.est <- estimate.s(this.traj, Ne, method="Soft EM", verbose=FALSE)
-        this.p <- p.value(this.traj, Ne, this.est$s)
-        if(include.ci){
-            ci <- find.confidence.interval(this.traj, Ne, this.est$s)
-            results[i,] <- c(this.est$s, this.p, ci)
-        } else{
-            results[i,] <- c(this.est$s, this.p)        
+    #Ignore errors if something randomly goes wrong. 
+    e <- tryCatch(
+        if(sum(this.traj$N[1:(NROW(this.traj)-1)]>1)>2){
+            this.est <- estimate.s(this.traj, Ne, method="Soft EM", verbose=FALSE)
+            this.p <- p.value(this.traj, Ne, this.est$s)
+            if(include.ci){
+                ci <- find.confidence.interval(this.traj, Ne, this.est$s)
+                results[i,] <- c(this.est$s, this.p, ci)
+            } else{
+                results[i,] <- c(this.est$s, this.p)        
+            }
         }
-    }
+        , error=function(e){e}
+        )
 }
 
 write.table(results, paste0("~/selection/analysis/s_estimates/s_estimates_", tag, ".txt"), row.names=TRUE, col.names=FALSE, sep="\t", quote=FALSE)
