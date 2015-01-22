@@ -90,3 +90,103 @@ test.diff <- function(N, N.A){
     p <- pchisq(stat, df=degf, lower.tail=F)
     return( c(stat, p) )
 }
+
+#########################################################
+#
+# Likelihood for the combined read and count based
+# model.
+# p: Reference allele frequencies (length N)
+# data: list of N populations, each entry is a list with
+# two elements, "reads" and "counts". "reads" is itself
+# a list with "ref" and "alt" vectors of ref and alt
+# read counts for each individual and "counts" is a vector
+# of length 2 for giving ref/alt counts.
+# This returns the log likelihood summed over all the
+# populations. 
+#########################################################
+
+likelihood.reads <- function(freq, data){
+    ll <- 0
+    i.pop <- 1
+    for(pop in names(data)){
+        N.read.ind <- length(data[[pop]][["reads"]][["ref"]]) #Number of individuals with read information
+        p <- freq[i.pop]
+        if(N.read.ind){
+            #Add reads
+            for(i in 1:N.read.ind){
+                ref <- data[[pop]][["reads"]][["ref"]][[i]]
+                alt <- data[[pop]][["reads"]][["alt"]][[i]]
+                ll <- ll+log((alt==0)*p*p + (ref==0)*(1-p)*(1-p) + 2*dbinom(ref, ref+alt, 0.5)*p*(1-p))
+            }
+        }
+        #Add counts, can be zero
+        cnts <- data[[pop]][["counts"]]
+        ll <- ll+dbinom(cnts[1], cnts[1]+cnts[2], p, log=TRUE)
+        i.pop <- i.pop+1
+    }
+    return(ll)
+}
+
+#########################################################
+#
+# Constrained likelihood for read based model
+# 
+#########################################################
+
+constrained.likelihood.reads <- function(p, A, data){
+    p <- c(p, c(p %*% A))
+    p <- pmin(pmax(EPSILON, p), 1-EPSILON)
+    ll <- likelihood.reads(p, data)
+    return(ll)
+}
+
+#########################################################
+#
+# Fit the constrained model
+# 
+#########################################################
+
+fit.constrained.model.reads <- function(data, A){
+    p.anc.init <- rep(0.5, dim(A)[1])
+    opt <- optim(p.anc.init, constrained.likelihood.reads, A=A, data=data, control=list(fnscale=-1), lower=0, upper=1, method="L-BFGS")
+    return(opt)
+}
+
+#########################################################
+#
+# Fit the unconstrained model
+# Since the frequencies are independent, we can fit them
+# separately. 
+# 
+#########################################################
+
+fit.unconstrained.model.reads <- function(data){
+    p <- rep(NA, length(data))
+    for(i in 1:length(data)){
+        subdata=list(data[[i]])
+        names(subdata) <- names(data)[i]
+        opt <- optimize(likelihood.reads, data=subdata, maximum=TRUE, lower=EPSILON, upper=1-EPSILON)
+        p[i] <- opt$maximum
+    }
+    ll <- likelihood.reads(p, data)
+    return(list(par=p, value=ll))
+}
+
+#########################################################
+#
+# General 3 population test using read information                                        
+# 
+#########################################################
+
+test.3pop.reads <- function(data, A){
+    degf <- dim(A)[2]
+
+    if(sum(dim(A))!=length(data)){stop("Matrix A not compatible with observations")}
+
+    uf <- fit.unconstrained.model.reads(data)
+    cf <- fit.constrained.model.reads(data, A)   
+    
+    stat <- 2*(uf$value-cf$value)
+    p <- pchisq(stat, df=degf, lower.tail=F)
+    return( c(stat, p) )
+}

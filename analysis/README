@@ -23,7 +23,12 @@ R --vanilla < ~/selection/code/analysis/genome_wide_scan_plot_mh.R
 #3d QQ plots
 R --vanilla < ~/selection/code/analysis/genome_wide_scan_plot_qq.R
 
-#Time series and allele frequency plots
+#4 Time series and allele frequency plots
 R --vanilla ~/selection/code/analysis/time_series_plots.R
 R --vanilla ~/selection/code/analysis/allele_frequency_plots.R
 (need to manually edit the file to make both panels)
+
+#5 Polygenic selection scans
+# We are using different population names here. 
+R --vanilla < ~/selection/code/analysis/polymap_rename.txt
+

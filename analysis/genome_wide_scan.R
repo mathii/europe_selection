@@ -18,15 +18,15 @@ lambda=NA
 #Compute the likelihood 
 
 pops <- c("WHG", "LBK_EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
-A <- matrix(c(0.187, 0.312, 0.501, 0.160, 0.413, 0.427, 0, 0.764, 0.236, 0, 0.714, 0.286),3, 4)
-
+## A <- matrix(c(0.187, 0.312, 0.501, 0.160, 0.413, 0.427, 0, 0.764, 0.236, 0, 0.714, 0.286),3, 4)
+A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.226, 0, 0.712, 0.287),3, 4) 
 
 counts <- read.table(paste0(root, ".count"), header=TRUE, as.is=TRUE)
 totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
 
 ## Merge WHG (not inbred so counted separately...)
-counts$WHG <- counts$Loschbour+counts$LatvianMesolithic+counts$LaBrana1+counts$HungaryGamba_HG
-totals$WHG <- totals$Loschbour+totals$LatvianMesolithic+totals$LaBrana1+totals$HungaryGamba_HG
+counts$WHG <- counts$Loschbour+counts$LaBrana1+counts$HungaryGamba_HG
+totals$WHG <- totals$Loschbour+totals$LaBrana1+totals$HungaryGamba_HG
 
 ## counts$LBK_EN <- counts$LBK_EN +counts$Stuttgart+counts$HungaryGamba_EN+counts$Spain_EN
 ## totals$LBK_EN <- totals$LBK_EN +totals$Stuttgart+totals$HungaryGamba_EN+totals$Spain_EN
