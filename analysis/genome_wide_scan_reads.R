@@ -51,6 +51,7 @@ totals <- totals[include,]
 reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts"), as.is=TRUE, header=FALSE)
 
 ## get list of samples in each population of reads
+ind <- read.table(indfile, as.is=TRUE, header=FALSE)
 include.read.samples <- lapply(include.reads, function(x){NULL})
 for(pop in names(include.reads)){
     for(subpop in include.reads[[pop]]){
