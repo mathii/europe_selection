@@ -57,23 +57,7 @@ corrected.p <- pchisq(results[,1]/lambda, df=degf, lower.tail=F)
 tt <- qqplot(rexp(NROW(results))/log(10), -log10(corrected.p), plot.it=FALSE)
 points(tt, pch=16, col="darkblue", bty="n")
 
-results <- cbind(results, corrected.p)
-colnames(results) <- c("ID", "uncorrected.p", "corrected.p")
+results <- cbind(rownames(results), results, corrected.p)
+colnames(results) <- c("ID", "ChiSq", "uncorrected.p", "corrected.p")
 results <- data.frame(results)
 write.table(results, "~/selection/analysis/gscan/scan_diff_results.txt", row.names=T, col.names=T, quote=F)
-
-data <- read.table("~/data/v6/use/v61kg_europe2names.snp", as.is=TRUE)
-dist <- 100000
-
-res <- data.frame(ID=rownames(results), PVAL=results$corrected.p)
-dat <- data[,c(1,2,4)]
-colnames(dat) <- c("ID", "CHR", "POS")
-res <- merge(res,dat,by="ID")
-res <- res[order(res$CHR, res$POS),]
-
-png(paste0("~/selection/analysis/gscan/mh_plot_diff.png"), width=800, height=400)
-par(mar=c(2,4,1,1))
-MH.plot(res, color.loci=data.frame())
-abline(h=6.79, col="red", lty=2)
-dev.off()
-

@@ -21,7 +21,7 @@ if(length(commandArgs(TRUE))){
 ## Details
 root <- "~/selection/counts/all"
 out <- "~/selection/analysis/gscan/"
-results.tag <- "read"
+results.tag <- ""
 read.root <- "~/data/v6/reads/jj2"
 indfile <- "~/data/v6/use/v61kg_europe2names.ind"
 
