@@ -105,7 +105,7 @@ test.diff <- function(N, N.A){
 # populations. 
 #########################################################
 
-likelihood.reads <- function(freq, data){
+likelihood.reads <- function(freq, data, error.prob=0.001){
     ll <- 0
     i.pop <- 1
     for(pop in names(data)){
@@ -117,7 +117,7 @@ likelihood.reads <- function(freq, data){
                 ref <- data[[pop]][["reads"]][["ref"]][[i]]
                 alt <- data[[pop]][["reads"]][["alt"]][[i]]
                 ## ll <- ll+log((alt==0)*p*p + (ref==0)*(1-p)*(1-p) + 2*dbinom(ref, ref+alt, 0.5)*p*(1-p))
-                ll <- ll+log(dbinom(alt, ref+alt, 0.005)*p*p + dbinom(ref, ref+alt, 0.005)*(1-p)*(1-p) + dbinom(ref, ref+alt, 0.5)*2*p*(1-p))
+                ll <- ll+log(dbinom(alt, ref+alt, error.prob)*p*p + dbinom(ref, ref+alt, error.prob)*(1-p)*(1-p) + dbinom(ref, ref+alt, 0.5)*2*p*(1-p))
             }
         }
         #Add counts, can be zero
@@ -134,10 +134,10 @@ likelihood.reads <- function(freq, data){
 # 
 #########################################################
 
-constrained.likelihood.reads <- function(p, A, data){
+constrained.likelihood.reads <- function(p, A, data, error.prob=0){
     p <- c(p, c(p %*% A))
     p <- pmin(pmax(EPSILON, p), 1-EPSILON)
-    ll <- likelihood.reads(p, data)
+    ll <- likelihood.reads(p, data, error.prob=error.prob)
     return(ll)
 }
 
@@ -147,9 +147,9 @@ constrained.likelihood.reads <- function(p, A, data){
 # 
 #########################################################
 
-fit.constrained.model.reads <- function(data, A){
+fit.constrained.model.reads <- function(data, A, error.prob=0){
     p.anc.init <- rep(0.5, dim(A)[1])
-    opt <- optim(p.anc.init, constrained.likelihood.reads, A=A, data=data, control=list(fnscale=-1), lower=0, upper=1, method="L-BFGS")
+    opt <- optim(p.anc.init, constrained.likelihood.reads, A=A, data=data, error.prob=error.prob, control=list(fnscale=-1), lower=0, upper=1, method="L-BFGS")
     return(opt)
 }
 
@@ -161,12 +161,12 @@ fit.constrained.model.reads <- function(data, A){
 # 
 #########################################################
 
-fit.unconstrained.model.reads <- function(data){
+fit.unconstrained.model.reads <- function(data, error.prob=0){
     p <- rep(NA, length(data))
     for(i in 1:length(data)){
         subdata=list(data[[i]])
         names(subdata) <- names(data)[i]
-        opt <- optimize(likelihood.reads, data=subdata, maximum=TRUE, lower=EPSILON, upper=1-EPSILON)
+        opt <- optimize(likelihood.reads, data=subdata, error.prob=error.prob, maximum=TRUE, lower=EPSILON, upper=1-EPSILON)
         p[i] <- opt$maximum
     }
     ll <- likelihood.reads(p, data)
@@ -179,13 +179,13 @@ fit.unconstrained.model.reads <- function(data){
 # 
 #########################################################
 
-test.3pop.reads <- function(data, A){
+test.3pop.reads <- function(data, A, error.prob=error.prob){
     degf <- dim(A)[2]
 
     if(sum(dim(A))!=length(data)){stop("Matrix A not compatible with observations")}
 
-    uf <- fit.unconstrained.model.reads(data)
-    cf <- fit.constrained.model.reads(data, A)   
+    uf <- fit.unconstrained.model.reads(data, error.prob=error.prob)
+    cf <- fit.constrained.model.reads(data, A, error.prob=error.prob)   
     
     stat <- 2*(uf$value-cf$value)
     p <- pchisq(stat, df=degf, lower.tail=F)
