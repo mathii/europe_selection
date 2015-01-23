@@ -24,6 +24,7 @@ out <- "~/selection/analysis/gscan/"
 results.tag <- ""
 read.root <- "~/data/v6/reads/jj2"
 indfile <- "~/data/v6/use/v61kg_europe2names.ind"
+error.prob <- 0.001
 
 pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
 A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.226, 0, 0.712, 0.287),3, 4) 
@@ -108,7 +109,7 @@ for(i in 1:NROW(data)){
         }
     }    
     
-    results[i,] <- test.3pop.reads(freq.data, A)
+    results[i,] <- test.3pop.reads(freq.data, A, error.prob=error.prob)
 }
 
 results <- cbind(rownames(results), results)
