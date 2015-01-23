@@ -27,6 +27,9 @@ indfile <- "~/data/v6/use/v61kg_europe2names.ind"
 error.prob <- 0.001
 
 pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
+#Check if the SNP is monomorphic in these populations. 
+monocheck <- c("CEU", "GBR", "IBS", "TSI", "LaBrana1", "HungaryGamba_HG", "Loschbour", "Stuttgart",
+               "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")
 A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.226, 0, 0.712, 0.287),3, 4) 
 
 ########################################################################
@@ -45,6 +48,7 @@ totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
 data <- counts[,1:5]
 include <- data$CHR==chr
 data <- data[include,]
+
 counts <- data.matrix(counts[,6:NCOL(counts)])
 totals <- data.matrix(totals[,6:NCOL(totals)])
 counts <- counts[include,]
@@ -107,10 +111,17 @@ for(i in 1:NROW(data)){
                 freq.data[[pop]][["counts"]] <- freq.data[[pop]][["counts"]]+ref.alt
             }
         }
-    }    
-    
-    results[i,] <- test.3pop.reads(freq.data, A, error.prob=error.prob)
+    }
+
+    monomorphic <- all(counts[i,monocheck]==0)|all(counts[i,monocheck]==totals[i,monocheck])
+    if(monomorphic){
+        results[i,] <- NA
+    }else{
+        results[i,] <- test.3pop.reads(freq.data, A, error.prob=error.prob)
+    }
 }
+
+results <- results[!is.na(results[,2]),]
 
 results <- cbind(rownames(results), results)
 colnames(results) <- c("ID", "ChiSq", "uncorrected.p")
