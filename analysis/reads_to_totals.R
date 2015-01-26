@@ -82,11 +82,12 @@ for(i in 1:NROW(data)){
             tt <- 0 
             for(sample in include.read.samples[[pop]]){
                 ref.alt <- this.read[this.read[,2]==sample,3:4]
-                if(ref.alt[1]==0 | ref.alt[2]==0){
-                    tt <- tt+1+0.5^(ref.alt[1]+ref.alt[2])
-                }else{
-                    tt <- tt+2
-                }
+                tt <- tt+1+0.5^(ref.alt[1]+ref.alt[2])
+                ## if(ref.alt[1]==0 | ref.alt[2]==0){
+                ##     tt <- tt+1+0.5^(ref.alt[1]+ref.alt[2])
+                ## }else{
+                ##     tt <- tt+2
+                ## }
             }
             new.totals[i,j] <- tt
         } 

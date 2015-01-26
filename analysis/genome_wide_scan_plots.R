@@ -33,6 +33,8 @@ if(!("corrected.p"  %in% names(results))){
     cat(paste0("Used lambda = ", lambda, "\n"))
 }else{cat("Using corrected p-values\n")}
 
+sig.level <- -log10(0.05/NROW(res))
+cat(paste0("Used sig.level = ", sig.level, "\n"))
 
 ## Merge SNP position data with results
 res <- data.frame(ID=results$ID, PVAL=results$corrected.p)
@@ -45,8 +47,18 @@ res <- res[order(res$CHR, res$POS),]
 png(paste0("~/selection/analysis/gscan/mh_plot", results.tag ,".png"), width=800, height=400)
 par(mar=c(2,4,1,1))
 MH.plot(res, color.loci=data.frame())
-abline(h=6.79, col="red", lty=2)
+abline(h=sig.level, col="red", lty=2)
 dev.off()
+
+## Per-chromosome Manhattan plots
+sig.chrs <- unique(res$CHR[res$PVAL<(10^-(sig.level))])
+for(c in sig.chrs){
+    png(paste0("~/selection/analysis/gscan/mh_plot", results.tag ,".chr", c, ".png"), width=800, height=400)
+    par(mar=c(2,4,1,1))
+    MH.plot(res[res$CHR==c,], color.loci=data.frame())
+    abline(h=sig.level, col="red", lty=2)
+    dev.off()
+}
 
 ## QQ plots
 res$TAG <- paste(res$CHR, res$POS, sep=":")
