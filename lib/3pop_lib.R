@@ -1,4 +1,5 @@
 #Functions to implement the 3 (or n) population test.
+## require(numDeriv)
 
 EPSILON <- 1e-4 #Minumum allele frequency
 
@@ -121,9 +122,11 @@ likelihood.reads <- function(freq, data, error.prob=0.001){
             }
         }
         #Add counts, can be zero
-        cnts <- data[[pop]][["counts"]]
-        ll <- ll+dbinom(cnts[1], cnts[1]+cnts[2], p, log=TRUE)
-        i.pop <- i.pop+1
+        if("counts" %in% names(data[[pop]])){
+            cnts <- data[[pop]][["counts"]]
+            ll <- ll+dbinom(cnts[1], cnts[1]+cnts[2], p, log=TRUE)
+        }
+        i.pop <- i.pop+1    
     }
     return(ll)
 }
@@ -190,4 +193,17 @@ test.3pop.reads <- function(data, A, error.prob=error.prob){
     stat <- 2*(uf$value-cf$value)
     p <- pchisq(stat, df=degf, lower.tail=F)
     return( c(stat, p) )
+}
+
+#########################################################
+#
+# Estimated frequency and effective sample size for
+# one data point. Freq.data of size 1 
+#########################################################
+
+effective.size.reads <- function(data, error.prob=0){
+    uf <- fit.unconstrained.model.reads(data, error.prob=error.prob)
+    d2 <- hessian(likelihood.reads, uf$par, method="Richardson", method.args=list(eps=EPSILON/2), data, error.prob=error.prob)
+    N <- -uf$par*(1-uf$par)*c(d2)
+    return(list(p=uf$par, N=N, d2=c(d2)))
 }

@@ -20,11 +20,11 @@ degf <- 4
 ## Read inputs
 results <- read.table(results, header=TRUE, as.is=TRUE)
 selection <- read.table("~/selection/data/cms/All_selection.snp", as.is=TRUE)
+neutral <- !(results[,"ID"] %in% selection[,1])
 data <- read.table(snpdata, as.is=TRUE)
 
 ## Apply genomic control if we haven't already
 if(!("corrected.p"  %in% names(results))){
-    neutral <- !(results[,"ID"] %in% selection[,1])
     lambda <- median(results[neutral,"ChiSq"])/qchisq(0.5, df=degf)
     corrected.p <- pchisq(results[,"ChiSq"]/lambda, df=degf, lower.tail=F)
     results <- cbind(results, corrected.p)
