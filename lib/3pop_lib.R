@@ -207,3 +207,58 @@ effective.size.reads <- function(data, error.prob=0){
     N <- -uf$par*(1-uf$par)*c(d2)
     return(list(p=uf$par, N=N, d2=c(d2)))
 }
+
+#########################################################
+#
+# Empty read/allele count data structure
+#
+#########################################################
+
+make.empty.data <- function(pops){
+    empty.data <- rep( list(list()), length(pops) ) 
+    names(empty.data) <- pops
+    for(pop in pops){
+        empty.data[[pop]] <- list("reads"=list("ref"=NULL, "alt"=NULL), "counts"=c(0,0)) #ref and alt counts. 
+    }
+    return(empty.data)
+}
+
+#########################################################
+#
+# Combine information from read counts and allele counts 
+# into the data structure used for the likelihood
+# calcluations here
+#
+# pops: list of populations to include
+# include.reads: list, with names in pops, mapping to
+# vectors of sub-populations to add together to make
+# each population, using read counts.
+# include.read samples: which samples are in each sub-population
+# include.counds: As include.reads, but with populations
+# for which we should add hard counts.
+# read.info, counts, totals: standard data structures
+#########################################################
+
+make.freq.data <- function(pops, include.reads, include.read.samples, include.counts, read.info, counts, totals, empty.data){
+    freq.data <- empty.data
+    for(pop in pops){
+        if(pop %in% names(include.reads)){
+            for(sample in include.read.samples[[pop]]){
+                ref.alt <- read.info[read.info[,2]==sample,3:4]
+                if(sum(ref.alt)>0){
+                    freq.data[[pop]][["reads"]][["ref"]] <- c(freq.data[[pop]][["reads"]][["ref"]],ref.alt[[1]])
+                    freq.data[[pop]][["reads"]][["alt"]] <- c(freq.data[[pop]][["reads"]][["alt"]],ref.alt[[2]])
+                }
+            }
+        }
+
+        if(pop %in% names(include.counts)){
+            for(subpop in include.counts[[pop]]){
+                ref.alt <- c(counts[i,subpop], totals[i,subpop]-counts[i,subpop])
+                names(ref.alt) <- NULL
+                freq.data[[pop]][["counts"]] <- freq.data[[pop]][["counts"]]+ref.alt
+            }
+        }
+    }
+    return(freq.data)
+}

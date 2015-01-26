@@ -75,12 +75,8 @@ if(!all(read.sample.counts==N.read.samples)){stop("Different number of read samp
 results <- matrix(0, nrow=NROW(data), ncol=2)
 rownames(results) <- data$ID
 
-empty.data <- rep( list(list()), length(pops) ) 
-names(empty.data) <- pops
-for(pop in pops){
-    empty.data[[pop]] <- list("reads"=list("ref"=NULL, "alt"=NULL), "counts"=c(0,0)) #ref and alt counts. 
-}
-
+## Data structure
+empty.data <- make.empty.data(pops)
 
 for(i in 1:NROW(data)){
     this.snp <- data[i,1]
@@ -92,27 +88,9 @@ for(i in 1:NROW(data)){
     if(!all(this.read[,1]==this.snp)){stop("Selected the wrong SNP")}
 
                                         #Setup read data
-    freq.data <- empty.data
-    for(pop in pops){
-        if(pop %in% names(include.reads)){
-            for(sample in include.read.samples[[pop]]){
-                ref.alt <- this.read[this.read[,2]==sample,3:4]
-                if(sum(ref.alt)>0){
-                    freq.data[[pop]][["reads"]][["ref"]] <- c(freq.data[[pop]][["reads"]][["ref"]],ref.alt[[1]])
-                    freq.data[[pop]][["reads"]][["alt"]] <- c(freq.data[[pop]][["reads"]][["alt"]],ref.alt[[2]])
-                }
-            }
-        }
 
-        if(pop %in% names(include.counts)){
-            for(subpop in include.counts[[pop]]){
-                ref.alt <- c(counts[i,subpop], totals[i,subpop]-counts[i,subpop])
-                names(ref.alt) <- NULL
-                freq.data[[pop]][["counts"]] <- freq.data[[pop]][["counts"]]+ref.alt
-            }
-        }
-    }
-
+    freq.data <- make.freq.data(pops, include.reads, include.read.samples, include.counts,
+                                this.read, counts, totals, empty.data)
     monomorphic <- all(counts[i,monocheck]==0)|all(counts[i,monocheck]==totals[i,monocheck])
     if(monomorphic){
         results[i,] <- NA

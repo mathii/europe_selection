@@ -23,9 +23,12 @@ selection <- read.table("~/selection/data/cms/All_selection.snp", as.is=TRUE)
 neutral <- !(results[,"ID"] %in% selection[,1])
 data <- read.table(snpdata, as.is=TRUE)
 
+include <- results$ChiSq>0
+cat(paste0("Ignoring ", sum(!include), " SNPs with negative test statistics"))
+
 ## Apply genomic control if we haven't already
 if(!("corrected.p"  %in% names(results))){
-    lambda <- median(results[neutral,"ChiSq"])/qchisq(0.5, df=degf)
+    lambda <- median(results[neutral&include,"ChiSq"])/qchisq(0.5, df=degf)
     corrected.p <- pchisq(results[,"ChiSq"]/lambda, df=degf, lower.tail=F)
     results <- cbind(results, corrected.p)
     write.table(results, paste0("~/selection/analysis/gscan/scan_results", results.tag, ".txt"),
@@ -33,15 +36,17 @@ if(!("corrected.p"  %in% names(results))){
     cat(paste0("Used lambda = ", lambda, "\n"))
 }else{cat("Using corrected p-values\n")}
 
-sig.level <- -log10(0.05/NROW(res))
-cat(paste0("Used sig.level = ", sig.level, "\n"))
-
 ## Merge SNP position data with results
 res <- data.frame(ID=results$ID, PVAL=results$corrected.p)
+res <- res[include,]
 dat <- data[,c(1,2,4)]
 colnames(dat) <- c("ID", "CHR", "POS")
 res <- merge(res,dat,by="ID")
 res <- res[order(res$CHR, res$POS),]
+
+
+sig.level <- -log10(0.05/NROW(res))
+cat(paste0("Used sig.level = ", sig.level, "\n"))
 
 ## Manhattan plot
 png(paste0("~/selection/analysis/gscan/mh_plot", results.tag ,".png"), width=800, height=400)
