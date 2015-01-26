@@ -95,4 +95,4 @@ for(i in 1:NROW(data)){
     readi <- readi+1
 }
 
-write.table(results, paste0("~/selection/analysis/effsize/effsize_reads", ".chr", paste(chrs, collapse="_"), ".txt"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+write.table(new.totals, paste0("~/selection/analysis/effsize/effsize_reads", ".chr", paste(chrs, collapse="_"), ".txt"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
