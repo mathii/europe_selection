@@ -30,7 +30,7 @@ pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
 #Check if the SNP is monomorphic in these populations. 
 monocheck <- c("CEU", "GBR", "IBS", "TSI", "LaBrana1", "HungaryGamba_HG", "Loschbour", "Stuttgart",
                "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")
-A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.226, 0, 0.712, 0.287),3, 4) 
+A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.712, 0.288),3, 4) 
 
 ########################################################################
 
@@ -56,13 +56,7 @@ totals <- totals[include,]
 reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts"), as.is=TRUE, header=FALSE)
 
 ## get list of samples in each population of reads
-ind <- read.table(indfile, as.is=TRUE, header=FALSE)
-include.read.samples <- lapply(include.reads, function(x){NULL})
-for(pop in names(include.reads)){
-    for(subpop in include.reads[[pop]]){
-        include.read.samples[[pop]] <- c(include.read.samples[[pop]], ind[ind[,3]==subpop,1])
-    }
-}
+include.read.samples <- read.samples(indfile, include.reads)
 
 ## Sort reads by ID for faster indexing
 reads <- reads[order(match(reads[,1], data$ID)),]

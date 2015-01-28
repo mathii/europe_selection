@@ -11,26 +11,27 @@ python ~/spindrift/Freq.py \
 	-s ~/data/v6/use/v61kg_europe2names
 
 #2. Compute sample size
-R --vanilla < ~/selection/code/analysis/effective_sample_size.R
 for chr in {1..23}; do R --vanilla --args $chr <  ~/selection/code/analysis/reads_to_totals.R; done
 grep ^ID effsize_reads.chr1.txt > effsize_reads.txt
 grep -hv "^ID" effsize_reads.chr*.txt >> effsize_reads.txt
+R --vanilla < ~/selection/code/analysis/effective_sample_size.R
 
 #3Genome-wide scan for seelction
 R --vanilla <  ~/selection/code/analysis/genome_wide_scan.R
 for chr in {1..23}; do R --vanilla --args $chr <  ~/selection/code/analysis/genome_wide_scan_reads.R; done
 grep ^ID scan_results_read.chr1.txt > scan_results_reads.txt
 grep -hv "^ID" scan_results_read.chr*.txt >> scan_results_reads.txt
-#3a also run genome_wide_scan_diff.R for comparison
+
 #3b generate locuszoom plots (see ./locuszoom_commands).
 ./locuszoom.sh
+
 #3c Manhattan and qq plots
 R --vanilla < ~/selection/code/analysis/genome_wide_scan_plots.R
 R --args _reads --vanilla < ~/selection/code/analysis/genome_wide_scan_plots.R
 
 #4 Time series and allele frequency plots
-R --vanilla ~/selection/code/analysis/time_series_plots.R
-R --vanilla ~/selection/code/analysis/allele_frequency_plots.R
+R --vanilla ~/selection/code/analysis/time_series_plot_reads.R
+R --vanilla ~/selection/code/analysis/allele_frequency_plots_reads.R
 (need to manually edit the file to make both panels)
 
 #5 Polygenic selection scans

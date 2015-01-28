@@ -4,7 +4,7 @@ source("~/selection/code/lib/readlib.R")
 ########################################################################
 ## Details
 root <- "~/selection/counts/all"
-read.totals <- "~/selection/analysis/effsize/effsize_total.txt"
+read.totals <- "~/selection/analysis/effsize/effsize_reads.txt"
 ########################################################################
 
 ## Majority call info
@@ -14,12 +14,12 @@ totals <- rd$totals
 data <- rd$data
 
 ## Read level info
-read.data <- read.table(read.totals, as.is=TRUE, header=TRUE)
-read.totals <- read.data[,6:NCOL(read.data)]
-read.data <- read.data[,1:5]
+read.totals <- read.table(read.totals, as.is=TRUE, header=TRUE)
 
 
 
 results <- data.frame(pops=colnames(totals), size=apply(totals, 2, max), effective.size=colMeans(totals))
 write.table(results, "~/selection/analysis/effective_sample_size.txt", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
+read.results <- data.frame(pops=colnames(read.totals), effective.size=colMeans(read.totals))
+write.table(read.results, "~/selection/analysis/effective_sample_size_reads.txt", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")

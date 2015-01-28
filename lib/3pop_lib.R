@@ -178,6 +178,36 @@ fit.unconstrained.model.reads <- function(data, error.prob=0){
 
 #########################################################
 #
+# Effective size of data - roughly how many hard                                       
+# calls is this data equivalent to? 
+#########################################################
+
+effective.data.size <- function(data){
+    data.size <- rep(0, length(data))
+    names(data.size) <- names(data)
+    for(pop in names(data)){
+        total <- 0
+        N.read.ind <- length(data[[pop]][["reads"]][["ref"]]) #Number of individuals with read information
+        if(N.read.ind){
+            #Add reads
+            for(i in 1:N.read.ind){
+                ref <- data[[pop]][["reads"]][["ref"]][[i]]
+                alt <- data[[pop]][["reads"]][["alt"]][[i]]
+                total <- total+2-0.5^(ref+alt-1)
+            }
+        }
+        #Add counts, can be zero
+        if("counts" %in% names(data[[pop]])){
+            cnts <- data[[pop]][["counts"]]
+            total <- total+cnts[1]+cnts[2]
+        }
+        data.size[pop] <- total
+    }
+    return(data.size)
+}
+
+#########################################################
+#
 # General 3 population test using read information                                        
 # 
 #########################################################
@@ -218,7 +248,7 @@ make.empty.data <- function(pops){
     empty.data <- rep( list(list()), length(pops) ) 
     names(empty.data) <- pops
     for(pop in pops){
-        empty.data[[pop]] <- list("reads"=list("ref"=NULL, "alt"=NULL), "counts"=c(0,0)) #ref and alt counts. 
+        empty.data[[pop]] <- list("reads"=list("ref"=NULL, "alt"=NULL, "samples"=NULL), "counts"=c(0,0)) #ref and alt counts. 
     }
     return(empty.data)
 }
@@ -248,6 +278,8 @@ make.freq.data <- function(pops, include.reads, include.read.samples, include.co
                 if(sum(ref.alt)>0){
                     freq.data[[pop]][["reads"]][["ref"]] <- c(freq.data[[pop]][["reads"]][["ref"]],ref.alt[[1]])
                     freq.data[[pop]][["reads"]][["alt"]] <- c(freq.data[[pop]][["reads"]][["alt"]],ref.alt[[2]])
+                    freq.data[[pop]][["reads"]][["samples"]] <- c(freq.data[[pop]][["reads"]][["samples"]],sample)
+
                 }
             }
         }
@@ -261,4 +293,20 @@ make.freq.data <- function(pops, include.reads, include.read.samples, include.co
         }
     }
     return(freq.data)
+}
+#########################################################
+#
+## get list of samples in each population of reads
+## 
+#########################################################
+
+read.samples <- function(indfile, include.reads){
+    ind <- read.table(indfile, as.is=TRUE, header=FALSE)
+    include.read.samples <- lapply(include.reads, function(x){NULL})
+    for(pop in names(include.reads)){
+        for(subpop in include.reads[[pop]]){
+            include.read.samples[[pop]] <- c(include.read.samples[[pop]], ind[ind[,3]==subpop,1])
+        }
+    }
+    return(include.read.samples)
 }
