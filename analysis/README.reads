@@ -30,9 +30,9 @@ R --vanilla < ~/selection/code/analysis/genome_wide_scan_plots.R
 R --args _reads --vanilla < ~/selection/code/analysis/genome_wide_scan_plots.R
 
 #4 Time series and allele frequency plots
-R --vanilla ~/selection/code/analysis/time_series_plot_reads.R
-R --vanilla ~/selection/code/analysis/allele_frequency_plots_reads.R
-(need to manually edit the file to make both panels)
+R --vanilla --args figure2 < ~/selection/code/analysis/time_series_plot_reads.R
+R --vanilla --args figure2 b < ~/selection/code/analysis/allele_frequency_plot.R
+R --vanilla --args figure2 c < ~/selection/code/analysis/allele_frequency_plot.R
 
 #5 Polygenic selection scans
 # We are using different population names here. 

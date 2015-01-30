@@ -11,7 +11,6 @@ library(RColorBrewer)
 ########################################################################
 ## Details
 root <- "~/selection/counts/all"
-readmefile <- "~/selection/analysis/series/figure2.readme"
 read.root <- "~/data/v6/reads/"
 out <- "~/selection/analysis/series/"
 indfile <- "~/data/v6/use/v61kg_europe2names.ind"
@@ -20,10 +19,15 @@ ylim <- c(0,1)
 outsize=c(6,6)
 error.prob <- 0.001
 
-what="c"
+what <- "figure2"
+sub="c"
 if(length(commandArgs(TRUE))){
     what=commandArgs(TRUE)[1]
+    sub=commandArgs(TRUE)[2]
 }
+outname <- paste0(what, sub, ".pdf")
+readmefile <- paste0("~/selection/code/files/", what, ".readme")
+
 ## ########################################################################
 
 int.names <- c("IBS", "TSI", "CEU", "GBR", "FIN")
@@ -32,21 +36,20 @@ int.starts <- c(10000, 8000, 6000, 4000, 2000)
 int.ends <- c(9000, 7000, 5000, 3000, 1000)
 int.include <- c("IBS", "TSI", "CEU", "GBR", "FIN")
 names(int.include) <-c("IBS", "TSI", "CEU", "GBR", "FIN")
-outname <- "figure2c.pdf"
 include.counts <- list("IBS"="IBS", "TSI"="TSI", "GBR"="GBR", "CEU"="CEU", "FIN"="FIN")
 include.reads <- list()
 
 ## ########################################################################
-if(what=="b"){
+if(sub=="b"){
     int.names <- c("SHG","Yamnaya")
     long.names <-  c("Swedish Hunter Gatherers",  "Yamnaya")
     int.starts <- c(10000, 4000)
     int.ends <- c(6000, 0)
     int.include <-  c("SHG", "SHG", "SHG", "Yamnaya")
     names(int.include) <-  c("SwedenSkoglund_MHG", "Motala_HG", "SwedenSkoglund_NHG", "Yamnaya")
-    outname <- "figure2b.pdf"
     include.reads <- list( "SHG"=c("SwedenSkoglund_MHG", "Motala_HG", "SwedenSkoglund_NHG"),
                           "Yamnaya"="Yamnaya")
+    include.counts <- list()
 }
 
 ## ########################################################################

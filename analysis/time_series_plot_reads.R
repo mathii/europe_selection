@@ -23,6 +23,14 @@ error.prob <- 0.001
 
 ########################################################################
 
+if(length(commandArgs(TRUE))){
+    what <- commandArgs(TRUE)[1]
+    readmefile <- paste0("~/selection/code/files/", what, ".readme")
+    outname <- paste0(what, "a.pdf")
+}
+
+########################################################################
+
 int.names <- c("WHG", "EN", "MN", "LN/BA","CEU")
 long.names <- c("Western Hunter\nGatherers", "Early neolithic", "Middle neolithic", "Late neolithic/Bronze age", "CEU")
 int.starts <- c(8000, 7200, 5800, 4800, 100)
