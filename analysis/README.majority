@@ -1,9 +1,17 @@
+#Paths - you should change these to your own paths, 
+#but you will also have to change them when they 
+#are hardcoded in the scripts. Sorry.
+
+DDIR=~/data/v6/ #Data - has subdirs "use" and "reads"
+ADIR=~/selection/code/analysis/ #This directory. 
+SDIR=~/spindrift/ #spindrift (www.github.com/mathii/spindrift)
+
 #0. Initial processing - rename to europe2 names in data/v6
-R --vanilla < ~/selection/code/analysis/initial_process.R
+R --vanilla < ${ADIR}/initial_process.R
 
 #1. Pull out allele counts from eigenstrat data
 
-python ~/spindrift/Freq.py \
+python ${SDIR}/Freq.py \
 	-d ~/data/v6/use/v61kg_europe2names \
 	-p ~/data/v6/use/used_all.txt \
 	-n ~/data/v6/use/used_ancient_pseudodiploid.txt \
@@ -11,22 +19,20 @@ python ~/spindrift/Freq.py \
 	-s ~/data/v6/use/v61kg_europe2names
 
 #2. Compute sample size
-R --vanilla < ~/selection/code/analysis/effective_sample_size.R
+R --vanilla < ${ADIR}/effective_sample_size.R
 
-#3Genome-wide scan for seelction
-R --vanilla <  ~/selection/code/analysis/genome_wide_scan.R
+#3Genome-wide scan for selection
+R --vanilla <  ${ADIR}/genome_wide_scan.R
 #3a also run genome_wide_scan_diff.R for comparison
-#3b generate locuszoom plots (see ./locuszoom_commands).
-./locuszoom.sh
-#3c Manhattan and qq plots
-R --vanilla < ~/selection/code/analysis/genome_wide_scan_plots.R
+#3b Manhattan and qq plots
+R --vanilla < ${ADIR}/genome_wide_scan_plots.R
 
 #4 Time series and allele frequency plots
-R --vanilla ~/selection/code/analysis/time_series_plots.R
-R --vanilla ~/selection/code/analysis/allele_frequency_plots.R
+R --vanilla ${ADIR}/time_series_plots.R
+R --vanilla ${ADIR}/allele_frequency_plots.R
 (need to manually edit the file to make both panels)
 
 #5 Polygenic selection scans
 # We are using different population names here. 
-R --vanilla < ~/selection/code/analysis/polymap_rename.txt
-
+R --vanilla < ${ADIR}/polymap_rename.txt
+${ADIR}/run_polytest.sh

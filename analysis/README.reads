@@ -35,6 +35,9 @@ R --vanilla --args figure2 b < ~/selection/code/analysis/allele_frequency_plot.R
 R --vanilla --args figure2 c < ~/selection/code/analysis/allele_frequency_plot.R
 
 #5 Polygenic selection scans
-# We are using different population names here. 
-R --vanilla < ~/selection/code/analysis/polymap_rename.txt
+#Estimate allele frequncies in polypops
+for chr in {1..23}; do R --vanilla --args $chr <  ~/selection/code/analysis/reads_to_freq.R; done
+CDIR=~/selection/counts
+grep ^ID ${CDIR}/all.reads.chr1.freq > ${CDIR}/all.reads.freq
+grep -hv ^ID ${CDIR}/all.reads.chr*.freq >> ${CDIR}/all.reads.freq 
 
