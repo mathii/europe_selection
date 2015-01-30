@@ -300,12 +300,14 @@ make.freq.data <- function(pops, include.reads, include.read.samples, include.co
 ## 
 #########################################################
 
-read.samples <- function(indfile, include.reads){
+read.samples <- function(indfile, include.reads, exclude=c()){
     ind <- read.table(indfile, as.is=TRUE, header=FALSE)
     include.read.samples <- lapply(include.reads, function(x){NULL})
     for(pop in names(include.reads)){
         for(subpop in include.reads[[pop]]){
-            include.read.samples[[pop]] <- c(include.read.samples[[pop]], ind[ind[,3]==subpop,1])
+            to.include <- ind[ind[,3]==subpop,1]
+            to.include <- to.include[!(to.include %in% exclude)]
+            include.read.samples[[pop]] <- c(include.read.samples[[pop]], to.include)
         }
     }
     return(include.read.samples)
