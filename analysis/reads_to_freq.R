@@ -121,6 +121,6 @@ for(i in 1:NROW(data)){
 }
 
 freq <- cbind(data[,1:5],freq)
-freq <- freq[!is.na(freq[,4]),]
+freq <- freq[!is.na(freq[,6]),]
 
 write.table(freq, paste0(out, ".chr", paste(chrs, collapse="_"), ".freq"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
