@@ -135,7 +135,7 @@ for( gsi in 1:length(gss)){
             this.tot <- sum(this.tf[[i]][[pop]][["counts"]])
             this.alt <-  rbinom(1, this.tot, new.fr)
             this.tf[[i]][[pop]][["counts"]] <- c(this.tot-this.alt, this.alt)
-            test <- test.3pop(this.tt[i,], this.tc[i,], A)
+            test <- test.3pop.reads(this.tf[[i]], A, error.prob=error.prob)
             test[2] <- pchisq(test[1]/lambda, df=degf, lower.tail=FALSE)
             if(test[2]<sig){results.one[si,gsi] <- results.one[si,gsi]+1} 
         }
