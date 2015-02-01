@@ -1,7 +1,7 @@
 #Test whether the modern population frequencies can be modelled as a mixture of the
 #Three ancestral populations.
-source("~/selection/code/lib/3pop_lib.R")
 library(reshape2)
+source("~/selection/code/lib/3pop_lib.R")
 dir <- getwd()
 setwd("~/Packages/s_lattice/")
 source("include.R")
@@ -12,12 +12,36 @@ setwd(dir)
 
 ########################################################################
 ## Details
+## Details
 root <- "~/selection/counts/all"
 snproot <- "~/data/v6/use/v61kg_europe2names"
 out <- "~/selection/analysis/power/"
 indfile <- "~/data/v6/use/v61kg_europe2names.ind"
 
-lambda=1.20
+read.root <- "~/data/v6/reads/jj2"
+indfile <- "~/data/v6/use/v61kg_europe2names.ind"
+error.prob <- 0.001
+
+pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
+#Check if the SNP is monomorphic in these populations. 
+monocheck <- c("CEU", "GBR", "IBS", "TSI", "LaBrana1", "HungaryGamba_HG", "Loschbour", "Stuttgart",
+               "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")
+A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.712, 0.288),3, 4) 
+degf <- dim(A)[2]
+
+selpops <- c("CEU", "GBR", "IBS", "TSI")
+
+include.reads <- list(                  #Include these populations as reads
+    "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #SpanishMesolithic is the high coverage LaBrana I0585
+    "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"), 
+    "Yamnaya"="Yamnaya")
+include.counts <- list(                 #Include these populations as hard calls. 
+    "WHG"="Loschbour",
+    "EN"="Stuttgart",
+    "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
+## Setup the data. 
+
+lambda=1.21
 
 ########################################################################
 
@@ -27,42 +51,54 @@ Ne <- 6000                                          #2 Population size
 N <- 1000                                           #Number of replicates
 sig <- 10^-6.79                                      #genome-wide significance level
 
+########################################################################
+
 pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
 #Check if the SNP is monomorphic in these populations. 
 A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.712, 0.288),3, 4) 
 degf <- dim(A)[2]
 
-########################################################################
-
-
+## Prepare counts and totals
 counts <- read.table(paste0(root, ".count"), header=TRUE, as.is=TRUE)
 totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
-
-counts$WHG <- counts$Loschbour+counts$LaBrana1+counts$HungaryGamba_HG
-totals$WHG <- totals$Loschbour+totals$LaBrana1+totals$HungaryGamba_HG
-counts$EN <- counts$LBK_EN +counts$Stuttgart+counts$HungaryGamba_EN+counts$Spain_EN+counts$Starcevo_EN+counts$LBKT_EN
-totals$EN <- totals$LBK_EN +totals$Stuttgart+totals$HungaryGamba_EN+totals$Spain_EN+totals$Starcevo_EN+totals$LBKT_EN
-
-
 data <- counts[,1:5]
 counts <- data.matrix(counts[,6:NCOL(counts)])
 totals <- data.matrix(totals[,6:NCOL(totals)])
 counts <- counts[,pops]
 totals <- totals[,pops]
 
-#Select sites with f0 < 0.1
-tc <- matrix(0, nrow=N, ncol=NCOL(counts))
-tt <- matrix(0, nrow=N, ncol=NCOL(totals))
-i=1
-while(i <= N){
-    try <- sample(NROW(counts),1)
-    fr <- counts[try,4:NCOL(counts)]/totals[try,4:NCOL(totals)]
-    fr <- fr[!is.infinite(fr)]
-    if(mean(fr)>0.1){next}
+## setup for read data. 
+include.read.samples <- read.samples(indfile, include.reads)
+empty.data <- make.empty.data(pops)
 
-    tc[i,] <- counts[try,]
-    tt[i,] <- totals[try,]
-    i <- i+1
+#Sample uniformly per chromosome. 
+counts.per.chr <- table(sample(data$CHR[data$CHR<=22], N))
+
+#Select sites with f0 < 0.1
+#Now these are lists of frequencies. 
+tf <- list()
+i=1
+for(chr in 1:22){
+    cat(paste0("chr", chr))
+    reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts"), as.is=TRUE, header=FALSE)
+    k=1
+    while(k <= counts.per.chr[chr]){
+        cat(paste0("\rchr", chr, " ", k, "/", counts.per.chr[chr]))
+        inc <- data$CHR==chr
+        try <- sample(sum(inc), 1)
+        snp <- data[inc,][try,"ID"]
+        this.reads <- reads[reads[,1]==snp,]
+        freq.data <- make.freq.data(pops, include.reads, include.read.samples, include.counts, this.reads, counts[inc,][try,], totals[inc,][try,], empty.data)
+
+
+        ## model fit gives us frequency of ref allele. 
+        fr <- 1-fit.unconstrained.model.reads(freq.data, error.prob=error.prob)$par
+        if(mean(fr)>0.1){next}
+        tf[[i]] <- freq.data
+        
+        i <- i+1
+        k <- k+1
+    }
 }
 
 results.all <- matrix(0,nrow=length(ss), ncol=length(gss))
@@ -74,29 +110,31 @@ for( gsi in 1:length(gss)){
         cat(paste0(gss[gsi]," ",  ss[si], "\n"))
 
         #All pops
-        this.tc <- tc
-        this.tt <- tt
+        this.tf <- tf
         for(i in 1:N){
-            for(j in 4:NCOL(counts)){
-                this.fr <- pmax(0.01, this.tc[i,j]/this.tt[i,j])
+            for(pop in selpops){
+                this.fr <- pmax(0.01, this.tf[[i]][[pop]][["counts"]][2]/this.tf[[i]][[pop]][["counts"]][1])
                 traj <- simulate.wright.fisher(Ne, gss[gsi], this.fr, ss[si])
                 new.fr <- rev(traj)[1]
-                this.tc[i,j] <- rbinom(1, this.tt[i,j], new.fr)
+                this.tot <- sum(this.tf[[i]][[pop]][["counts"]])
+                this.alt <-  rbinom(1, this.tot, new.fr)
+                this.tf[[i]][[pop]][["counts"]] <- c(this.tot-this.alt, this.alt)
             }
-            test <- test.3pop(this.tt[i,], this.tc[i,], A)
+            test <- test.3pop.reads(this.tf[[i]], A, error.prob=error.prob)
             test[2] <- pchisq(test[1]/lambda, df=degf, lower.tail=FALSE)
             if(test[2]<sig){results.all[si,gsi] <- results.all[si,gsi]+1} 
         }
 
         #One pop
-        this.tc <- tc
-        this.tt <- tt
+        this.tf <- tf
         for(i in 1:N){
-            j <- sample(4:NCOL(counts), 1)
-            this.fr <- pmax(0.01, this.tc[i,j]/this.tt[i,j])
-            traj <- simulate.wright.fisher(Ne, gs, this.fr, ss[si])
+            pop <- sample(selpops, 1)
+            this.fr <- pmax(0.01, this.tf[[i]][[pop]][["counts"]][2]/this.tf[[i]][[pop]][["counts"]][1])
+            traj <- simulate.wright.fisher(Ne, gss[gsi], this.fr, ss[si])
             new.fr <- rev(traj)[1]
-            this.tc[i,j] <- rbinom(1, this.tt[i,j], new.fr)
+            this.tot <- sum(this.tf[[i]][[pop]][["counts"]])
+            this.alt <-  rbinom(1, this.tot, new.fr)
+            this.tf[[i]][[pop]][["counts"]] <- c(this.tot-this.alt, this.alt)
             test <- test.3pop(this.tt[i,], this.tc[i,], A)
             test[2] <- pchisq(test[1]/lambda, df=degf, lower.tail=FALSE)
             if(test[2]<sig){results.one[si,gsi] <- results.one[si,gsi]+1} 
@@ -113,7 +151,7 @@ lines(ss, results.all[,2], col="#E41A1C", type="b", pch=16, lty=2)
 lines(ss, results.all[,3], col="#4DAF4A", type="b", pch=16, lty=2)
 lines(ss, results.one[,1], col="#377EBA", type="b", pch=1, lty=3)
 lines(ss, results.one[,2], col="#E41A1C", type="b", pch=1, lty=3)
-lines(ss, results.one[,3], col="#4DAF4A", type="b", pch=16, lty=3)
+lines(ss, results.one[,3], col="#4DAF4A", type="b", pch=1, lty=3)
 legend("topleft", c("Selected in all populations", "Selected in one population", "50 generations of selection", "100 generations of selection", "200 generations of selection"), col=c("black", "black", "#377EBA", "#E41A1C", "#4DAF4A"), pch=16, lty=c(2,3,1,1,1), bty="n")
 
 colnames(results.all) <- colnames(results.one) <- gss
@@ -122,6 +160,6 @@ m1[,1] <- "All"
 m2 <- melt(results.one)
 m2[,1] <- "One"
 mres <- rbind(m1, m2)
-mres <- cbind(mres, "Majority")
+mres <- cbind(mres, "Likelihood")
 colnames(mres) <- c("Populations", "Generations", "Power", "Analysis")
-write.table(mres, paste0(out, "power.majority.txt"), col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+write.table(mres, paste0(out, "power.reads.txt"), col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")

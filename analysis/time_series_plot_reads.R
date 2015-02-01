@@ -88,7 +88,7 @@ for(i in 1:NROW(data)){
     read.data <- read.data[read.data[,1]==data[i,"ID"],]
     
     freq.data <- make.freq.data(int.names, include.reads, include.read.samples, include.counts,
-                                read.data, counts, totals, empty.data)
+                                read.data, counts[i,], totals[i,], empty.data)
     f <- fit.unconstrained.model.reads(freq.data, error.prob=error.prob)$p
     names(f) <- int.names
     eff.totals <- round(effective.data.size(freq.data),1)

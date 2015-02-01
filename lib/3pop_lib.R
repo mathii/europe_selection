@@ -1,7 +1,7 @@
 #Functions to implement the 3 (or n) population test.
 ## require(numDeriv)
 
-EPSILON <- 1e-4 #Minumum allele frequency
+EPSILON.3pop <- 1e-4 #Minumum allele frequency
 
 #########################################################
 #
@@ -12,7 +12,7 @@ EPSILON <- 1e-4 #Minumum allele frequency
 
 constrained.likelihood <- function(p, A, N, N.A){
     p <- c(p, c(p %*% A))
-    p <- pmin(pmax(EPSILON, p), 1-EPSILON)
+    p <- pmin(pmax(EPSILON.3pop, p), 1-EPSILON.3pop)
     return(sum(dbinom(N.A, N, p, log=TRUE)))
 }
 
@@ -48,13 +48,13 @@ test.3pop <- function(N, N.A, A){
     #MLE is just the observed proportion
     #If no observations then it doesn't matter what p is
     p.hat <- ifelse(N==0, 0.5, N.A/N)  
-    p.hat <- pmin(pmax(EPSILON, p.hat), 1-EPSILON)
+    p.hat <- pmin(pmax(EPSILON.3pop, p.hat), 1-EPSILON.3pop)
     l1 <- sum(dbinom(N.A, N, p.hat, log=TRUE))
 
     #Null
     opt <- fit.constrained.model(N, N.A, A)
     p.est <- c(opt$par, opt$par %*% A) 
-    p.est <- pmin(pmax(EPSILON, p.est), 1-EPSILON)
+    p.est <- pmin(pmax(EPSILON.3pop, p.est), 1-EPSILON.3pop)
     l0 <- sum(dbinom(N.A, N, p.est, log=TRUE))
 
     stat <- 2*(l1-l0)
@@ -79,12 +79,12 @@ test.diff <- function(N, N.A){
     #MLE is just the observed proportion
     #If no observations then it doesn't matter what p is
     p.hat <- ifelse(N==0, 0.5, N.A/N)  
-    p.hat <- pmin(pmax(EPSILON, p.hat), 1-EPSILON)
+    p.hat <- pmin(pmax(EPSILON.3pop, p.hat), 1-EPSILON.3pop)
     l1 <- sum(dbinom(N.A, N, p.hat, log=TRUE))
 
     #Null
     p.est <- rep(sum(N.A)/sum(N), length(N))
-    p.est <- pmin(pmax(EPSILON, p.est), 1-EPSILON)
+    p.est <- pmin(pmax(EPSILON.3pop, p.est), 1-EPSILON.3pop)
     l0 <- sum(dbinom(N.A, N, p.est, log=TRUE))
 
     stat <- 2*(l1-l0)
@@ -139,7 +139,7 @@ likelihood.reads <- function(freq, data, error.prob=0.001){
 
 constrained.likelihood.reads <- function(p, A, data, error.prob=0){
     p <- c(p, c(p %*% A))
-    p <- pmin(pmax(EPSILON, p), 1-EPSILON)
+    p <- pmin(pmax(EPSILON.3pop, p), 1-EPSILON.3pop)
     ll <- likelihood.reads(p, data, error.prob=error.prob)
     return(ll)
 }
@@ -169,7 +169,7 @@ fit.unconstrained.model.reads <- function(data, error.prob=0){
     for(i in 1:length(data)){
         subdata=list(data[[i]])
         names(subdata) <- names(data)[i]
-        opt <- optimize(likelihood.reads, data=subdata, error.prob=error.prob, maximum=TRUE, lower=EPSILON, upper=1-EPSILON)
+        opt <- optimize(likelihood.reads, data=subdata, error.prob=error.prob, maximum=TRUE, lower=EPSILON.3pop, upper=1-EPSILON.3pop)
         p[i] <- opt$maximum
     }
     ll <- likelihood.reads(p, data)
@@ -233,7 +233,7 @@ test.3pop.reads <- function(data, A, error.prob=error.prob){
 
 effective.size.reads <- function(data, error.prob=0){
     uf <- fit.unconstrained.model.reads(data, error.prob=error.prob)
-    d2 <- hessian(likelihood.reads, uf$par, method="Richardson", method.args=list(eps=EPSILON/2), data, error.prob=error.prob)
+    d2 <- hessian(likelihood.reads, uf$par, method="Richardson", method.args=list(eps=EPSILON.3pop/2), data, error.prob=error.prob)
     N <- -uf$par*(1-uf$par)*c(d2)
     return(list(p=uf$par, N=N, d2=c(d2)))
 }
@@ -269,7 +269,7 @@ make.empty.data <- function(pops){
 # read.info, counts, totals: standard data structures
 #########################################################
 
-make.freq.data <- function(pops, include.reads, include.read.samples, include.counts, read.info, counts, totals, empty.data){
+make.freq.data <- function(pops, include.reads, include.read.samples, include.counts, read.info, this.counts, this.totals, empty.data){
     freq.data <- empty.data
     for(pop in pops){
         if(pop %in% names(include.reads)){
@@ -286,7 +286,7 @@ make.freq.data <- function(pops, include.reads, include.read.samples, include.co
 
         if(pop %in% names(include.counts)){
             for(subpop in include.counts[[pop]]){
-                ref.alt <- c(counts[i,subpop], totals[i,subpop]-counts[i,subpop])
+                ref.alt <- c(this.counts[subpop], this.totals[subpop]-this.counts[subpop])
                 names(ref.alt) <- NULL
                 freq.data[[pop]][["counts"]] <- freq.data[[pop]][["counts"]]+ref.alt
             }
@@ -312,3 +312,4 @@ read.samples <- function(indfile, include.reads, exclude=c()){
     }
     return(include.read.samples)
 }
+

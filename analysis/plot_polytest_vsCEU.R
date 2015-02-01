@@ -2,21 +2,27 @@
 library(shape)
 library(RColorBrewer)
 
+result.tag <- ""
+if(length(commandArgs(TRUE))){
+    result.tag <- commandArgs(TRUE)[1]
+}
+
 traits <- c("Height", "BMI", "WHR", "T2D", "IBD", "Lipids")
 
 polypops <- scan("~/selection/data/polypops.txt", what="")
 popkey <- letters[1:length(polypops)]
 names(popkey) <- polypops
 
-xlim=c(-5.5,5.5)
+xlim=c(-6,4)
+xticks <- c(-6, -4, -2, 0, 2, 4)
 
-pdf("~/selection/analysis/poly/results/vsCEU.pdf", height=5, width=6)
+pdf(paste0("~/selection/analysis/poly/results/vsCEU", result.tag ,".pdf"), height=5, width=6)
 par(mar=c(4.1,4.1,4.1,2.1))
 plot(0,0, col="white", bty="n", xaxt="n", yaxt="n", bty="n", xlim=xlim+c(0,2), ylim=c(-0.5, length(traits)+0.5), xlab="", ylab="")
 
 i=length(traits)
 for(trait in traits){
-    results <- read.table(paste0("~/selection/analysis/poly/", trait, "/", trait, "_vsCEU.results.txt"), as.is=T, header=T)
+    results <- read.table(paste0("~/selection/analysis/poly/", trait, "/", trait, "_vsCEU", result.tag , ".results.txt"), as.is=T, header=T)
     pops <- sapply(strsplit(results[,1],","), "[[", 2)
     Z <- sqrt(results[,2])
     gv <- matrix(as.numeric(unlist(strsplit(results[,5], ","))), ncol=2, byrow=TRUE)
@@ -37,7 +43,6 @@ for(trait in traits){
 }
 
 segments(xlim[1], 0, xlim[2],0)
-xticks <- c(-4, -2, 0, 2, 4)
 xlabs <- ifelse(xticks<=0, as.character(xticks), paste0( "+", xticks))
 for(xx in xticks){
     abline(v=xx, col="#00000020")

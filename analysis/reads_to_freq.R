@@ -108,7 +108,7 @@ for(i in 1:NROW(data)){
     if(!all(this.read[,1]==this.snp)){stop("Selected the wrong SNP")}
 
     freq.data <- make.freq.data(pops, include.reads, include.read.samples, include.counts,
-                                this.read, counts, totals, empty.data)
+                                this.read, counts[i,], totals[i,], empty.data)
 
     monomorphic <- all(counts[i,]==0)|all(counts[i,monocheck]==totals[i,monocheck])
     if(monomorphic){
