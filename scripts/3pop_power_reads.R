@@ -41,6 +41,9 @@ include.counts <- list(                 #Include these populations as hard calls
     "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
 ## Setup the data. 
 
+monocheck <- c("CEU", "GBR", "IBS", "TSI", "LaBrana1", "HungaryGamba_HG", "Loschbour", "Stuttgart",
+               "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")
+
 lambda=1.21
 
 ########################################################################
@@ -64,8 +67,7 @@ totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
 data <- counts[,1:5]
 counts <- data.matrix(counts[,6:NCOL(counts)])
 totals <- data.matrix(totals[,6:NCOL(totals)])
-counts <- counts[,pops]
-totals <- totals[,pops]
+
 
 ## setup for read data. 
 include.read.samples <- read.samples(indfile, include.reads)
@@ -93,7 +95,12 @@ for(chr in 1:22){
 
         ## model fit gives us frequency of ref allele. 
         fr <- 1-fit.unconstrained.model.reads(freq.data, error.prob=error.prob)$par
-        if(mean(fr)>0.1){next}
+        if(mean(fr)>0.2){next}
+
+        ## Don't want it to me monomporphic. 
+        monomorphic <- all(counts[inc,][try,monocheck]==0)|all(counts[inc,][try,monocheck]==totals[inc,][try,monocheck])
+        if(monomorphic){next}
+
         tf[[i]] <- freq.data
         
         i <- i+1
@@ -146,6 +153,7 @@ results.all <- results.all/N
 results.one <- results.one/N
 
 
+pdf("~/selection/analysis/power/read_power.pdf")
 plot(ss, results.all[,1], col="#377EBA", type="b", pch=16, bty="n", lty=2, ylim=c(0,1), log="x", xlab="Selection coefficient", ylab="power")
 lines(ss, results.all[,2], col="#E41A1C", type="b", pch=16, lty=2)
 lines(ss, results.all[,3], col="#4DAF4A", type="b", pch=16, lty=2)
@@ -153,6 +161,7 @@ lines(ss, results.one[,1], col="#377EBA", type="b", pch=1, lty=3)
 lines(ss, results.one[,2], col="#E41A1C", type="b", pch=1, lty=3)
 lines(ss, results.one[,3], col="#4DAF4A", type="b", pch=1, lty=3)
 legend("topleft", c("Selected in all populations", "Selected in one population", "50 generations of selection", "100 generations of selection", "200 generations of selection"), col=c("black", "black", "#377EBA", "#E41A1C", "#4DAF4A"), pch=16, lty=c(2,3,1,1,1), bty="n")
+dev.off()
 
 colnames(results.all) <- colnames(results.one) <- gss
 m1 <- melt(results.all)

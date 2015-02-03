@@ -286,7 +286,7 @@ make.freq.data <- function(pops, include.reads, include.read.samples, include.co
 
         if(pop %in% names(include.counts)){
             for(subpop in include.counts[[pop]]){
-                ref.alt <- c(this.counts[subpop], this.totals[subpop]-this.counts[subpop])
+                ref.alt <- c(this.counts[subpop][[1]], this.totals[subpop][[1]]-this.counts[subpop][[1]])
                 names(ref.alt) <- NULL
                 freq.data[[pop]][["counts"]] <- freq.data[[pop]][["counts"]]+ref.alt
             }

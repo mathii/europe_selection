@@ -15,9 +15,9 @@ polynames.file <- "~/data/v6/use/polymap.txt"
 modern <- c("IBS"="Spain", "CEU"="Germany")
 datefile <- "~/data/v6/use/population_dates.txt"
 gen.time <- 29
-Ne <- 6000                             #TODO!
+Ne <- 3000                             #TODO!
 m <- 0.005
-fix.m <- FALSE
+fix.m <- TRUE
 
 snp <- "rs12913832"
 flip <- TRUE
@@ -76,7 +76,31 @@ if(fix.m){
     est<-estimate.s.m(obs, Ne, M=NULL, update="Soft EM", max.iters=10, verbose=TRUE, initial.M=m)
     est.fix<-estimate.s.m(obs, Ne, M=NULL, update="Soft EM", max.iters=10, verbose=TRUE, initial.M=m, s.free=FALSE)
 }
-plot.wright.fisher.lattice.observations(obs, est$f, est$f, est.s=est$s, error.bars=TRUE, main="s estimate")
+par(mfrow=c(1,2))
+plot.wright.fisher.lattice.observations(obs, est$f, est$f, est.s=est$s, error.bars=TRUE, main="s estimate free")
+plot.wright.fisher.lattice.observations(obs, est.fix$f, est.fix$f, est.s=est.fix$s, error.bars=TRUE, main="s estimate fixed")
 
 X2 <- 2*(est$log.likelihood-est.fix$log.likelihood)
 p <- pchisq(X2, df=length(demes)-1, lower.tail=FALSE)
+
+print(est$s)
+print(est$M)
+print(est$log.likelihood)
+
+print(est.fix$s)
+print(est.fix$M)
+print(est.fix$log.likelihood)
+
+## free <- rep(0,10)
+## fixed <- rep(0,10)
+## ms <- seq(0.001,0.01,0.001)
+## free.store <- list()
+## fixed.store <- list()
+## for(i in 1:10){
+##     est<-estimate.s.m(obs, Ne, M=ms[i], update="Soft EM", max.iters=10, verbose=TRUE)
+##     est.fix<-estimate.s.m(obs, Ne, M=ms[i], update="Soft EM", max.iters=10, verbose=TRUE, s.free=FALSE)
+##     free[i] <- est$log.likelihood
+##     fixed[i] <- est.fix$log.likelihood
+##     free.store[[i]] <- est
+##     fixed.store[[i]] <- est.fix
+## }

@@ -1,5 +1,5 @@
 #Plot the results of the polygenic selection test against CEU.
-library(shape)
+## library(shape)
 library(RColorBrewer)
 
 result.tag <- ""

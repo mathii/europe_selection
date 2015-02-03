@@ -108,6 +108,7 @@ results.all <- results.all/N
 results.one <- results.one/N
 
 
+pdf("~/selection/analysis/power/majority_power.pdf")
 plot(ss, results.all[,1], col="#377EBA", type="b", pch=16, bty="n", lty=2, ylim=c(0,1), log="x", xlab="Selection coefficient", ylab="power")
 lines(ss, results.all[,2], col="#E41A1C", type="b", pch=16, lty=2)
 lines(ss, results.all[,3], col="#4DAF4A", type="b", pch=16, lty=2)
@@ -115,6 +116,7 @@ lines(ss, results.one[,1], col="#377EBA", type="b", pch=1, lty=3)
 lines(ss, results.one[,2], col="#E41A1C", type="b", pch=1, lty=3)
 lines(ss, results.one[,3], col="#4DAF4A", type="b", pch=16, lty=3)
 legend("topleft", c("Selected in all populations", "Selected in one population", "50 generations of selection", "100 generations of selection", "200 generations of selection"), col=c("black", "black", "#377EBA", "#E41A1C", "#4DAF4A"), pch=16, lty=c(2,3,1,1,1), bty="n")
+dev.off()
 
 colnames(results.all) <- colnames(results.one) <- gss
 m1 <- melt(results.all)

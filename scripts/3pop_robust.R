@@ -7,43 +7,34 @@ source("~/Packages/s_lattice/simulation.R")
 
 ########################################################################
 ## Details
-root <- "~/selection/series/counts/all_3pop"
-snproot <- "~/selection/series/snps/all_3pop"
-## root <- "~/selection/series/counts/diet"
-## snproot <- "~/selection/series/snps/diet"
-out <- "~/selection/series/series/"
-popfile="~/data/v6/hov6_1kg_motalav3_3pop.ind"
+root <- "~/selection/counts/all"
+snproot <- "~/selection/snps/all"
 
 ########################################################################
 
 rnds <- seq(0,1,length.out=11)                               #proportions of randomness
-Nsims <- NA                                           #Number of replicates per test
-Npowersims <- 10000                                           #Number of replicates per test
-sig <- 10^-6.5                                      #genome-wide significance level
+Nsims <- 50000                                           #Number of replicates per Ne test
+Npowersims <- 50000                                           #Number of replicates per test
+sig <- 10^-6.79                                      #genome-wide significance level
 
 ########################################################################
 
 
 #Compute the likelihood 
 
-## pops <- c("WHG", "Eneo", "YamnayaEBA", "CEU", "GBR", "IBS", "TSI")
+pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
 ## A <- matrix(c(0.187, 0.312, 0.501, 0.160, 0.413, 0.427, 0, 0.764, 0.236, 0, 0.714, 0.286),3, 4)
-
-## Excluding IBS which seem to be messed up. 
-pops <- c("WHG", "Eneo", "YamnayaEBA", "CEU", "GBR", "TSI")
-A <- matrix(c(0.187, 0.312, 0.501, 0.160, 0.413, 0.427, 0, 0.714, 0.286),3, 3)
-
-#Adding other ancient pops. 
-## pops <- c("WHG", "Eneo", "YamnayaEBA", "CEU", "GBR", "TSI", "Spain_MN", "UneticeEBA", "GermanBellBeakerNeolithic", "CordedWareNeolithic")
-## A <- matrix(c(0.187, 0.312, 0.501, 0.160, 0.413, 0.427, 0, 0.714, 0.286,
-##               0.175, 0.825, 0.000, 0.328, 0.208, 0.464, 0.184, 0.365, 0.451,
-##               0.243, 0.078, 0.679),nrow=3)
-
+A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.226, 0, 0.712, 0.287),3, 4) 
 
 degf <- dim(A)[2]
 
 counts <- read.table(paste0(root, ".count"), header=TRUE, as.is=TRUE)
 totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
+counts$WHG <- counts$Loschbour+counts$LaBrana1+counts$HungaryGamba_HG
+totals$WHG <- totals$Loschbour+totals$LaBrana1+totals$HungaryGamba_HG
+counts$EN <- counts$LBK_EN +counts$Stuttgart+counts$HungaryGamba_EN+counts$Spain_EN+counts$Starcevo_EN+counts$LBKT_EN
+totals$EN <- totals$LBK_EN +totals$Stuttgart+totals$HungaryGamba_EN+totals$Spain_EN+totals$Starcevo_EN+totals$LBKT_EN
+
 data <- counts[,1:5]
 counts <- data.matrix(counts[,6:NCOL(counts)])
 totals <- data.matrix(totals[,6:NCOL(totals)])
@@ -88,9 +79,9 @@ for( rndi in 1:length(rnds)){
     lambda.all[rndi] <- median(this.res[!is.na(this.res[,2]),1])/qchisq(0.5, df=degf)
 }
 
-## pdf("~/selection/paper/FigureS4a.pdf")
-plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=1, xlab="Random proportion", ylab="Genomic inflation factor")
-## dev.off()
+pdf("~/selection/analysis/power/majority_robust_lambda.pdf")
+plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor")
+dev.off()
 
 #Now test power.
 gens <- 200
@@ -146,7 +137,17 @@ for( rndi in 1:length(rnds)){
     
 
 }
-dev.new()
-## pdf("~/selection/paper/FigureS4b.pdf")
-plot(rnds, one.power, col="#E41A1C", type="b", pch=16, bty="n", lty=3, xlab="Random proportion", ylab="Power")
-## dev.off()
+pdf("~/selection/analysis/power/majority_robust.pdf")
+plot(rnds, one.power, col="#E41A1C", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Power")
+dev.off()
+
+pdf("~/selection/analysis/power/majority_robust_power.pdf")
+par(mar=c(5,4,4,4))
+plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", yaxt="n", xaxt="n")
+axis(2, col="#377EBA", lwd=2)
+axis(1, lwd=2)
+par(new=TRUE)
+plot(rnds, one.power, col="#CC5500", type="b", pch=16, bty="n", lwd=2, axes=FALSE, xlab="", ylab="")
+axis(4, col="#CC5500", lwd=2)
+mtext("Power", 4, line=3)
+dev.off()

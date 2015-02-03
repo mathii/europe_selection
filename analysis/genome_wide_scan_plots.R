@@ -58,8 +58,8 @@ dev.off()
 ## Per-chromosome Manhattan plots
 sig.chrs <- unique(res$CHR[res$PVAL<(10^-(sig.level))])
 for(c in sig.chrs){
-    png(paste0("~/selection/analysis/gscan/mh_plot", results.tag ,".chr", c, ".png"), width=800, height=400)
-    par(mar=c(2,4,1,1))
+    png(paste0("~/selection/analysis/gscan/mh_plot", results.tag ,".chr", c, ".png"), width=250, height=250)
+    par(mar=c(1,2,1,1))
     MH.plot(res[res$CHR==c,], color.loci=data.frame())
     abline(h=sig.level, col="red", lty=2)
     dev.off()
@@ -74,7 +74,7 @@ neutral <- res[!(res$TAG %in% selection$TAG),]
 selection <- res[(res$TAG %in% selection$TAG),]
 png(paste0("~/selection/analysis/gscan/qq_plot_all", results.tag, ".png"), width=400, height=400)
 par(mar=c(4,4,1,1))
-qqPlotOfPValues(neutral$PVAL, col="#377EBA", linecol="black", ci=FALSE)
+qqPlotOfPValues(neutral$PVAL, col="#377EBA", linecol="black", ci=FALSE, xlim=c(0,6), ylim=c(0,30))
 draw.qq.ci(NROW(neutral), border.col="#377EBA20", fill.col="#377EBA20")
 qqPlotOfPValues(selection$PVAL, col="#E41A1C", add=T)
 draw.qq.ci(NROW(selection), border.col="#E41A1C20", fill.col="#E41A1C20")
@@ -92,7 +92,7 @@ cats <- c("GWAS", "CMS", "HiDiff", "Immune", "HLA")
 cols <- brewer.pal(length(cats), "Set1")
 for(i in 1:length(cats)){
     this.lot <- res[res$TAG %in% cat.data$TAG[cat.data[,cats[i]]==1],]
-    qqPlotOfPValues(this.lot$PVAL, col=cols[i], ci=FALSE, add=(i!=1), xlim=c(0,5), ylim=c(0,5),  linecol="black" )
+    qqPlotOfPValues(this.lot$PVAL, col=cols[i], ci=FALSE, add=(i!=1), xlim=c(0,4), ylim=c(0,20),  linecol="black" )
     draw.qq.ci(NROW(this.lot), border.col=paste0(cols[i],"20"), fill.col=paste0(cols[i],"20"))
 }
 legend("topleft", cats, col=cols, pch=16, bty="n")

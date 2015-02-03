@@ -1,16 +1,17 @@
 #Make a haplotype plot around a SNP
 source("~/selection/code/lib/readlib.R")
+library(RColorBrewer)
 
 ############################################################
 snp <- "rs3827760"
-flank <- 100000
+flank <- 150000
 root <- "~/data/v6/use/v61kg_europe2names"
 pops <- c("CHB", "Motala_HG", "CEU")
 out <- "~/selection/analysis/EDAR/EDAR_haplotype"
 read.root <- "~/data/v6/reads/jj2"
 
 pops.with.reads <- "Motala_HG"
-cols <- c("blue", "purple", "red")
+cols <- brewer.pal(3, "Set1")
 
 ############################################################
 
@@ -43,16 +44,20 @@ ht <- matrix(0, nrow=ntotal, ncol=NROW(gt))
 pr <- matrix(0, nrow=ntotal, ncol=NROW(gt))
 
 i=1
+poplist=c()
+indivlist=c()
 for(pop in pops){
     if(pop %in% pops.with.reads){
         for(indiv in ind[ind[,3]==pop,1]){
+            poplist <- c(poplist, pop)
+            indivlist <- c(indivlist, indiv)
             j=1
             for(snpid in gt.data[,1]){
                 select <- reads[,1]==snpid & reads[,2]==indiv
                 ref=reads[select,3]
                 alt=reads[select,4]
                 if(alt==0 & ref==0){    #No data
-                    ht[i,j] <- 1
+                    ht[i,j] <- NA        #Using NA to mean missing. hack
                     pr[i,j] <- 0
                 }else if(alt==0){
                     ht[i,j] <- 2
@@ -70,9 +75,62 @@ for(pop in pops){
         }
     }else{
         for(indiv in ind[ind[,3]==pop,1]){
+            poplist <- c(poplist, pop)
+            indivlist <- c(indivlist, indiv)
             ht[i,] <- gt[,indiv]
             pr[i,] <- 1
             i=i+1
         }
     }
 }
+
+## Flip to European alleles
+for(i in 1:NCOL(ht)){
+    if(mean(ht[poplist=="CEU",i])>1){ht[,i] <- 2-ht[,i]}
+}
+
+motala.order <- c("I0011", "I0012", "I0017", "I0016", "I0013", "I0014", "I0015")
+## No subsampling
+s.size <- sum(poplist=="CHB")
+sub <- c(which(poplist=="CHB"), which(poplist=="Motala_HG")[match(motala.order, indivlist[poplist=="Motala_HG"])], which(poplist=="CEU"))
+
+## subsample 20 CEU and 20 CHB
+if(subsample){
+    s.size <- 20
+    sub <- c(sample(which(poplist=="CHB"), s.size), which(poplist=="Motala_HG")[match(motala.order, indivlist[poplist=="Motala_HG"])], sample(which(poplist=="CEU"), s.size))
+}
+sub.ht <- ht[sub,]
+sub.pr <- pr[sub,]
+subtotal <- length(sub)
+
+cols <- c("grey", "pink", "darkred", "white")
+s.cols <- c("grey", "lightblue", "darkblue", "white")
+
+snpi <- which(data[,1]==snp)
+
+    nsnp <- NROW(gt)
+
+if(subsample){
+    pdf(paste0(out, "_subsampled.pdf"), width=12, height=6)
+}else{
+    pdf(paste0(out, ".pdf"), width=12, height=24)
+}
+plot(0,0, col="white", bty="n", xaxt="n", yaxt="n", xlim=c(0,nsnp), ylim=c(0,subtotal), xlab="", ylab="")
+
+for(i in 1:subtotal){
+    cc <- cols[sub.ht[i,]+1]
+    bc=col2rgb(cols[sub.ht[i,]+1], alpha=TRUE)
+    bc[4,] <- round(255*sub.pr[i,]^2)
+    bc <- apply(bc, 2, function(x)do.call(rgb, as.list((x/255))))
+    points(1:nsnp, rep(i,nsnp), pch=21, cex=1, col=cc, bg=bc)
+}
+cc=s.cols[sub.ht[,snpi]+1]
+bc=col2rgb(s.cols[sub.ht[,snpi]+1], alpha=TRUE)
+bc[4,] <- round(255*sub.pr[,snpi]^2)
+bc <- apply(bc, 2, function(x)do.call(rgb, as.list((x/255))))
+points(rep(snpi,subtotal), 1:subtotal, pch=21, cex=1, col=cc, bg=bc)
+
+abline(h=s.size+0.5, col="black")
+abline(h=s.size+sum(poplist=="Motala_HG")+0.5, col="black")
+mtext(c("CHB", "Motala", "CEU"), side=2, adj=-0.25, at=c(s.size/2, s.size+sum(poplist=="Motala")/2, 1.5*s.size+sum(poplist=="Motala")), line=-2)
+dev.off()
