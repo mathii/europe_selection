@@ -62,8 +62,6 @@ totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
 data <- counts[,1:5]
 counts <- data.matrix(counts[,6:NCOL(counts)])
 totals <- data.matrix(totals[,6:NCOL(totals)])
-counts <- counts[,pops]
-totals <- totals[,pops]
 
 ## setup for read data. 
 include.read.samples <- read.samples(indfile, include.reads)

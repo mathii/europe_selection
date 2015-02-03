@@ -42,7 +42,11 @@ sim.freq.admix.pop <- function(Ne1, g1, a, Ne2=Ne1, g2=g1,s1=0,s2=s1,f01=runif(1
 ## g2 in total. selection s in the receiving population.
 
 sim.freq.admix.obs <- function(Ne, g1, g2, f0, a, s, sample.pattern){
-    f <- sim.freq.admix.pop(Ne1=Ne, g1=g1, a=a, Ne2=Ne, g2=g2, s1=0, s2=s, f01=f0, f02=f0)
+    if(f0<=0|f0>=1){stop("f0 must be intermediate")}
+    f <- 0
+    while(rev(f)[1]<=0 | rev(f)[1]>=1){
+        f <- sim.freq.admix.pop(Ne1=Ne, g1=g1, a=a, Ne2=Ne, g2=g2, s1=0, s2=s, f01=f0, f02=f0)
+    }
     obs <- generate.observations.from.path(f, sample.pattern)
     return(obs)
 }
