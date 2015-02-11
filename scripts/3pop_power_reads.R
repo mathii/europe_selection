@@ -32,7 +32,7 @@ degf <- dim(A)[2]
 selpops <- c("CEU", "GBR", "IBS", "TSI")
 
 include.reads <- list(                  #Include these populations as reads
-    "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #SpanishMesolithic is the high coverage LaBrana I0585
+    "WHG"=c("LaBrana1", "HungaryGamba_HG"), #SpanishMesolithic is the high coverage LaBrana I0585
     "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"), 
     "Yamnaya"="Yamnaya")
 include.counts <- list(                 #Include these populations as hard calls. 

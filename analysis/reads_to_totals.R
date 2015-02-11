@@ -36,7 +36,7 @@ data <- totals[,1:5]
 totals <- totals[,6:NCOL(totals)]
 
 new.totals <- 0*totals
-new.totals$SpanishMesolithic <- 0
+## new.totals$SpanishMesolithic <- 0
 
 totals <- data.matrix(totals)
 new.totals <- data.matrix(new.totals)
