@@ -17,7 +17,6 @@ grep -hv "^ID" effsize_reads.chr*.txt >> effsize_reads.txt
 R --vanilla < ~/selection/code/analysis/effective_sample_size.R
 
 #3Genome-wide scan for seelction
-R --vanilla <  ~/selection/code/analysis/genome_wide_scan.R
 for chr in {1..23}; do R --vanilla --args $chr <  ~/selection/code/analysis/genome_wide_scan_reads.R; done
 grep ^ID scan_results_read.chr1.txt > scan_results_reads.txt
 grep -hv "^ID" scan_results_read.chr*.txt >> scan_results_reads.txt
