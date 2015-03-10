@@ -25,8 +25,7 @@ indfile <- "~/data/v6/use/v61kg_europe2names.ind"
 error.prob <- 0.01
 ########################################################################
 
-#Include these populations as hard calls
-include.totals <- c( "Loschbour", "Stuttgart", "CEU", "GBR", "IBS", "TSI", "FIN")
+include.totals <- c( "Loschbour", "Stuttgart", "CEU", "GBR", "IBS", "TSI", "FIN", "YRI")
 
 ## Setup the data. 
 totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
@@ -39,17 +38,24 @@ new.totals <- 0*totals
 ## new.totals$SpanishMesolithic <- 0
 
 totals <- data.matrix(totals)
-new.totals <- data.matrix(new.totals)
 
 ## get list of samples in each population of reads
 ind <- read.table(indfile, as.is=TRUE, header=FALSE)
-include.read.samples <- list()
-for(j in 1:NCOL(new.totals)){
-    if( !(colnames(new.totals)[j] %in% include.totals)){
-        pop <- colnames(new.totals)[j]
-        include.read.samples[[pop]] <- ind[ind[,3]==pop,1]
+include.read.samples <- c()
+for(j in 1:NCOL(totals)){
+    if( !(colnames(totals)[j] %in% include.totals)){
+        pop=colnames(totals)[j]
+        samples <-  ind[ind[,3]==pop,1]
+        for(samp in samples){
+            include.read.samples <- c(include.read.samples, samp)
+        }
     }
 }
+include.read.samples <- sort(include.read.samples)
+
+new.totals <- matrix(0, ncol=length(include.read.samples), nrow=nrow(data))
+new.totals <- data.matrix(new.totals)
+colnames(new.totals) <- include.read.samples
 
 this.chr=0                             #Which chromosome are we currently on?
 readi <- 1
@@ -59,40 +65,40 @@ for(i in 1:NROW(data)){
         cat(paste0("Loading chromosome ", this.chr, " reads..."))
         reads <- read.table(paste0(read.root, ".chr", data[i,"CHR"], ".readcounts"), as.is=TRUE, header=FALSE)
         this.chr.ID.order <- data[data[,"CHR"]==this.chr,"ID"]
-        reads <- reads[order(match(reads[,1],this.chr.ID.order)),]
+        reads <- reads[order(match(reads[,1],this.chr.ID.order), reads[,2]),]
+        reads <- reads[reads[,2]%in%include.read.samples,]
         read.sample.counts <- table(reads[,1])  #Number of samples for each SNP
         N.read.samples <- as.numeric(read.sample.counts[1])
         if(!all(read.sample.counts==N.read.samples)){stop("Different number of read samples for some snps")}
         readi <- 1
         cat(paste0("Done\n"))
     }
-
     
     if(verbose){cat(paste0("\r", readi))}
-    this.snp <- data[readi,1]
+    this.snp <- data[i,1]
     ## this.read <- reads[reads[,1]==this.snp,]
     this.read <- reads[(1+N.read.samples*(readi-1)):(N.read.samples*readi),]
     if(!all(this.read[,1]==this.snp)){stop("Selected the wrong SNP")}
 
-    for(j in 1:NCOL(new.totals)){
-        if(colnames(new.totals)[j] %in% include.totals){
-            new.totals[i,j] <- totals[i,j]
-        } else{
-            pop=colnames(new.totals)[j]
-            tt <- 0 
-            for(sample in include.read.samples[[pop]]){
-                ref.alt <- this.read[this.read[,2]==sample,3:4]
-                tt <- tt+2-0.5^(ref.alt[1]+ref.alt[2]-1)
-                ## if(ref.alt[1]==0 | ref.alt[2]==0){
-                ##     tt <- tt+1+0.5^(ref.alt[1]+ref.alt[2])
-                ## }else{
-                ##     tt <- tt+2
-                ## }
-            }
-            new.totals[i,j] <- tt
-        } 
-    }
+    if(verbose){cat(paste0("\r", i))}
+    new.totals[i,] <- this.read[,3]+this.read[,4]
     readi <- readi+1
 }
 
-write.table(new.totals, paste0("~/selection/analysis/effsize/effsize_reads", ".chr", paste(chrs, collapse="_"), ".txt"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+results <- data.frame(IID=include.read.samples, coverage=colMeans(new.totals), hit.once=colMeans(new.totals>0), effective=colMeans(2-0.5^(new.totals-1)))
+
+tag=paste0("~/selection/analysis/effsize/effsize_reads_by_ind", ".chr", paste(chrs, collapse="_"), ".txt")
+if(all(chrs==1:22)){
+    tag <- "~/selection/analysis/effsize/effsize_reads_by_ind.txt"
+}
+write.table(results, tag, row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+
+pdf("~/Desktop/Coverage_vs_Hits.pdf")
+plot(results$coverage, results$hit.once, ylab="Proportion of sites hit at least once", xlab="Mean coverage", pch=16, col="#377EBA", log="x")
+xpts <- 10^seq(-2, 2, length.out=100)
+ypts=1-exp(-xpts)
+lines(xpts, ypts, col="red")
+abline(h=0.95, col="grey", lty=2)
+abline(v=3, col="grey", lty=2)
+abline(v=8, col="grey", lty=2)
+dev.off()

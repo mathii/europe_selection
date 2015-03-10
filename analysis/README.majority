@@ -36,3 +36,6 @@ R --vanilla ${ADIR}/allele_frequency_plots.R
 # We are using different population names here. 
 R --vanilla < ${ADIR}/polymap_rename.txt
 ${ADIR}/run_polytest.sh
+
+
+

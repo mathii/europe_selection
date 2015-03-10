@@ -35,7 +35,7 @@ A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.71
 ########################################################################
 
 include.reads <- list(                  #Include these populations as reads
-    "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #SpanishMesolithic is the high coverage LaBrana I0585
+    "WHG"=c("LaBrana1", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
     "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"), 
     "Yamnaya"="Yamnaya")
 include.counts <- list(                 #Include these populations as hard calls. 
