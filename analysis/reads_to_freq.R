@@ -73,9 +73,9 @@ counts <- counts[include,]
 totals <- totals[include,]
 data <- data[include,]
 
-freq <- matrix(0, nrow=NROW(data), ncol=length(pops))
-colnames(freq) <- pops
-rownames(freq) <- data$ID
+freq <- ci.low <- ci.up <- matrix(0, nrow=NROW(data), ncol=length(pops))
+colnames(freq) <- colnames(ci.low) <- colnames(ci.up) <- pops
+rownames(freq) <- rownames(ci.low) <- rownames(ci.up) <- data$ID
 
 ## get list of samples in each population of reads
 include.read.samples <- read.samples(indfile, include.reads, c(exclude, unlist(include.counts)))
@@ -115,13 +115,23 @@ for(i in 1:NROW(data)){
     if(monomorphic){
         freq[i,] <- NA
     }else{
-        freq[i,] <- fit.unconstrained.model.reads(freq.data, error.prob=error.prob)$par
+        info <- ci.unconstrained.model.reads(freq.data, error.prob=error.prob)
+        freq[i,] <- info$p
+        ci.low[i,] <- info$lci
+        ci.up[i,] <- info$uci
     }
 
     readi <- readi+1
 }
 
 freq <- cbind(data[,1:5],freq)
-freq <- freq[!is.na(freq[,6]),]
+ci.low <- cbind(data[1:5],ci.low)
+ci.up <- cbind(data[1:5],ci.up)
+include <- !is.na(freq[,6])
+freq <- freq[include,]
+ci.low <- ci.low[include,]
+ci.up <- ci.up[include,]
 
 write.table(freq, paste0(out, ".chr", paste(chrs, collapse="_"), ".freq"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+write.table(ci.low, paste0(out, ".chr", paste(chrs, collapse="_"), ".lowCI.freq"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+write.table(ci.up, paste0(out, ".chr", paste(chrs, collapse="_"), ".highCI.freq"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")

@@ -164,7 +164,7 @@ fit.constrained.model.reads <- function(data, A, error.prob=0){
 # 
 #########################################################
 
-fit.unconstrained.model.reads <- function(data, error.prob=0){
+fit.unconstrained.model.reads <- function(data, error.prob=0.001){
     p <- rep(NA, length(data))
     for(i in 1:length(data)){
         subdata=list(data[[i]])
@@ -172,8 +172,18 @@ fit.unconstrained.model.reads <- function(data, error.prob=0){
         opt <- optimize(likelihood.reads, data=subdata, error.prob=error.prob, maximum=TRUE, lower=EPSILON.3pop, upper=1-EPSILON.3pop)
         p[i] <- opt$maximum
     }
-    ll <- likelihood.reads(p, data)
+    ll <- likelihood.reads(p, data, error.prob=error.prob)
     return(list(par=p, value=ll))
+}
+
+#########################################################
+#
+# Helper function. 
+#
+#########################################################
+
+ci.optfun <- function(f, data, error.prob, target){
+    return(target-likelihood.reads(f, data, error.prob=error.prob))
 }
 
 #########################################################
@@ -182,21 +192,35 @@ fit.unconstrained.model.reads <- function(data, error.prob=0){
 #
 #########################################################
 
-upper.ci.unconstrained.model.reads <- function(data, error.prob=0, alpha=0.95){
+ci.unconstrained.model.reads <- function(data, error.prob=0.001, alpha=0.95){
     uci <- rep(NA, length(data))
+    lci <- rep(NA, length(data))
+    f <- rep(NA, length(data))
+    ll <- rep(NA, length(data))
     ll.diff <- qchisq(alpha, df=1)/2
-    f <- fit.unconstrained.model.reads(data, error.prob=error.prob)
     for(i in 1:length(data)){
         subdata=list(data[[i]])
         names(subdata) <- names(data)[i]
-        if(f$ll-likelihood.reads(1, subdata, error.prob=error.prob)>0){
+        opt <- optimize(likelihood.reads, data=subdata, error.prob=error.prob, maximum=TRUE, lower=EPSILON.3pop, upper=1-EPSILON.3pop)
+        f[i] <- opt$maximum
+        ll[i] <- likelihood.reads(f[i], subdata, error.prob=error.prob)
+        
+        #Upper
+        if(ll[i]-likelihood.reads(1-EPSILON.3pop, subdata, error.prob=error.prob)<ll.diff){
             uci[i] <- 1
         }else{
-            optfun <- function()
+            uci[i] <- uniroot(ci.optfun, interval=c(f[i], 1-EPSILON.3pop), data=subdata, error.prob=error.prob, target=ll[i]-ll.diff)$root
         }
 
+        #Lower
+        if(ll[i]-likelihood.reads(EPSILON.3pop, subdata, error.prob=error.prob)<ll.diff){
+            lci[i] <- 0
+        }else{
+            lci[i] <- uniroot(ci.optfun, interval=c(EPSILON.3pop, f[i]), data=subdata, error.prob=error.prob, target=ll[i]-ll.diff)$root
+        }
     }
 
+    return(list(p=f, ll=ll, uci=uci, lci=lci))
 }
 
 
