@@ -32,11 +32,10 @@ include.counts <- list(                 #Include these populations as hard calls
     "Germany_EN"="Stuttgart",
     "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
 #Exclude these
-## exclude <- c("LaBrana1")
-exclude <- c()
+exclude <- c("LaBrana1")
+## exclude <- c()
                                         # include these
-## include.extra <- list("SpanishMesolithic"="WHG")         #High coverage LaBrana
-include.extra <- list()
+include.extra <- list("SpanishMesolithic"="WHG")         #High coverage LaBrana
 monocheck <- c("CEU", "IBS", "GBR", "IBS", "TSI")
 ########################################################################
 

@@ -178,6 +178,30 @@ fit.unconstrained.model.reads <- function(data, error.prob=0){
 
 #########################################################
 #
+# Upper confidence intervals for unconstrained model 
+#
+#########################################################
+
+upper.ci.unconstrained.model.reads <- function(data, error.prob=0, alpha=0.95){
+    uci <- rep(NA, length(data))
+    ll.diff <- qchisq(alpha, df=1)/2
+    f <- fit.unconstrained.model.reads(data, error.prob=error.prob)
+    for(i in 1:length(data)){
+        subdata=list(data[[i]])
+        names(subdata) <- names(data)[i]
+        if(f$ll-likelihood.reads(1, subdata, error.prob=error.prob)>0){
+            uci[i] <- 1
+        }else{
+            optfun <- function()
+        }
+
+    }
+
+}
+
+
+#########################################################
+#
 # Effective size of data - roughly how many hard                                       
 # calls is this data equivalent to? 
 #########################################################
