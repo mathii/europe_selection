@@ -16,12 +16,14 @@ ylim <- c(-1,1)
 ########################################################################
 ## Details
 data <- read.table("~/selection/analysis/poly/Height/pred_height.txt", as.is=TRUE)
+data[,1] <- gsub("_", " ", data[,1])
 pops <- unique(data[,1])
 
 cols <- brewer.pal( length(pops), "Set1")
+cols[6] <- "darkgrey"
 
 pdf(paste0(out, outname), width=12, height=6)
-plot(0,0, col="white", xlim=c(-8000, 0), ylim=ylim, bty="n", xlab="Years before present", ylab="Genetic height")
+plot(0,0, col="white", xlim=c(-8000, 0), ylim=ylim, bty="n", xlab="Years before present", ylab="Genetic height", xaxt="n")
 
 for(i in 1:length(pops)){
     pop <- pops[i]
@@ -37,5 +39,6 @@ for(i in 1:length(pops)){
     }
 }
 legend("bottomright", pops, col=cols,lwd=2, bty="n")
+axis(1, at=-seq(8,0,-2)*1000, labels=format(seq(8,0,-2)*1000, big.mark=","))
 
 dev.off()

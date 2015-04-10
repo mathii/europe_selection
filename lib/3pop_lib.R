@@ -103,10 +103,11 @@ test.diff <- function(N, N.A){
 # read counts for each individual and "counts" is a vector
 # of length 2 for giving ref/alt counts.
 # This returns the log likelihood summed over all the
-# populations. 
+# populations. het.p is the probability of seeing the reference
+# read for heterozygotes (0.5 by default)
 #########################################################
 
-likelihood.reads <- function(freq, data, error.prob=0.001){
+likelihood.reads <- function(freq, data, error.prob=0.001, het.p=0.5){
     ll <- 0
     i.pop <- 1
     for(pop in names(data)){
@@ -118,7 +119,7 @@ likelihood.reads <- function(freq, data, error.prob=0.001){
                 ref <- data[[pop]][["reads"]][["ref"]][[i]]
                 alt <- data[[pop]][["reads"]][["alt"]][[i]]
                 ## ll <- ll+log((alt==0)*p*p + (ref==0)*(1-p)*(1-p) + 2*dbinom(ref, ref+alt, 0.5)*p*(1-p))
-                ll <- ll+log(dbinom(alt, ref+alt, error.prob)*p*p + dbinom(ref, ref+alt, error.prob)*(1-p)*(1-p) + dbinom(ref, ref+alt, 0.5)*2*p*(1-p))
+                ll <- ll+log(dbinom(alt, ref+alt, error.prob)*p*p + dbinom(ref, ref+alt, error.prob)*(1-p)*(1-p) + dbinom(ref, ref+alt, het.p)*2*p*(1-p))
             }
         }
         #Add counts, can be zero

@@ -49,6 +49,8 @@ sig.level <- -log10(0.05/NROW(res))
 cat(paste0("Used sig.level = ", sig.level, "\n"))
 
 ## Manhattan plot
+## png(paste0("~/Dropbox/posters/AAPA/mh_plot", results.tag ,".png"), width=16, height=8, units="in", res=400)
+## par(bg = "grey92")
 png(paste0("~/selection/analysis/gscan/mh_plot", results.tag ,".png"), width=800, height=400)
 par(mar=c(2,4,1,1))
 MH.plot(res, color.loci=data.frame())
@@ -59,8 +61,10 @@ dev.off()
 sig.chrs <- unique(res$CHR[res$PVAL<(10^-(sig.level))])
 for(c in sig.chrs){
     png(paste0("~/selection/analysis/gscan/mh_plot", results.tag ,".chr", c, ".png"), width=250, height=250)
+    ## png(paste0("~/Dropbox/posters/AAPA/mh_plot.chr", c ,".png"), width=4, height=4, units="in", res=400)
+    ## par(bg = "grey92")
     par(mar=c(1,2,1,1))
-    MH.plot(res[res$CHR==c,], color.loci=data.frame())
+    MH.plot(res[res$CHR==c,], color.loci=data.frame(), chr.labels=FALSE)
     abline(h=sig.level, col="red", lty=2)
     dev.off()
 }
