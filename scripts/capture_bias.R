@@ -24,6 +24,8 @@ alpha <- 0.05
 ll.diff <- qchisq(0.05, df=1, lower.tail=F)/2
 
 reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts"), as.is=TRUE, header=FALSE)
+## Must sort!
+reads <- reads[order(reads[,1]),]
 
 ## Sort reads by ID for faster indexing
 read.sample.counts <- table(reads[,1])  #Number of samples for each SNP
@@ -38,6 +40,8 @@ for(i in 1:N.SNPS){
     if(verbose){cat(paste0("\r", i, " ", this.read[1,1]))}
 
     this.read <- reads[(1+N.read.samples*(i-1)):(N.read.samples*i),]
+    if(!all(this.read[,1]==this.read[1,1])){stop("Selected the wrong SNP")}
+    
     data <- empty.data
     data[["ALL"]][["reads"]][["ref"]]=this.read[,3]
     data[["ALL"]][["reads"]][["alt"]]=this.read[,4]
