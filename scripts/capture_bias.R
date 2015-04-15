@@ -46,26 +46,26 @@ for(i in 1:N.SNPS){
     data[["ALL"]][["reads"]][["ref"]]=this.read[,3]
     data[["ALL"]][["reads"]][["alt"]]=this.read[,4]
 
-    these.log.likelihoods <- matrix(0, nrow=10, ncol=100)
-    for(k in 1:10){
-        for(j in 1:100){
-            hp=min(max(j/100, error.prob), 1-error.prob) 
-            these.log.likelihoods[k,j] <- likelihood.reads(k/10, data, error.prob=error.prob, het.p=hp)
+    these.log.likelihoods <- matrix(0, nrow=11, ncol=101)
+    for(k in 1:11){
+        for(j in 1:101){
+            hp=min(max((j-1)/100, error.prob), 1-error.prob) 
+            these.log.likelihoods[k,j] <- likelihood.reads((k-1)/10, data, error.prob=error.prob, het.p=hp)
         }
     }
     
-    best.ij <- which(these.log.likelihoods==max(these.log.likelihoods), arr.ind=TRUE)
+    best.ij <- which(these.log.likelihoods==max(these.log.likelihoods), arr.ind=TRUE)[1,]
     max.ll <- these.log.likelihoods[best.ij[1], best.ij[2]]
     low.pi=best.ij[2]
     hi.pi=best.ij[2]
-    for(k in 1:10){
+    for(k in 1:11){
         if(any(these.log.likelihoods[k,]>max.ll-ll.diff)){
             low.pi=min(low.pi, min(which(these.log.likelihoods[k,]>max.ll-ll.diff)))
             hi.pi=max(hi.pi, max(which(these.log.likelihoods[k,]>max.ll-ll.diff)))
         }
     }
 
-    results[i,] <- c(this.read[1,1], best.ij[1]/10, best.ij[2]/100, low.pi/100, hi.pi/100)
+    results[i,] <- c(this.read[1,1], (best.ij[1]-1)/10, (best.ij[2]-1)/100, (low.pi-1)/100, (hi.pi-1)/100)
 }
 
 write.table(results, paste0("~/capture_bias/390k_chr", chr, ".results"), row.names=FALSE, col.names=TRUE, quote=FALSE)
