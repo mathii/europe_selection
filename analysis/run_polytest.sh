@@ -10,7 +10,7 @@ do
 		python ~/spindrift/Qx.py -d ${DATA} -n 10000 \
 		-p ${LDIR}/polypairs_${what}.txt \
 		-o ${OUT}/${a}_${what} -v \
-		-g ${b} -i ${LDIR}/polynames_inbred.txt \ 
+		-g ${b} -i ${LDIR}/polypops_inbred.txt \ 
 		2> ${OUT}/${a}_${what}.log
 	done
 done < ~/selection/data/traits.txt
