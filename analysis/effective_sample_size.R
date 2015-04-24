@@ -1,10 +1,15 @@
 #Calculate the effective sample size
 source("~/selection/code/lib/readlib.R")
 
+version=v6
+if(length(commandArgs(TRUE))){
+  version=commansArgs(TRUE)[1]
+}
+
 ########################################################################
 ## Details
-root <- "~/selection/counts/all"
-read.totals <- "~/selection/analysis/effsize/effsize_reads.txt"
+root <- paste0("~/selection/counts/", version ,"/all"
+read.totals <- "~/selection/analysis/",version,"/effsize/effsize_reads.txt"
 ########################################################################
 
 ## Majority call info
@@ -19,7 +24,7 @@ read.totals <- read.table(read.totals, as.is=TRUE, header=TRUE)
 
 
 results <- data.frame(pops=colnames(totals), size=apply(totals, 2, max), effective.size=colMeans(totals))
-write.table(results, "~/selection/analysis/effective_sample_size.txt", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(results, paste0("~/selection/analysis/",version,"/effective_sample_size.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 read.results <- data.frame(pops=colnames(read.totals), effective.size=colMeans(read.totals))
-write.table(read.results, "~/selection/analysis/effective_sample_size_reads.txt", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(read.results, paste0("~/selection/analysis/",version,"/effective_sample_size_reads.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")

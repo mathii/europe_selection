@@ -12,16 +12,17 @@ chrs <- 1:22                                #set manually, or from --args
 verbose=TRUE
 if(length(commandArgs(TRUE))){
     chrs <- as.numeric(commandArgs(TRUE)[1])
+    version <- as.numeric(commandArgs(TRUE)[2])
     verbose=FALSE
 }
 
 
 ########################################################################
 ## Details
-root <- "~/selection/counts/all"
-out <- "~/selection/counts/all.reads"
-read.root <- "~/data/v6/reads/jj2"
-indfile <- "~/data/v6/use/v61kg_europe2names.ind"
+root <- paste0("~/selection/counts/", version, "all")
+out <- paste0("~/selection/counts/", version, "all.reads"
+read.root <- paste0("~/data/", version, "/reads/jj2")
+indfile <- paste0("~/data/", version, "/use/", version, "1kg_europe2names.ind")
 error.prob <- 0.01
 ########################################################################
 
@@ -95,4 +96,4 @@ for(i in 1:NROW(data)){
     readi <- readi+1
 }
 
-write.table(new.totals, paste0("~/selection/analysis/effsize/effsize_reads", ".chr", paste(chrs, collapse="_"), ".txt"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+write.table(new.totals, paste0("~/selection/analysis/", version, "/effsize/effsize_reads", ".chr", paste(chrs, collapse="_"), ".txt"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
