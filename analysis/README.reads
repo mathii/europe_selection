@@ -1,4 +1,8 @@
-#0. Initial processing - rename to europe2 names in data/v6
+#Which version - v6, v7
+#Data should be in the directory ~/data/$VERSION/{use,reads} 
+VERSION=v6
+
+#0. Initial processing - rename to europe2 names in data/${VERSION}/use
 R --vanilla < ~/selection/code/analysis/initial_process.R
 
 #1. Pull out allele counts from eigenstrat data
