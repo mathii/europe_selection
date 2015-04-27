@@ -1,7 +1,7 @@
 #Which version - v6, v7
 #Data should be in the directory ~/data/$VERSION/{use,reads} 
 #Output will be in ~/selection/analysis/$VERSION/
-V=v6
+V=v7
 
 for dir in effsize  gscan  series  s_estimates poly
 do

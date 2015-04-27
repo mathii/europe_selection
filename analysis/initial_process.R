@@ -10,7 +10,7 @@ if(length(commandArgs(TRUE))){
 pop.labels <- c("ESN", "GWD", "LWK", "MSL", "YRI", "ACB", "ASW", "CLM", "MXL", "PEL", "PUR", "CDX", "CHB", "CHS", "JPT", "KHV", "CEU", "FIN", "GBR", "IBS", "TSI", "BEB", "GIH", "ITU", "PJL", "STU")
 
 
-indfile <- read.table(paste0("~/data/", version, "/raw/", version, "1kgx.ind", header=FALSE, as.is=TRUE)
+indfile <- read.table(paste0("~/data/", version, "/raw/", version, "1kgx.ind"), header=FALSE, as.is=TRUE)
 rownames(indfile) <- indfile[,1]
 
 europe2names <- read.table("~/selection/code/files/europe2.ind", header=FALSE, as.is=TRUE)
@@ -21,7 +21,7 @@ for(i in 1:NROW(europe2names)){
     }
 }
 
-write.table(indfile, paste0("~/data/", version, "/use/", version, "1kg_europe2names.ind", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(indfile, paste0("~/data/", version, "/use/", version, "1kg_europe2names.ind"), row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 
 ## LBK.EN.samples <- c()
