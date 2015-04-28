@@ -20,7 +20,7 @@ if(length(commandArgs(TRUE))){
 ########################################################################
 ## Details
 root <- paste0("~/selection/counts/", version, "all")
-out <- paste0("~/selection/counts/", version, "all.reads"
+out <- paste0("~/selection/counts/", version, "all.reads")
 read.root <- paste0("~/data/", version, "/reads/jj2")
 indfile <- paste0("~/data/", version, "/use/", version, "1kg_europe2names.ind")
 error.prob <- 0.01

@@ -10,7 +10,7 @@ done
 
 #0. Initial processing - rename to europe2 names in data/${VERSION}/use
 # Create symlinks TODO, perhaps add polypops names
-R --vanilla --arfs ${V} < ~/selection/code/analysis/initial_process.R
+R --vanilla --args ${V} < ~/selection/code/analysis/initial_process.R
 ln -s ~/data/${V}/use/${V}1kgx.geno ~/data/${V}/use/${V}1kg_europe2names.geno
 ln -s ~/data/${V}/use/${V}1kgx.snp ~/data/${V}/use/${V}1kg_europe2names.snp
 
