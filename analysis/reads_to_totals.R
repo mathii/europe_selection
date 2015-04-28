@@ -59,6 +59,8 @@ for(i in 1:NROW(data)){
         this.chr <- data[i,"CHR"]
         cat(paste0("Loading chromosome ", this.chr, " reads..."))
         reads <- read.table(paste0(read.root, ".chr", data[i,"CHR"], ".readcounts"), as.is=TRUE, header=FALSE)
+        #Restrict to SNPs that are in data
+        reads<-reads[reads[,1] %in% data[,1],]
         this.chr.ID.order <- data[data[,"CHR"]==this.chr,"ID"]
         reads <- reads[order(match(reads[,1],this.chr.ID.order)),]
         read.sample.counts <- table(reads[,1])  #Number of samples for each SNP
