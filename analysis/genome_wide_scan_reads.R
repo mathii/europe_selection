@@ -13,17 +13,19 @@ source("~/selection/code/lib/3pop_lib.R")
 ## Details
 chr <- 1                                #set manually, or from --args
 verbose=TRUE
+version <- "vx" #v6, v7 etc...
 if(length(commandArgs(TRUE))){
     chr <- commandArgs(TRUE)[1]
+    version <- commandArgs(TRUE)[2]
     verbose=FALSE
 }
 ########################################################################
 ## Details
-root <- "~/selection/counts/all"
-out <- "~/selection/analysis/gscan/"
+root <- paste0("~/selection/counts/", version, "all")
+out <- paste0("~/selection/analysis/", version, "gscan/")
 results.tag <- ""
-read.root <- "~/data/v6/reads/jj2"
-indfile <- "~/data/v6/use/v61kg_europe2names.ind"
+read.root <- paste0("~/data/", version, "/reads/jj2")
+indfile <- paste0("~/data/", version, "/use/", version,"1kg_europe2names.ind")
 error.prob <- 0.001
 
 pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
@@ -100,5 +102,5 @@ results <- results[!is.na(results[,2]),]
 results <- cbind(rownames(results), results)
 colnames(results) <- c("ID", "ChiSq", "uncorrected.p")
 results <- data.frame(results)
-write.table(results, paste0("~/selection/analysis/gscan/scan_results_read", results.tag, ".chr", chr, ".txt"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+write.table(results, paste0("~/selection/analysis/",version,"/gscan/scan_results_read", results.tag, ".chr", chr, ".txt"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
 
