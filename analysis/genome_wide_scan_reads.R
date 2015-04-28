@@ -30,14 +30,15 @@ error.prob <- 0.001
 
 pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
 #Check if the SNP is monomorphic in these populations. 
-monocheck <- c("CEU", "GBR", "IBS", "TSI", "LaBrana1", "HungaryGamba_HG", "Loschbour", "Stuttgart",
+monocheck <- c("CEU", "GBR", "IBS", "TSI", "HungaryGamba_HG", "Loschbour", "Stuttgart",
                "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")
 A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.712, 0.288),3, 4) 
 
 ########################################################################
 
 include.reads <- list(                  #Include these populations as reads
-    "WHG"=c("LaBrana1", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
+    ## "WHG"=c("LaBrana1", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
+    "WHG"=c("Iberian_Mesolithic", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
     "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"), 
     "Yamnaya"="Yamnaya")
 include.counts <- list(                 #Include these populations as hard calls. 
