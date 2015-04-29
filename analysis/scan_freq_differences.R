@@ -17,7 +17,7 @@ if(length(cA)){
     if(length(cA)>2){
         results.tag <- cA[3]
     }
-    verbose=TRUE
+    verbose=FALSE
 }
 ########################################################################
 ## Details
