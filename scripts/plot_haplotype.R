@@ -7,9 +7,9 @@ snp <- "rs3827760"
 flank <- 150000
 root <- "~/data/v6/use/v61kg_europe2names"
 pops <- c("CHB", "Motala_HG", "CEU")
-out <- "~/selection/analysis/EDAR/EDAR_haplotype"
+out <- "~/selection/analysis/v6/EDAR/EDAR_haplotype"
 read.root <- "~/data/v6/reads/jj2"
-
+subsample <- TRUE
 pops.with.reads <- "Motala_HG"
 cols <- brewer.pal(3, "Set1")
 
@@ -27,7 +27,7 @@ write.table(data, paste0(out, ".snp"), col.names=FALSE, row.names=FALSE, quote=F
 ## python ~/spindrift/Freq.py -d ~/data/v6/use/v61kg_europe2names -p CHB,CEU -o CHB_CEU_EDAR_haps -s EDAR_haplotype -g
 
 ind <- read.table(paste0(root, ".ind"), as.is=TRUE)
-gt <- read.table("~/selection/analysis/EDAR/CHB_CEU_EDAR_haps.gt", as.is=TRUE, header=TRUE)
+gt <- read.table("~/selection/analysis/v6/EDAR/CHB_CEU_EDAR_haps.gt", as.is=TRUE, header=TRUE)
 gt.data <- gt[,1:5]
 gt <- gt[,6:NCOL(gt)]
 
@@ -103,10 +103,13 @@ sub.ht <- ht[sub,]
 sub.pr <- pr[sub,]
 subtotal <- length(sub)
 
-cols <- c("grey", "pink", "darkred", "white")
-s.cols <- c("grey", "lightblue", "darkblue", "white")
+## cols <- c("grey", "pink", "darkred", "white")
+## s.cols <- c("grey", "lightblue", "darkblue", "white")
 
-snpi <- which(data[,1]==snp)
+cols <- c("white", "pink", "darkred", "white")
+s.cols <- c("white", "lightblue", "darkblue", "white")
+
+snpi <- which(data[,1]==snp)-1
 
     nsnp <- NROW(gt)
 

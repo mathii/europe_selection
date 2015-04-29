@@ -10,10 +10,6 @@ library(RColorBrewer)
 
 ########################################################################
 ## Details
-root <- "~/selection/counts/all"
-read.root <- "~/data/v6/reads/"
-out <- "~/selection/analysis/series/"
-indfile <- "~/data/v6/use/v61kg_europe2names.ind"
 ang <- 12
 ylim <- c(0,1)
 outsize=c(6,6)
@@ -21,12 +17,19 @@ error.prob <- 0.001
 
 what <- "figure2"
 sub="c"
+version <- ""
 if(length(commandArgs(TRUE))){
     what=commandArgs(TRUE)[1]
     sub=commandArgs(TRUE)[2]
+    version <- commandArgs(TRUE)[3]
 }
+
 outname <- paste0(what, sub, ".pdf")
 readmefile <- paste0("~/selection/code/files/", what, ".readme")
+root <- paste0("~/selection/counts/",version,"/all")
+read.root <- paste0("~/data/",version,"/reads/")
+indfile <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.ind")
+out <- paste0("~/selection/analysis/",version,"/series/")
 
 ## ########################################################################
 
@@ -86,7 +89,7 @@ plot(0,0, col="white", xlim=c(-max(int.starts), 0), ylim=ylim, bty="n", xlab="",
 for(i in 1:NROW(data)){
     cat(paste0("\r", readme[i,2]))
     chr <- data[i,"CHR"]
-    read.data <- read.table(paste0(read.root, "jj2.chr", chr, ".readcounts"), as.is=TRUE)
+    read.data <- read.table(paste0(read.root, "jj2.chr", chr, ".readcounts.gz"), as.is=TRUE)
     read.data <- read.data[read.data[,1]==data[i,"ID"],]
     
     freq.data <- make.freq.data(int.names, include.reads, include.read.samples, include.counts,

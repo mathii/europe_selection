@@ -276,6 +276,31 @@ test.3pop.reads <- function(data, A, error.prob=error.prob){
 
 #########################################################
 #
+# Test for a difference in population means, using read                                        
+# 
+#########################################################
+
+test.diff.reads <- function(data, error.prob=error.prob){
+    degf=length(data)-1
+    
+    uf <- fit.unconstrained.model.reads(data, error.prob=error.prob)
+    cd <- list(ALL=list(reads=list(ref=c(), alt=c(), samples=c()), counts=c(0,0)))
+    for(n in names(data)){
+        cd[["ALL"]][["reads"]][["ref"]] <- c(cd[["ALL"]][["reads"]][["ref"]], data[[n]][["reads"]][["ref"]])
+        cd[["ALL"]][["reads"]][["alt"]] <- c(cd[["ALL"]][["reads"]][["alt"]], data[[n]][["reads"]][["alt"]])
+        cd[["ALL"]][["reads"]][["samples"]] <- c(cd[["ALL"]][["reads"]][["samples"]], data[[n]][["reads"]][["samples"]])
+        cd[["ALL"]][["counts"]] <- cd[["ALL"]][["counts"]] + data[[n]][["counts"]]
+    }
+    cf <- fit.unconstrained.model.reads(cd, error.prob=error.prob)
+    cl <- likelihood.reads(rep(cf$par, degf+1), data, error.prob=error.prob)
+    
+    stat <- 2*(uf$value-cl)
+    p <- pchisq(stat, df=degf, lower.tail=F)
+    return( c(stat, p) )
+}
+
+#########################################################
+#
 # Estimated frequency and effective sample size for
 # one data point. Freq.data of size 1 
 #########################################################

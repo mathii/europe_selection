@@ -10,24 +10,28 @@ library(RColorBrewer)
 
 ########################################################################
 ## Details
-root <- "~/selection/counts/all"
-readmefile <- "~/selection/analysis/series/figure2.readme"
-read.root <- "~/data/v6/reads/"
-out <- "~/selection/analysis/series/"
-indfile <- "~/data/v6/use/v61kg_europe2names.ind"
 outname <- "figure2a.pdf"
 what <- NA
+version <- NA
 ang <- 20
 ylim <- c(0,1)
 error.prob <- 0.001
+readmefile <- "~/selection/code/files/figure2.readme" 
 
 ########################################################################
 
 if(length(commandArgs(TRUE))){
     what <- commandArgs(TRUE)[1]
+    version <- commandArgs(TRUE)[2]
     readmefile <- paste0("~/selection/code/files/", what, ".readme")
     outname <- paste0(what, "a.pdf")
 }
+
+root <- paste0("~/selection/counts/", version, "/all")
+read.root <- paste0("~/data/",version,"/reads/")
+indfile <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.ind")
+out <- paste0("~/selection/analysis/",version,"/series/")
+
 
 ########################################################################
 
@@ -36,10 +40,10 @@ long.names <- c("Western Hunter\nGatherers", "Early neolithic", "Middle neolithi
 int.starts <- c(8000, 7200, 5800, 4800, 100)
 int.ends <- c(7700, 6900, 5200, 3600, -50)
 int.include <- c("WHG", "WHG", "WHG", "EN", "EN", "EN", "EN", "EN", "EN", "MN", "MN", "MN", "MN", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "CEU")
-names(int.include) <-c("Loschbour", "SpanishMesolithic", "HungaryGamba_HG", "Starcevo_EN", "Stuttgart", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA", "CEU")
+names(int.include) <-c("Loschbour", "Iberian_Mesolithic", "HungaryGamba_HG", "Starcevo_EN", "Stuttgart", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA", "CEU")
 
 include.reads <- list(                  #Include these populations as reads
-    "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #SpanishMesolithic is the high coverage LaBrana I0585
+    "WHG"=c("Iberian_Mesolithic", "HungaryGamba_HG"), #SpanishMesolithic is the high coverage LaBrana1 I0585 and LaBrana2
     "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"),
     "MN"=c( "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN" ),
     "LN/BA"=c( "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA")
@@ -84,7 +88,7 @@ plot(0,0, col="white", xlim=c(-max(int.starts), 0), ylim=ylim, bty="n", xlab="Ye
 for(i in 1:NROW(data)){
     cat(paste0("\r", readme[i,2]))
     chr <- data[i,"CHR"]
-    read.data <- read.table(paste0(read.root, "jj2.chr", chr, ".readcounts"), as.is=TRUE)
+    read.data <- read.table(paste0(read.root, "jj2.chr", chr, ".readcounts.gz"), as.is=TRUE)
     read.data <- read.data[read.data[,1]==data[i,"ID"],]
     
     freq.data <- make.freq.data(int.names, include.reads, include.read.samples, include.counts,
