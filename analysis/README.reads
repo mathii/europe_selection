@@ -18,8 +18,8 @@ ln -s ~/data/${V}/use/${V}1kgx.snp ~/data/${V}/use/${V}1kg_europe2names.snp
 
 python ~/spindrift/Freq.py \
 	-d ~/data/${V}/use/${V}1kg_europe2names \
-	-p ~/data/${V}/use/used_all.txt \
-	-n ~/data/${V}/use/used_ancient_pseudodiploid.txt \
+	-p ~/selection/code/files/used_all.txt \
+	-n ~/selection/code/files/used_ancient_pseudodiploid.txt \
 	-o ~/selection/counts/${V}/all \
 	-s ~/data/${V}/use/${V}1kg_europe2names
 
@@ -37,13 +37,14 @@ grep ^ID ${GD}/scan_results_read.chr1.txt > ${GD}/scan_results_reads.txt
 grep -hv "^ID" ${GD}/scan_results_read.chr*.txt >> ${GD}/scan_results_reads.txt
 
 #3b Manhattan and qq plots
-R --vanilla --args _reads ${V} < ~/selection/code/analysis/genome_wide_scan_plots.R
+R --vanilla --args _reads ${V} 4 < ~/selection/code/analysis/genome_wide_scan_plots.R
 
 #3c generate locuszoom plots (see ./locuszoom_commands).
 ./locuszoom.sh
 
 #3d Scan for differences between Hunter Gatherers and Early Neolithic
 for chr in {1..23};do R --vanilla --args $chr $V HG-EN < ~/selection/code/analysis/scan_freq_differences.R; done
+R --vanilla --args _reads ${V} 1 < ~/selection/code/analysis/genome_wide_scan_plots.R
 
 #4 Time series and allele frequency plots
 R --vanilla --args figure2 ${V} < ~/selection/code/analysis/time_series_plot_reads.R

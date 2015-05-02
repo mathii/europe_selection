@@ -134,6 +134,33 @@ likelihood.reads <- function(freq, data, error.prob=0.001, het.p=0.5){
 
 #########################################################
 #
+# Fit the constrained model
+# 
+#########################################################
+
+fit.fixed.model.reads <- function(data, error.prob=0){
+    p.anc.init <- 0.5
+    opt <- optimize(fixed.likelihood.reads, lower=0, upper=1, data=data, error.prob=error.prob, maximum=TRUE)
+    par=list(par=rep(opt$maximum, length(data)), value=opt$objective)
+    return(par)
+}
+
+#########################################################
+#
+# Likelihood for read based model with all frequencies
+# the same
+# 
+#########################################################
+
+fixed.likelihood.reads <- function(p, data, error.prob=0){
+    p <- rep(p, length(data))
+    p <- pmin(pmax(EPSILON.3pop, p), 1-EPSILON.3pop)
+    ll <- likelihood.reads(p, data, error.prob=error.prob)
+    return(ll)
+}
+
+#########################################################
+#
 # Constrained likelihood for read based model
 # 
 #########################################################
@@ -284,17 +311,9 @@ test.diff.reads <- function(data, error.prob=error.prob){
     degf=length(data)-1
     
     uf <- fit.unconstrained.model.reads(data, error.prob=error.prob)
-    cd <- list(ALL=list(reads=list(ref=c(), alt=c(), samples=c()), counts=c(0,0)))
-    for(n in names(data)){
-        cd[["ALL"]][["reads"]][["ref"]] <- c(cd[["ALL"]][["reads"]][["ref"]], data[[n]][["reads"]][["ref"]])
-        cd[["ALL"]][["reads"]][["alt"]] <- c(cd[["ALL"]][["reads"]][["alt"]], data[[n]][["reads"]][["alt"]])
-        cd[["ALL"]][["reads"]][["samples"]] <- c(cd[["ALL"]][["reads"]][["samples"]], data[[n]][["reads"]][["samples"]])
-        cd[["ALL"]][["counts"]] <- cd[["ALL"]][["counts"]] + data[[n]][["counts"]]
-    }
-    cf <- fit.unconstrained.model.reads(cd, error.prob=error.prob)
-    cl <- likelihood.reads(rep(cf$par, degf+1), data, error.prob=error.prob)
+    cf <- fit.fixed.model.reads(data, error.prob=error.prob)
     
-    stat <- 2*(uf$value-cl)
+    stat <- 2*(uf$value-cf$value)
     p <- pchisq(stat, df=degf, lower.tail=F)
     return( c(stat, p) )
 }

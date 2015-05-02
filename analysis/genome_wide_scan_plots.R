@@ -8,14 +8,16 @@ source("~/selection/code/lib/mh_plot_lib.R")
 
 results.tag <- ""
 version <- "" 
-if(length(commandArgs(TRUE))){
-    results.tag <- commandArgs(TRUE)[1]
-    version <- commandArgs(TRUE)[2]
+degf <- 4
+cA <- commandArgs(TRUE)
+if(length(cA)){
+    results.tag <- cA[1]
+    version <- cA[2]
+    degf <- as.numeric(cA[3])
 }
 
 results <- paste0("~/selection/analysis/",version,"/gscan/scan_results", results.tag, ".txt")
 snpdata <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.snp")
-degf <- 4
 
 ##############################################################
 

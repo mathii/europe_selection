@@ -13,17 +13,18 @@ chrs <- 1:22                                #set manually, or from --args
 verbose=TRUE
 if(length(commandArgs(TRUE))){
     chrs <- as.numeric(commandArgs(TRUE)[1])
+    version <- commandArgs(TRUE)[2]
     verbose=FALSE
 }
 
 
 ########################################################################
 ## Details
-root <- "~/selection/counts/all"
-out <- "~/selection/counts/all.reads"
-read.root <- "~/data/v6/reads/jj2"
-indfile <- "~/data/v6/use/v61kg_europe2names.ind"
-polymap <- "~/data/v6/use/polymap.txt"
+root <- paste0("~/selection/counts/",version,"/all")
+out <- paste0("~/selection/counts/",version,"/all.reads")
+read.root <- paste0("~/data/",version,"/reads/jj2")
+indfile <- paste0("~/data/",version,"/use/v61kg_europe2names.ind")
+polymap <- "~/selection/code/files/polymap.txt"
 error.prob <- 0.01
 ########################################################################
 #Include these populations as hard calls
@@ -91,7 +92,7 @@ for(i in 1:NROW(data)){
     if(this.chr!=data[i,"CHR"]){
         this.chr <- data[i,"CHR"]
         cat(paste0("Loading chromosome ", this.chr, " reads..."))
-        reads <- read.table(paste0(read.root, ".chr", data[i,"CHR"], ".readcounts"), as.is=TRUE, header=FALSE)
+        reads <- read.table(paste0(read.root, ".chr", data[i,"CHR"], ".readcounts.gz"), as.is=TRUE, header=FALSE)
         this.chr.ID.order <- data[data[,"CHR"]==this.chr,"ID"]
         reads <- reads[order(match(reads[,1],this.chr.ID.order)),]
         read.sample.counts <- table(reads[,1])  #Number of samples for each SNP

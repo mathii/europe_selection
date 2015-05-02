@@ -35,12 +35,12 @@ out <- paste0("~/selection/analysis/",version,"/series/")
 
 ########################################################################
 
-int.names <- c("WHG", "EN", "MN", "LN/BA","CEU")
-long.names <- c("Western Hunter\nGatherers", "Early neolithic", "Middle neolithic", "Late neolithic/Bronze age", "CEU")
+int.names <- c("WHG", "EN", "MN", "LN/BA","CEU/IBS")
+long.names <- c("Western Hunter\nGatherers", "Early neolithic", "Middle neolithic", "Late neolithic/Bronze age", "CEU/IBS")
 int.starts <- c(8000, 7200, 5800, 4800, 100)
 int.ends <- c(7700, 6900, 5200, 3600, -50)
-int.include <- c("WHG", "WHG", "WHG", "EN", "EN", "EN", "EN", "EN", "EN", "MN", "MN", "MN", "MN", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "CEU")
-names(int.include) <-c("Loschbour", "Iberian_Mesolithic", "HungaryGamba_HG", "Starcevo_EN", "Stuttgart", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA", "CEU")
+int.include <- c("WHG", "WHG", "WHG", "EN", "EN", "EN", "EN", "EN", "EN", "MN", "MN", "MN", "MN", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "CEU/IBS", "CEU/IBS")
+names(int.include) <-c("Loschbour", "Iberian_Mesolithic", "HungaryGamba_HG", "Starcevo_EN", "Stuttgart", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA", "CEU", "IBS")
 
 include.reads <- list(                  #Include these populations as reads
     "WHG"=c("Iberian_Mesolithic", "HungaryGamba_HG"), #SpanishMesolithic is the high coverage LaBrana1 I0585 and LaBrana2
@@ -51,7 +51,8 @@ include.reads <- list(                  #Include these populations as reads
 include.counts <- list(                 #Include these populations as hard calls. 
     "WHG"="Loschbour",
     "EN"="Stuttgart",
-    "CEU"="CEU")
+    "CEU/IBS"=c("CEU", "IBS")
+     )
 
 ## ########################################################################
 
@@ -102,10 +103,11 @@ for(i in 1:NROW(data)){
     ln <- length(int.ends)
 
     include.segments <- rep(TRUE, ln-1)
+    ## include.segments <- c(FALSE, TRUE, FALSE, TRUE)
     ## TODO - include segments based on p value? 
     
     segments(-int.ends[1:(ln-1)][include.segments], f[1:(ln-1)][include.segments], -int.starts[2:ln][include.segments], f[2:ln][include.segments], col=cols[i], lwd=2)
-    segments(-int.ends[1:(ln-1)][!include.segments], f[1:(ln-1)][!include.segments], -int.starts[2:ln][!include.segments], f[2:ln][!include.segments], col=cols[i], lwd=2, lty=2)
+    ## segments(-int.ends[1:(ln-1)][!include.segments], f[1:(ln-1)][!include.segments], -int.starts[2:ln][!include.segments], f[2:ln][!include.segments], col=cols[i], lwd=2, lty=2)
 
     ## text(-0.5*(int.ends[1:(ln-1)]+int.starts[1:(ln-1)])+100*i-50*ln, f[1:(ln-1)]+ifelse(f[1:(ln-1)]<0.7,0.03,-0.03), format(eff.totals[1:(ln-1)], digits=2, nsmall=1), col=cols[i], cex=0.7)
     text(-0.5*(int.ends[1:(ln-1)]+int.starts[1:(ln-1)]), f[1:(ln-1)]+ifelse(f[1:(ln-1)]<0.7,0.03,-0.03), format(eff.totals[1:(ln-1)], digits=2, nsmall=1), col=cols[i], cex=0.7)
