@@ -1,0 +1,11 @@
+WHG,SHG
+Spain_EN,Germany_EN
+Germany_EN,Hungary_EN
+Spain_EN,Hungary_EN
+Spain_MN,Germany_MN
+Spain_MN,Steppe_MN
+Germany_MN,Steppe_MN
+Germany_LNBA,Steppe_MN
+Hungary_LNBA,Germany_LNBA
+Hungary_LNBA,Steppe_MN
+CEU,IBS
