@@ -14,16 +14,22 @@ source("~/selection/code/lib/3pop_lib.R")
 chr <- 1                                #set manually, or from --args
 verbose=TRUE
 version <- "vx" #v6, v7 etc...
-if(length(commandArgs(TRUE))){
-    chr <- commandArgs(TRUE)[1]
-    version <- commandArgs(TRUE)[2]
-    verbose=FALSE
+results.tag <- ""
+
+cA <- commandArgs(TRUE)
+if(length(cA)){
+  chr <- cA
+  version <- cA
+  verbose=FALSE
+  if(length(cA)>2){
+    results.tag <- cA[3]
+  }
 }
+
 ########################################################################
 ## Details
 root <- paste0("~/selection/counts/", version, "/all")
 out <- paste0("~/selection/analysis/", version, "/gscan/")
-results.tag <- ""
 read.root <- paste0("~/data/", version, "/reads/jj2")
 indfile <- paste0("~/data/", version, "/use/", version,"1kg_europe2names.ind")
 error.prob <- 0.001
@@ -38,13 +44,25 @@ A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.71
 
 include.reads <- list(                  #Include these populations as reads
     ## "WHG"=c("LaBrana1", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
-    "WHG"=c("Iberian_Mesolithic", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
+    "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
     "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"), 
     "Yamnaya"="Yamnaya")
 include.counts <- list(                 #Include these populations as hard calls. 
     "WHG"="Loschbour",
     "EN"="Stuttgart",
     "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
+
+# version specific.
+if(results.tag=="incSHG"){
+  include.reads[["WHG"]] <- c("Iberian_Mesolithic", "HungaryGamba_HG", "Motala_HG")
+}
+if(results.tag=="onlySHG"){
+  include.reads[["WHG"]] <- c("Motala_HG")
+}
+if(version=="v7"){
+  include.reads[["WHG"]] <- gsub("SpanishMesolithic", "Iberian_Mesolithic", include.reads[["WHG"]], fixed=TRUE)
+}
+
 ## Setup the data. 
 counts <- read.table(paste0(root, ".count"), header=TRUE, as.is=TRUE)
 totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
