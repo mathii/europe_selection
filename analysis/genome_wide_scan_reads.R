@@ -56,7 +56,7 @@ counts <- data.matrix(counts[,6:NCOL(counts)])
 totals <- data.matrix(totals[,6:NCOL(totals)])
 counts <- counts[include,]
 totals <- totals[include,]
-reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts"), as.is=TRUE, header=FALSE)
+reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts.gz"), as.is=TRUE, header=FALSE)
 #Restrict reads to snps included in data file. 
 reads<-reads[reads[,1] %in% data[,1],]
 
