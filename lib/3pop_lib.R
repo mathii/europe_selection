@@ -119,7 +119,7 @@ likelihood.reads <- function(freq, data, error.prob=0.001, het.p=0.5){
                 ref <- data[[pop]][["reads"]][["ref"]][[i]]
                 alt <- data[[pop]][["reads"]][["alt"]][[i]]
                 ## ll <- ll+log((alt==0)*p*p + (ref==0)*(1-p)*(1-p) + 2*dbinom(ref, ref+alt, 0.5)*p*(1-p))
-                ll <- ll+log(dbinom(alt, ref+alt, error.prob)*p*p + dbinom(ref, ref+alt, 1-error.prob)*(1-p)*(1-p) + dbinom(ref, ref+alt, het.p)*2*p*(1-p))
+                ll <- ll+log(dbinom(alt, ref+alt, error.prob)*p*p + dbinom(ref, ref+alt, error.prob)*(1-p)*(1-p) + dbinom(ref, ref+alt, het.p)*2*p*(1-p))
             }
         }
         #Add counts, can be zero
