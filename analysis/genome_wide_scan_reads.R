@@ -121,5 +121,7 @@ results <- results[!is.na(results[,2]),]
 results <- cbind(rownames(results), results)
 colnames(results) <- c("ID", "ChiSq", "uncorrected.p")
 results <- data.frame(results)
-write.table(results, paste0("~/selection/analysis/",version,"/gscan/scan_results_read", results.tag, ".chr", chr, ".txt"), row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+out.file <-  paste0("~/selection/analysis/",version,"/gscan/scan_results_read", results.tag, ".chr", chr, ".txt")
+print(outfile)
+write.table(results,outfile, row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
 
