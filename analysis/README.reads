@@ -53,7 +53,7 @@ R --vanilla --args figure2 c ${V} < ~/selection/code/analysis/allele_frequency_p
 
 #5 Polygenic selection scans
 #Estimate allele frequncies in polypops
-for chr in {1..23}; do R --vanilla --args $chr <  ~/selection/code/analysis/reads_to_freq.R; done
+for chr in {1..23}; do R --vanilla --args $chr $V <  ~/selection/code/analysis/reads_to_freq.R; done
 CDIR=~/selection/counts/${V}
 for what in freq lowCI.freq highCI.freq;
 do
