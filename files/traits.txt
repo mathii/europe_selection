@@ -1,0 +1,6 @@
+Height	/Users/mathii/selection/data/gwas/lango_allen_snps.gwas
+BMI	/Users/mathii/selection/data/gwas/speliotes_2010.gwas
+WHR	/Users/mathii/selection/data/gwas/heid_2012.gwas
+T2D	/Users/mathii/selection/data/gwas/morris_2012.gwas
+IBD	/Users/mathii/selection/data/gwas/Jostins_IBD.gwas
+Lipids	/Users/mathii/selection/data/gwas/Teslovich_ALL.gwas

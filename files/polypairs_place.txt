@@ -1,0 +1,17 @@
+WHG,Spain_EN
+WHG,Spain_MN
+WHG,IBS
+Spain_EN,Spain_MN
+Spain_EN,IBS
+Spain_MN,IBS
+WHG,Germany_EN
+WHG,Germany_MN
+WHG,Germany_LNBA
+WHG,CEU
+Germany_EN,Germany_MN
+Germany_EN,Germany_LNBA
+Germany_EN,CEU
+Germany_MN,Germany_LNBA
+Germany_MN,CEU
+Germany_LNBA,CEU
+Hungary_EN,Hungary_LNBA
