@@ -122,6 +122,6 @@ results <- cbind(rownames(results), results)
 colnames(results) <- c("ID", "ChiSq", "uncorrected.p")
 results <- data.frame(results)
 out.file <-  paste0("~/selection/analysis/",version,"/gscan/scan_results_read", results.tag, ".chr", chr, ".txt")
-print(outfile)
-write.table(results,outfile, row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+print(out.file)
+write.table(results,out.file, row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
 
