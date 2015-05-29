@@ -18,8 +18,8 @@ results.tag <- ""
 
 cA <- commandArgs(TRUE)
 if(length(cA)){
-  chr <- cA
-  version <- cA
+  chr <- cA[1]
+  version <- cA[2]
   verbose=FALSE
   if(length(cA)>2){
     results.tag <- cA[3]
