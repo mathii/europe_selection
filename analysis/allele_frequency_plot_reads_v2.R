@@ -18,6 +18,10 @@ error.prob <- 0.001
 version="v6"
 
 what <- "figure2"
+
+cA <- commandArgs(TRUE)
+if(length(cA)>0){what <- cA[1]}
+
 outname <- paste0(what, "v2.pdf")
 readmefile <- paste0("~/selection/code/files/", what, ".readme")
 root <- paste0("~/selection/counts/",version,"/all")
@@ -78,8 +82,10 @@ include.read.samples <- read.samples(indfile, include.reads)
 
 ########################################################################
 
-pdf(paste0(out, outname), width=12, height=12)
-par(mfrow=c(floor((NROW(data)+1)/2),2))
+n.plot.row <- floor((NROW(data)+1)/2)
+n.plot.col <- ifelse(NROW(data)>1, 2,1)
+pdf(paste0(out, outname), width=6*n.plot.col, height=4*n.plot.row)
+par(mfrow=c(n.plot.row, n.plot.col))
 
 for(i in 1:NROW(data)){
   plot(0,0, col="white", xlim=c(0.5, length(int.names)+0.5 ), ylim=ylim, bty="n", xlab="", ylab="Derived allele frequency", main=paste0(readme[i,1], " (", data$ID[i], ")"),xaxt="n", cex.axis=1.2, cex.main=1.2)

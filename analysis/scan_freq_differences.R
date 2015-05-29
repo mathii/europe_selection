@@ -40,14 +40,19 @@ if(results.tag=="HG-EN"){
                       )
     include.counts <- list( "HG"="Loschbour", "EN"="Stuttgart")
 }else if(results.tag=="HG-Modern"){
+  include.reads <- list(                  #Include these populations as reads
+                        "HG"=c("SpanishMesolithicc", "HungaryGamba_HG", "Motala_HG")
+                        )
+  include.counts <- list( "HG"="Loschbour", "Modern"=c("IBS", "GBR", "CEU", "TSI" ))
+}else if(results.tag=="HG-Anc"){
     include.reads <- list(                  #Include these populations as reads
-                          "HG"=c("SpanishMesolithicc", "HungaryGamba_HG", "Motala_HG")
-                          )
-    include.counts <- list( "HG"="Loschbour", "Modern"=c("IBS", "GBR", "CEU", "TSI" ))
+                          "HG"=c("SpanishMesolithicc", "HungaryGamba_HG", "Motala_HG"), 
+                          "All"=c( "Starcevo_EN", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "Yamnaya", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA"))
+    include.counts <- list( "HG"="Loschbour" )
 }else if(results.tag=="HG-All"){
     include.reads <- list(                  #Include these populations as reads
                           "HG"=c("SpanishMesolithicc", "HungaryGamba_HG", "Motala_HG"), 
-                          "All"=c( "Starcevo_EN", "Stuttgart", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "Yamnaya", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA"))
+                          "All"=c( "Starcevo_EN", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "Yamnaya", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA"))
     include.counts <- list( "HG"="Loschbour", "All"=c("IBS", "GBR", "CEU", "TSI" ))
 }else if(results.tag=="WHG-EN"){
     include.reads <- list(                  #Include these populations as reads

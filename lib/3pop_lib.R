@@ -368,6 +368,9 @@ make.freq.data <- function(pops, include.reads, include.read.samples, include.co
         if(pop %in% names(include.reads)){
             for(sample in include.read.samples[[pop]]){
                 ref.alt <- read.info[read.info[,2]==sample,3:4]
+
+                if(!(sample %in% read.info[,2])){stop(paste0(sample, "not in read info"))}
+                
                 if(sum(ref.alt)>0){
                     freq.data[[pop]][["reads"]][["ref"]] <- c(freq.data[[pop]][["reads"]][["ref"]],ref.alt[[1]])
                     freq.data[[pop]][["reads"]][["alt"]] <- c(freq.data[[pop]][["reads"]][["alt"]],ref.alt[[2]])
