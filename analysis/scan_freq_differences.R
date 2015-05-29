@@ -35,13 +35,25 @@ monocheck <- c("CEU", "GBR", "IBS", "TSI", "HungaryGamba_HG", "Loschbour", "Stut
 
 if(results.tag=="HG-EN"){
     include.reads <- list(                  #Include these populations as reads
-                          "HG"=c("Iberian_Mesolithic", "HungaryGamba_HG", "Motala_HG"), 
+                          "HG"=c("SpanishMesolithicc", "HungaryGamba_HG", "Motala_HG"), 
                           "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN")
                       )
     include.counts <- list( "HG"="Loschbour", "EN"="Stuttgart")
+}else if(results.tag=="HG-Modern"){
+    include.reads <- list(                  #Include these populations as reads
+                          "HG"=c("SpanishMesolithicc", "HungaryGamba_HG", "Motala_HG")
+                          )
+                      )
+    include.counts <- list( "HG"="Loschbour", "Modern"=c("IBS", "GBR", "CEU", "TSI" )
+}else if(results.tag=="HG-All"){
+    include.reads <- list(                  #Include these populations as reads
+                          "HG"=c("SpanishMesolithicc", "HungaryGamba_HG", "Motala_HG"), 
+                          "All"=c( "Starcevo_EN", "Stuttgart", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "Yamnaya", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA"))
+                      )
+    include.counts <- list( "HG"="Loschbour", "All"=c("IBS", "GBR", "CEU", "TSI" )
 }else if(results.tag=="WHG-EN"){
     include.reads <- list(                  #Include these populations as reads
-                          "WHG"=c("Iberian_Mesolithic", "HungaryGamba_HG"), 
+                          "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), 
                           "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN")
                       )
     include.counts <- list( "WHG"="Loschbour", "EN"="Stuttgart")
@@ -53,7 +65,7 @@ if(results.tag=="HG-EN"){
     include.counts <- list( "EN"="Stuttgart")
 }else if(results.tag=="WHG-SHG"){
     include.reads <- list(                  #Include these populations as reads
-                          "WHG"=c("Iberian_Mesolithic", "HungaryGamba_HG"), 
+                          "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), 
                           "SHG"=c( "Motala_HG"),
                       )
     include.counts <- list( "WHG"="Loschbour")
