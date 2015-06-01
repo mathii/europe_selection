@@ -7,5 +7,7 @@ Spain_MN,CEU
 Germany_MN,CEU
 Germany_LNBA,CEU
 Hungary_LNBA,CEU
-Steppe_MN,CEU
+Yamnaya,CEU
+Poltavka,CEU
+Srubnaya,CEU
 IBS,CEU

@@ -21,6 +21,5 @@ Stuttgart	Germany_EN
 SwedenSkoglund_MHG	SHG
 SwedenSkoglund_NHG	SHG
 Unetice_EBA	Germany_LNBA
-Yamnaya	Yamnaya
-Poltavka	Poltavka
-Srubnaya	Srubnaya
+Yamnaya	Steppe_MN
+Poltavka	Steppe_MN

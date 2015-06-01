@@ -4,27 +4,37 @@
 source("~/selection/code/lib/3pop_lib.R")
 source("~/selection/code/lib/readlib.R")
 
-#Modern GBR, CEU, IBS, TSI
-#Ancient WHG, ENeo, Yamnaya
-
 ########################################################################
 ## Details
 chrs <- 1:22                                #set manually, or from --args
-verbose=TRUE
-if(length(commandArgs(TRUE))){
-    chrs <- as.numeric(commandArgs(TRUE)[1])
-    version <- commandArgs(TRUE)[2]
-    verbose=FALSE
+which.map <- ""
+cA <- commandArgs(TRUE)
+if(length(cA)){
+    chrs <- as.numeric(cA[1])
+    version <- cA[2]
+    if(length(cA)>2){
+        which.map <- cA[3]
+    }
 }
 
+verbose=TRUE
+## Supposed to check if running on cluster, but YMMV
+if( Sys.info()["login"]!=Sys.info()["user"]){
+    verbose=FALSE
+}
 
 ########################################################################
 ## Details
 root <- paste0("~/selection/counts/",version,"/all")
-out <- paste0("~/selection/counts/",version,"/all.reads")
 read.root <- paste0("~/data/",version,"/reads/jj2")
 indfile <- paste0("~/data/",version,"/use/v61kg_europe2names.ind")
 polymap <- "~/selection/code/files/polymap.txt"
+out <- paste0("~/selection/counts/",version,"/all.reads")
+if(which.map!=""){
+    polymap <- paste0("~/selection/code/files/polymap.", which.map, ".txt" )
+    out <- paste0("~/selection/counts/",version,"/all.reads.", which.map)
+}
+
 error.prob <- 0.01
 ########################################################################
 #Include these populations as hard calls
