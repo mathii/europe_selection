@@ -54,9 +54,13 @@ R --vanilla --args figure2 c ${V} < ~/selection/code/analysis/allele_frequency_p
 #5 Polygenic selection scans
 #Estimate allele frequncies in polypops
 for chr in {1..23}; do R --vanilla --args $chr $V <  ~/selection/code/analysis/reads_to_freq.R; done
+for chr in {1..23}; do R --vanilla --args $chr $V Steppe_MN <  ~/selection/code/analysis/reads_to_freq.R; done
+for chr in {1..23}; do R --vanilla --args $chr $V Steppe_MN_no_Srubs <  ~/selection/code/analysis/reads_to_freq.R; done
+
 CDIR=~/selection/counts/${V}
 for what in freq lowCI.freq highCI.freq;
 do
-grep ^ID ${CDIR}/all.reads.chr1.freq > ${CDIR}/all.reads.${what}
-grep -hv ^ID ${CDIR}/all.reads.chr+([1-9]).freq >> ${CDIR}/all.reads.${what} 
+for who in . .Steppe_MN. .Steppe_MN_no_Srubs.
+grep ^ID ${CDIR}/all.reads${who}chr1.freq > ${CDIR}/all.reads${who}${what}
+grep -hv ^ID ${CDIR}/all.reads${who}chr+([1-9]).freq >> ${CDIR}/all.reads${who}${what} 
 done
