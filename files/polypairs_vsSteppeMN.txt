@@ -1,0 +1,10 @@
+WHG,Steppe_MN
+SHG,Steppe_MN
+Spain_EN,Steppe_MN
+Germany_EN,Steppe_MN
+Hungary_EN,Steppe_MN
+Spain_MN,Steppe_MN
+Germany_MN,Steppe_MN
+Germany_LNBA,Steppe_MN
+Hungary_LNBA,Steppe_MN
+IBS,Steppe_MN

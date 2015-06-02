@@ -1,11 +1,11 @@
 V=v6
-LDIR=~/selection/analysis/files/
+LDIR=~/selection/code/files/
 DATA=~/selection/counts/${V}/all.reads.freq
 
 while read a b
 do
-    mkdir -p ~/selection/analysis/poly/${a}
-    OUT=~/selection/analysis/poly/${a}
+    mkdir -p ~/selection/analysis/${V}/poly/${a}
+    OUT=~/selection/analysis/${V}/poly/${a}
     for what in vsCEU place time
     do
     python ~/spindrift/Qx.py -q ${DATA} -n 10000 \
@@ -17,11 +17,11 @@ do
     what=vsSteppeMN
     for extra in Steppe_MN Steppe_MN_no_Srubs
     do
-    DATA=~/selection/counts/all.reads.${extra}.freq
+    DATA=~/selection/counts/${V}/all.reads.${extra}.freq
     python ~/spindrift/Qx.py -q ${DATA} -n 10000 \
     -p ${LDIR}/polypairs_${what}.txt \
     -o ${OUT}/${a}_${what}_${extra}_reads -v \
-    -g ${b} 2> ${OUT}/${a}_${what}_reads.log
+    -g ${b} 2> ${OUT}/${a}_${what}_${extra}_reads.log
     done
 
     python ~/spindrift/Qx.py -q ${DATA} -n 10000 \
