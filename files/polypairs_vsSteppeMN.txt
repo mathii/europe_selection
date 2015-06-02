@@ -8,3 +8,4 @@ Germany_MN,Steppe_MN
 Germany_LNBA,Steppe_MN
 Hungary_LNBA,Steppe_MN
 IBS,Steppe_MN
+CEU,Steppe_MN
