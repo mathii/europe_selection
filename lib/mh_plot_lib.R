@@ -6,7 +6,7 @@
 ## }
 
 
-MH.plot <- function(data, flip=FALSE, add=FALSE, chr.labels=TRUE, shift = 0, cap = 100, color.loci=data.frame(),range.shift=2, ...){
+MH.plot <- function(data, flip=FALSE, add=FALSE, chr.labels=TRUE, shift = 0, cap = 100, color.loci=data.frame(),range.shift=2, log10=TRUE, ylab="-log10 p-value", .ylim=NA, ...){
 
   ## Deal with X chromosome
   if(typeof(data$CHR)=="character"){
@@ -22,7 +22,7 @@ MH.plot <- function(data, flip=FALSE, add=FALSE, chr.labels=TRUE, shift = 0, cap
   chr <- (data$CHR)
   pos <- (data$POS)
   obsmax <- min(cap, trunc(max(-log10(obspval))))+range.shift
-  
+
   sort.ind <- order(chr, pos)  # sorting index
   chr <- chr[sort.ind]
   pos <- pos[sort.ind]
@@ -60,7 +60,11 @@ MH.plot <- function(data, flip=FALSE, add=FALSE, chr.labels=TRUE, shift = 0, cap
     points(locX,locY,pch=plot.sym,col=curcol,cex=0.8, ...)
   }
   else{
-    plot(locX,locY,pch=plot.sym,col=curcol,axes=F,ylab="-log10 p-value",xlab="",bty="n",ylim=c(-obsmax/20,obsmax),cex=0.8, ...)
+    ylim=.ylim
+    if(all(is.na(.ylim))){
+        ylim=ylim=c(-obsmax/20,obsmax)
+    }
+    plot(locX,locY,pch=plot.sym,col=curcol,axes=F,ylab=ylab,xlab="",bty="n",ylim=ylim,cex=0.8, ...)
     axis(2,las=1)
     mtext("Chromosome",1,at=x[22]/2,cex=1,line=1)
   }
