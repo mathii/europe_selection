@@ -10,7 +10,6 @@ library(RColorBrewer)
 
 ########################################################################
 ## Details
-ang <- 12
 ylim <- c(0,1)
 outsize=c(6,6)
 error.prob <- 0.001
@@ -31,18 +30,26 @@ out <- paste0("~/selection/analysis/",version,"/series/")
 
 ## ########################################################################
 
-int.names <- c("SHG", "WHG", "EN", "MN", "Yamnaya", "LN/BA")
-## long.names <- c("Scandinavian\nHunter Gatherers", "Western Hunter\nGatherers", "Early\nneolithic", "Middle\nneolithic", "Yamnaya", "Late neolithic\n/Bronze age")
-long.names <- c("SHG", "WHG", "ENeo", "MNeo", "Yamnaya", "LNeo+BA")
-int.include <- c("SHG", "WHG", "WHG", "WHG", "EN", "EN", "EN", "EN", "EN", "EN", "MN", "MN", "MN", "MN", "Yamnaya", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "CEU/IBS", "CEU/IBS")
-names(int.include) <-c("Motala_HG", "Loschbour", "Iberian_Mesolithic", "HungaryGamba_HG", "Starcevo_EN", "Stuttgart", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "Yamnaya", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA")
+## int.names <- c("SHG", "WHG", "EN", "MN", "LN/BA", "Yamnaya", "Poltavka", "Srubnaya")
+## long.names <- c("SHG", "WHG", "ENeo", "MNeo", "LNeo/BA", "Yamn", "Polt", "Srub")
+## int.include <- c("SHG", "WHG", "WHG", "WHG", "EN", "EN", "EN", "EN", "EN", "EN", "MN", "MN", "MN", "MN", "Yamnaya", "Poltavka", "Srubnaya", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "CEU/IBS", "CEU/IBS")
+
+int.names <- c("SHG", "WHG", "EN", "MN", "SteppeBA","LN/BA")
+long.names <- c("SHG", "WHG", "ENeo", "MNeo", "SteppeBA", "LNeo/BA")
+int.include <- c("SHG", "WHG", "WHG", "WHG", "EN", "EN", "EN", "EN", "EN", "EN", "MN", "MN", "MN", "MN", "SteppeBA", "SteppeBA", "SteppeBA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "CEU/IBS", "CEU/IBS")
+
+
+names(int.include) <-c("Motala_HG", "Loschbour", "Iberian_Mesolithic", "HungaryGamba_HG", "Starcevo_EN", "Stuttgart", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "Yamnaya", "Poltavka", "Srubnaya", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA")
 
 include.reads <- list(                  #Include these populations as reads
     "SHG"=c("SwedenSkoglund_MHG", "Motala_HG", "SwedenSkoglund_NHG"),
     "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #SpanishMesolithic is the high coverage LaBrana1 I0585 and LaBrana2
     "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"),
     "MN"=c( "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN" ),
-    "Yamnaya"=c("Yamnaya"),
+    ## "Yamnaya"=c("Yamnaya"),
+    ## "Poltavka"=c("Poltavka"),
+    ## "Srubnaya"=c("Srubnaya"),
+    "SteppeBA"=c("Yamnaya", "Poltavka", "Srubnaya"),
     "LN/BA"=c( "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA")
     )
 include.counts <- list(                 #Include these populations as hard calls. 
