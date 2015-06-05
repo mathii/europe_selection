@@ -7,15 +7,15 @@ library(RColorBrewer)
 ########################################################################
 ## Details
 root <- "~/selection/counts/all"
-readmefile <- "~/selection/analysis/series/figure2.readme"
-out <- "~/selection/analysis/poly/Height/"
+readmefile <- "~/selection/analysis/v6/series/figure2.readme"
+out <- "~/selection/analysis/v6/poly/Height/"
 outname <- "heighseries.pdf"
 ang <- 20
 ylim <- c(-1,1)
 
 ########################################################################
 ## Details
-data <- read.table("~/selection/analysis/poly/Height/pred_height.txt", as.is=TRUE)
+data <- read.table("~/selection/analysis/v6/poly/Height/pred_height.txt", as.is=TRUE)
 data[,1] <- gsub("_", " ", data[,1])
 pops <- unique(data[,1])
 

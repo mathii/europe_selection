@@ -31,16 +31,33 @@ degf <- length(pops)-1
 
 ## Setup the data. 
 freqs <- read.table(paste0(root, ".reads.LargeScale.freq"), header=TRUE, as.is=TRUE)
+freqs.hci <- read.table(paste0(root, ".reads.LargeScale.highCI.freq"), header=TRUE, as.is=TRUE)
+freqs.lci <- read.table(paste0(root, ".reads.LargeScale.lowCI.freq"), header=TRUE, as.is=TRUE)
+
 data <- freqs[,1:5]
 rownames(freqs) <- data$ID
+rownames(freqs.lci) <- freqs.lci$ID
+freqs.lci <- freqs.lci[rownames(freqs),]
+rownames(freqs.hci) <- freqs.hci$ID
+freqs.hci <- freqs.hci[rownames(freqs),]
+
 
 freqs <- data.matrix(freqs[,6:NCOL(freqs)])
 freqs <- freqs[,pops]
 
+freqs.hci <- data.matrix(freqs.hci[,6:NCOL(freqs.hci)])
+freqs.hci <- freqs.hci[,pops]
 
-include <- rowMeans(freqs)>0.05 & rowMeans(freqs)<0.95
+freqs.lci <- data.matrix(freqs.lci[,6:NCOL(freqs.lci)])
+freqs.lci <- freqs.lci[,pops]
+
+include <- rowMeans(freqs)>0.05 & rowMeans(freqs)<0.95 & rowSums(1-freqs>1e-3)>2 & rowSums(freqs>1e-3)>2
+include2 <- rowSums(freqs.hci-freqs.lci>0.55)==0
+include <- include & include2
 data <- data[include,]
 freqs <- freqs[include,]
+freqs.hci <- freqs.hci[include,]
+freqs.lci <- freqs.lci[include,]
 
 ## Compute covariance on genome-wide SNPS?
 ps <- freqs[,pops]
@@ -63,13 +80,13 @@ for(i in 1:NROW(ps.drop)){
 
 results <- results[!is.na(results[,2]),]
 
-results <- cbind(rownames(results), results)
+save.results <- cbind(rownames(results), results)
 
-colnames(results) <- c("ID", "ChiSq", "uncorrected.p")
-results <- data.frame(results)
+colnames(save.results) <- c("ID", "ChiSq", "uncorrected.p")
+save.results <- data.frame(save.results)
 out.file <-  paste0("~/selection/analysis/",version,"/cov/scan_results_reads.txt")
 print(out.file)
-write.table(results,out.file, row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+write.table(save.results,out.file, row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
 
 
 ## reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts.gz"), as.is=TRUE, header=FALSE)
