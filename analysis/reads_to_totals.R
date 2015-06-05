@@ -27,7 +27,7 @@ error.prob <- 0.01
 ########################################################################
 
 #Include these populations as hard calls
-include.totals <- c( "Loschbour", "Stuttgart", "CEU", "GBR", "IBS", "TSI", "FIN")
+include.totals <- c( "Loschbour", "Stuttgart", "CEU", "GBR", "IBS", "TSI", "FIN", "YRI")
 
 ## Setup the data. 
 totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
@@ -84,13 +84,10 @@ for(i in 1:NROW(data)){
             pop=colnames(new.totals)[j]
             tt <- 0 
             for(sample in include.read.samples[[pop]]){
-                ref.alt <- this.read[this.read[,2]==sample,3:4]
-                tt <- tt+2-0.5^(ref.alt[1]+ref.alt[2]-1)
-                ## if(ref.alt[1]==0 | ref.alt[2]==0){
-                ##     tt <- tt+1+0.5^(ref.alt[1]+ref.alt[2])
-                ## }else{
-                ##     tt <- tt+2
-                ## }
+                if(any(this.read[,2]==sample)){
+                    ref.alt <- this.read[this.read[,2]==sample,3:4]
+                    tt <- tt+2-0.5^(ref.alt[1]+ref.alt[2]-1)
+                }
             }
             new.totals[i,j] <- tt
         } 
