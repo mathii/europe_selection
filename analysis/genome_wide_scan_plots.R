@@ -9,7 +9,7 @@ source("~/selection/code/lib/mh_plot_lib.R")
 results.tag <- ""
 version <- "" 
 degf <- 4
-what <- "gsan"
+what <- "gscan"
 cA <- commandArgs(TRUE)
 if(length(cA)){
     results.tag <- cA[1]

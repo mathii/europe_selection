@@ -65,6 +65,6 @@ do
 for who in . .Steppe_MN. .Steppe_MN_no_Srubs.;
 do
 grep ^ID ${CDIR}/all.reads${who}chr1.freq > ${CDIR}/all.reads${who}${what}
-grep -hv ^ID ${CDIR}/all.reads${who}chr+([1-9]).freq >> ${CDIR}/all.reads${who}${what} 
+grep -hv ^ID ${CDIR}/all.reads${who}chr+([0-9]).freq >> ${CDIR}/all.reads${who}${what} 
 done
 done
