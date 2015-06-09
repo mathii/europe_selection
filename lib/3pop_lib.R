@@ -98,10 +98,11 @@ test.diff <- function(N, N.A){
 # model.
 # p: Reference allele frequencies (length N)
 # data: list of N populations, each entry is a list with
-# two elements, "reads" and "counts". "reads" is itself
+# three elements, "reads", "probabilities" and "counts". "reads" is itself
 # a list with "ref" and "alt" vectors of ref and alt
 # read counts for each individual and "counts" is a vector
-# of length 2 for giving ref/alt counts.
+# of length 2 for giving ref/alt counts. Probabilities is a list of,
+# genotype probabilities (00, 01, and 11), named by samples. 
 # This returns the log likelihood summed over all the
 # populations. het.p is the probability of seeing the reference
 # read for heterozygotes (0.5 by default)
@@ -120,6 +121,14 @@ likelihood.reads <- function(freq, data, error.prob=0.001, het.p=0.5){
                 alt <- data[[pop]][["reads"]][["alt"]][[i]]
                 ## ll <- ll+log((alt==0)*p*p + (ref==0)*(1-p)*(1-p) + 2*dbinom(ref, ref+alt, 0.5)*p*(1-p))
                 ll <- ll+log(dbinom(alt, ref+alt, error.prob)*p*p + dbinom(ref, ref+alt, error.prob)*(1-p)*(1-p) + dbinom(ref, ref+alt, het.p)*2*p*(1-p))
+            }
+        }
+        #Add probabilities
+        if(length(data[[pop]][["probabilities"]])>0){
+            for(ps in data[[pop]][["probabilities"]]){
+                #Is this right?
+                pse <- pmin(pmax(ps, error.prob), 1-error.prob)
+                ll <- ll+log(pse[1]*p*p + pse[2]*2*p*(1-p) + pse[3]*(1-p)*(1-p))
             }
         }
         #Add counts, can be zero
@@ -341,7 +350,9 @@ make.empty.data <- function(pops){
     empty.data <- rep( list(list()), length(pops) ) 
     names(empty.data) <- pops
     for(pop in pops){
-        empty.data[[pop]] <- list("reads"=list("ref"=NULL, "alt"=NULL, "samples"=NULL), "counts"=c(0,0)) #ref and alt counts. 
+        empty.data[[pop]] <- list("reads"=list("ref"=NULL, "alt"=NULL, "samples"=NULL),
+                                  "counts"=c(0,0),
+                                  "probabilities"=list()) #ref and alt counts. 
     }
     return(empty.data)
 }
@@ -362,7 +373,7 @@ make.empty.data <- function(pops){
 # read.info, counts, totals: standard data structures
 #########################################################
 
-make.freq.data <- function(pops, include.reads, include.read.samples, include.counts, read.info, this.counts, this.totals, empty.data){
+make.freq.data <- function(pops, include.reads, include.read.samples, include.counts, read.info, this.counts, this.totals, empty.data, include.prob.samples, prob.data){
     freq.data <- empty.data
     for(pop in pops){
         if(pop %in% names(include.reads)){
@@ -390,6 +401,46 @@ make.freq.data <- function(pops, include.reads, include.read.samples, include.co
     }
     return(freq.data)
 }
+
+#########################################################
+#
+# Combine information from read counts and genotype probabilities 
+# into the data structure used for the likelihood
+# calcluations here
+#
+# pops: list of populations to include
+# include.reads: list, with names in pops, mapping to
+# vectors of sub-populations to add together to make
+# each population, using read counts.
+# include.read samples: which samples are in each sub-population
+# include.counds: As include.reads, but with populations
+# for which we should add hard counts.
+# read.info, counts, totals: standard data structures
+#########################################################
+
+make.prob.freq.data <- function(pops, include.probs, include.prob.samples, include.counts, prob.info, this.counts, this.totals, empty.data){
+    freq.data <- empty.data
+    for(pop in pops){
+        if(pop %in% names(include.probs)){
+            for(sample in include.prob.samples[[pop]]){
+                this.str <- as.character(prob.info[sample])
+                this.gp <- as.numeric(strsplit( strsplit(this.str, ":", fixed=TRUE)[[1]][3], ",")[[1]])
+                freq.data[[pop]][["probabilities"]][[sample]] <- this.gp
+            }
+        }
+
+        if(pop %in% names(include.counts)){
+            for(subpop in include.counts[[pop]]){
+                ref.alt <- c(this.counts[subpop][[1]], this.totals[subpop][[1]]-this.counts[subpop][[1]])
+                names(ref.alt) <- NULL
+                freq.data[[pop]][["counts"]] <- freq.data[[pop]][["counts"]]+ref.alt
+            }
+        }
+    }
+    return(freq.data)
+}
+
+
 #########################################################
 #
 ## get list of samples in each population of reads
