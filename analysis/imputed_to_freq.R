@@ -115,6 +115,8 @@ for(i in 1:NROW(data)){
 
     freq.data <- make.prob.freq.data(pops, include.probs, include.prob.samples, include.counts,
                                 this.prob, counts[i,], totals[i,], empty.data)
+
+    monomorphic <- all(counts[i,monocheck]==0)|all(counts[i,monocheck]==totals[i,monocheck])
     if(monomorphic){
         freq[i,] <- NA
     }else{
