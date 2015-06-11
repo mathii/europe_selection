@@ -12,7 +12,6 @@ source("~/selection/code/lib/3pop_lib.R")
 ########################################################################
 ## Details
 chr <- 1                                #set manually, or from --args
-verbose=TRUE
 version <- "vx" #v6, v7 etc...
 results.tag <- ""
 
@@ -20,10 +19,15 @@ cA <- commandArgs(TRUE)
 if(length(cA)){
   chr <- cA[1]
   version <- cA[2]
-  verbose=FALSE
   if(length(cA)>2){
     results.tag <- cA[3]
   }
+}
+
+verbose=TRUE
+## Supposed to check if running on cluster, but YMMV
+if( Sys.info()["login"]!=Sys.info()["user"]){
+    verbose=FALSE
 }
 
 ########################################################################

@@ -86,13 +86,14 @@ comment.lines <- sum(grepl("^##", impute[,1]))
 impute <- read.table(impute.file, comment.char="", as.is=TRUE, header=TRUE, skip=comment.lines, sep="\t", fill=TRUE)
 rownames(impute) <- impute$ID
 impute <- impute[impute$ID %in% data[,1],]
+impute.info <- impute[,8]
 impute <- impute[,10:NCOL(impute)]
 
 ## get list of samples in each population of reads
 include.prob.samples <- read.samples(indfile, include.probs)
 
 ## set up results
-results <- matrix(0, nrow=NROW(data), ncol=2)
+results <- matrix(0, nrow=NROW(data), ncol=3)
 rownames(results) <- data$ID
 
 ## Data structure
@@ -109,14 +110,15 @@ for(i in 1:NROW(data)){
     if(monomorphic){
         results[i,] <- NA
     }else{
-        results[i,] <- test.3pop.reads(freq.data, A, error.prob=error.prob)
+        AR2 <- as.numeric(strsplit(strsplit(impute.info[i], ";", fixed=TRUE)[[1]][1], "=", fixed=TRUE)[[1]][2])
+        results[i,] <- c(test.3pop.reads(freq.data, A, error.prob=error.prob), AR2)
     }
 }
 
 results <- results[!is.na(results[,2]),]
 
 results <- cbind(rownames(results), results)
-colnames(results) <- c("ID", "ChiSq", "uncorrected.p")
+colnames(results) <- c("ID", "ChiSq", "uncorrected.p", "AR2")
 results <- data.frame(results)
 out.file <-  paste0("~/selection/analysis/",version,"/gscan/scan_results_imputed", results.tag, ".chr", chr, ".txt")
 print(out.file)
