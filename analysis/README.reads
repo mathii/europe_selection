@@ -68,3 +68,10 @@ grep ^ID ${CDIR}/all.reads.chr1${who}freq > ${CDIR}/all.reads${who}${what}
 grep -hv ^ID ${CDIR}/all.reads.chr+([0-9])${who}freq >> ${CDIR}/all.reads${who}${what} 
 done
 done
+
+#estimate height series
+while read pop;
+do
+bsub -q reich "R --vanilla --args $V $pop 100000 500000 \
+\< ~/selection/code/analysis/estimate_height_series.R"
+done < ~/selection/code/files/height_series_list.txt
