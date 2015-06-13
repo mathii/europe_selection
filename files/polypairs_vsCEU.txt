@@ -2,12 +2,9 @@ WHG,CEU
 SHG,CEU
 Spain_EN,CEU
 Germany_EN,CEU
-Hungary_EN,CEU
 Spain_MN,CEU
 Germany_MN,CEU
 Germany_LNBA,CEU
 Hungary_LNBA,CEU
-Yamnaya,CEU
-Poltavka,CEU
-Srubnaya,CEU
+Steppe_BA,CEU
 IBS,CEU
