@@ -210,9 +210,19 @@ draw.qq.ci <- function(N, fill.col="lightgrey", border.col="grey"){
 
 }
 
-qqPlotOfPValues <- function( pvals, gi = NULL, add=FALSE, BW=FALSE, jitter=FALSE, col="blue", linecol="red", ci=TRUE,  ... ){
+qqPlotOfPValues <- function( pvals, gi = NULL, add=FALSE, BW=FALSE, jitter=FALSE, col="blue", linecol="red", ci=TRUE, cex.pts=1, ... ){
 ##   p <- sort(unique(pvals))
-  p <- sort(pvals)
+
+  if(length(col)==1){
+      col <- rep(col, length(pvals))
+  } else if(length(col)!=length(pvals)){
+      stop("col must be either length 1 or length(pvals)")
+  }
+  ord <- order(pvals)
+ 
+  p <- pvals[ord]
+  col <- col[ord]
+  
   e = -log10(((1:length(p))-0.5)/length( p ))
   o = -log10(p)
 
@@ -228,7 +238,7 @@ qqPlotOfPValues <- function( pvals, gi = NULL, add=FALSE, BW=FALSE, jitter=FALSE
         draw.qq.ci(length(p))
     }
     abline(0,1,col=linecol)
-    points( e, o, pch= 20, cex=0.3, col=col, ... )
+    points( e, o, pch= 20, cex=0.3*cex.pts, col=col, ... )
   }
 
   if(BW){

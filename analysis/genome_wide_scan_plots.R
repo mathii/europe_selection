@@ -8,15 +8,20 @@ source("~/selection/code/lib/mh_plot_lib.R")
 
 results.tag <- ""
 version <- "" 
-degf <- 4
-what <- "gscan"
+degf <- NA                      #degrees of freedom for test
+what <- "gscan"                #plot other things than gscan
 cA <- commandArgs(TRUE)
 if(length(cA)){
     results.tag <- cA[1]
     version <- cA[2]
     degf <- as.numeric(cA[3])
     if(length(cA)>3){what <- cA[4]}
+}else{
+    stop("Must specify results tag as first argument")
 }
+
+if(version==""){stop("Must specify version as second argument")}
+if(is.na(degf)){stop("Must specify degrees of freedom as third argument")}
 
 results <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt")
 snpdata <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.snp")
@@ -30,17 +35,17 @@ neutral <- !(results[,"ID"] %in% selection[,1])
 data <- read.table(snpdata, as.is=TRUE)
 
 include <- results$ChiSq>0
-cat(paste0("Ignoring ", sum(!include), " SNPs with non-positiveq test statistics"))
+cat(paste0("Ignoring ", sum(!include), " SNPs with non-positiveq test statistics\n"))
 
 ## Apply genomic control if we haven't already
-if(!("corrected.p"  %in% names(results))){
-    lambda <- median(results[neutral&include,"ChiSq"])/qchisq(0.5, df=degf)
-    corrected.p <- pchisq(results[,"ChiSq"]/lambda, df=degf, lower.tail=F)
-    results <- cbind(results, corrected.p)
-    write.table(results, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt"),
-                row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
-    cat(paste0("Used lambda = ", lambda, "\n"))
-}else{cat("Using corrected p-values\n")}
+## if(!("corrected.p"  %in% names(results))){
+lambda <- median(results[neutral&include,"ChiSq"])/qchisq(0.5, df=degf)
+corrected.p <- pchisq(results[,"ChiSq"]/lambda, df=degf, lower.tail=F)
+results <- cbind(results, corrected.p)
+## write.table(results, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt"),
+##             row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+cat(paste0("Used lambda = ", lambda, "\n"))
+## }else{cat("Using corrected p-values\n")}
 
 ## Merge SNP position data with results
 res <- data.frame(ID=results$ID, PVAL=results$corrected.p)
@@ -55,8 +60,6 @@ sig.level <- -log10(0.05/NROW(res))
 cat(paste0("Used sig.level = ", sig.level, "\n"))
 
 ## Manhattan plot
-## png(paste0("~/Dropbox/posters/AAPA/mh_plot", results.tag ,".png"), width=16, height=8, units="in", res=400)
-## par(bg = "grey92")
 png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".png"), width=800, height=400)
 par(mar=c(2,4,1,1))
 MH.plot(res, color.loci=data.frame())
@@ -67,8 +70,6 @@ dev.off()
 sig.chrs <- unique(res$CHR[res$PVAL<(10^-(sig.level))])
 for(c in sig.chrs){
     png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".chr", c, ".png"), width=250, height=250)
-    ## png(paste0("~/Dropbox/posters/AAPA/mh_plot.chr", c ,".png"), width=4, height=4, units="in", res=400)
-    ## par(bg = "grey92")
     par(mar=c(1,2,1,1))
     MH.plot(res[res$CHR==c,], color.loci=data.frame(), chr.labels=FALSE)
     abline(h=sig.level, col="red", lty=2)
