@@ -16,7 +16,7 @@ Motala_HG	SHG
 Spain_EN	Iberia_EN
 Spain_MN	Iberia_MN
 Starcevo_EN	Central_EN
-Stuttgart	Germany_EN
+Stuttgart	Central_EN
 SwedenSkoglund_MHG	SHG
 SwedenSkoglund_NHG	SHG
 Unetice_EBA	Central_LNBA

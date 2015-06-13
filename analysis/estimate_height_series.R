@@ -9,7 +9,6 @@ source("~/selection/code/lib/readlib.R")
 
 ########################################################################
 ## Details
-version <- "v6"
 verbose=TRUE
 which.map <- ""
 if( Sys.info()["login"]!=Sys.info()["user"]){
@@ -17,11 +16,31 @@ if( Sys.info()["login"]!=Sys.info()["user"]){
 }
 
 ########################################################################
+#Arguments
+
+cA <- commandArgs(TRUE)
+if(!length(cA)){
+    stop("Must specify version")
+}
+version <- cA[1]
+pops.to.use <- NA
+extag <- ""
+if(length(cA)>1){
+    pops.to.use <- strsplit(cA[2], ",", fixed=TRUE)[[1]]
+    extag <- paste0("_",gsub(",", "_", cA[2], fixed=TRUE))
+}
+
+########################################################################
 #MCMC parameters
 
-burn.in <- 20000
-N.iter <- 100000
+burn.in <- 100
+N.iter <- 1000
+if(length(cA)>2){
+    burn.in <- as.numeric(cA[3])
+    N.iter <- as.numeric(cA[4])
+}
 thin <- 1                               #Why bother?
+
 
 ########################################################################
 ## Details
@@ -43,14 +62,13 @@ error.prob <- 0.01
 #Include these populations as hard calls
 include.counts <- list(                 #Include these populations as hard calls. 
     "WHG"="Loschbour",
-    "Germany_EN"="Stuttgart",
+    "Central_EN"="Stuttgart",
     "CEU"="CEU",  "IBS"="IBS" )
 #Exclude these
 exclude <- c("LaBrana1")
 ## exclude <- c()
                                         # include these
 include.extra <- list("SpanishMesolithic"="WHG")         #High coverage LaBrana
-monocheck <- c("CEU", "IBS", "GBR", "IBS", "TSI")
 ########################################################################
 #Standard setup
 
@@ -187,13 +205,15 @@ mh.step <- function(f, prop.freq.data.list, proposal.sd=0.001){
     }
 }
 
-results <- matrix(0, nrow=length(pops), ncol=4)
-rownames(results) <- pops
+if(all(is.na(pops.to.use))){pops.to.use <- pops}
+
+results <- matrix(0, nrow=length(pops.to.use), ncol=4)
+rownames(results) <- pops.to.use
 colnames(results) <- c("MLE", "Post.Mn", "Post.5", "Post.95")
-results[,1] <- fr.4
+results[,1] <- fr.4[pops.to.use]
 
 popi <- 1
-for(pop in pops){
+for(pop in pops.to.use){
     prop.sd <- 0.01
     if(pop %in% c("CEU", "IBS")){prop.sd <- 0.003}
     
@@ -236,7 +256,7 @@ for(pop in pops){
 }
 
 
-write.table(results, paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates.txt"), col.names=TRUE, row.names=TRUE, quote=FALSE, sep="\t") 
+write.table(results, paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates", extag,".txt"), col.names=TRUE, row.names=TRUE, quote=FALSE, sep="\t") 
 
 
 
