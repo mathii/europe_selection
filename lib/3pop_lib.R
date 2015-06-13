@@ -241,7 +241,7 @@ ci.unconstrained.model.reads <- function(data, error.prob=0.001, alpha=0.95){
         opt <- optimize(likelihood.reads, data=subdata, error.prob=error.prob, maximum=TRUE, lower=EPSILON.3pop, upper=1-EPSILON.3pop)
         f[i] <- opt$maximum
         ll[i] <- likelihood.reads(f[i], subdata, error.prob=error.prob)
-        
+                    
         #Upper
         if(ll[i]-likelihood.reads(1-EPSILON.3pop, subdata, error.prob=error.prob)<ll.diff){
             uci[i] <- 1
@@ -259,7 +259,6 @@ ci.unconstrained.model.reads <- function(data, error.prob=0.001, alpha=0.95){
 
     return(list(p=f, ll=ll, uci=uci, lci=lci))
 }
-
 
 #########################################################
 #

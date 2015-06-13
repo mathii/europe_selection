@@ -8,7 +8,7 @@ source("~/selection/code/lib/mh_plot_lib.R")
 
 results.tag <- ""
 version <- "" 
-degf <- 4                      #degrees of freedom for test
+degf <- NA                      #degrees of freedom for test
 what <- "gscan"                #plot other things than gscan
 cA <- commandArgs(TRUE)
 if(length(cA)){
@@ -16,7 +16,12 @@ if(length(cA)){
     version <- cA[2]
     degf <- as.numeric(cA[3])
     if(length(cA)>3){what <- cA[4]}
+}else{
+    stop("Must specify results tag as first argument")
 }
+
+if(version==""){stop("Must specify version as second argument")}
+if(is.na(degf)){stop("Must specify degrees of freedom as third argument")}
 
 results <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt")
 snpdata <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.snp")

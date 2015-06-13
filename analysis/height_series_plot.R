@@ -6,35 +6,46 @@ library(RColorBrewer)
 
 ########################################################################
 ## Details
-root <- "~/selection/counts/all"
 readmefile <- "~/selection/analysis/v6/series/figure2.readme"
-out <- "~/selection/analysis/v6/poly/Height/"
-outname <- "heighseries.pdf"
+out <- "~/selection/analysis/v6/series/heighseries.pdf"
+height.values <- "~/selection/analysis/v6/series/height_series_mcmc_estimates.txt"
+dates <- "~/selection/code/files/population_dates.txt"
 ang <- 20
-ylim <- c(-1,1)
+ylim <- c(-0.5,0.5)
 
 ########################################################################
 ## Details
-data <- read.table("~/selection/analysis/v6/poly/Height/pred_height.txt", as.is=TRUE)
-data[,1] <- gsub("_", " ", data[,1])
-pops <- unique(data[,1])
+dates <- read.table(dates, as.is=TRUE)
+colnames(dates) <- c("MPOP", "POP", "START", "END")
+heights <- read.table(height.values, as.is=TRUE, header=TRUE)
+heights$POP <- rownames(heights)
+data <- merge(dates, heights, by="POP")
+
+data[,1] <- gsub("_", " ", data[,"MPOP"])
+pops <- unique(data[,"MPOP"])
+data <- data[order(data$MPOP, data$END, data$START),]
 
 cols <- brewer.pal( length(pops), "Set1")
 cols[6] <- "darkgrey"
 
-pdf(paste0(out, outname), width=12, height=6)
+pdf(out, width=12, height=6)
 plot(0,0, col="white", xlim=c(-8000, 0), ylim=ylim, bty="n", xlab="Years before present", ylab="Genetic height", xaxt="n")
 
 for(i in 1:length(pops)){
     pop <- pops[i]
-    
-    int.starts <- data[data[,1]==pop,3]
-    int.ends <- data[data[,1]==pop,4]
-    ht <- data[data[,1]==pop,5]
-    rect(-int.starts, ht-0.02, -int.ends, ht+0.02, col=cols[i], density=20, angle=ang*i, border=cols[i])
+
+    kk=data[,"MPOP"]==pop
+    int.starts <- data[kk,"END"]
+    int.ends <- data[kk,"START"]
+    ht <- data[kk,"Post.Mn"]
+    ## rect(-int.starts, ht-0.02, -int.ends, ht+0.02, col=cols[i], density=20, angle=ang*i, border=cols[i])
+    rect(-int.starts, data[kk,"Post.5"], -int.ends, data[kk,"Post.95"], col=cols[i], density=20, angle=ang*i, border=cols[i])
+
+    points(-0.5*(int.starts+int.ends), data[kk,"MLE"], cex=2, pch=16, col=cols[i])
+                
     ln <- length(int.ends)
 
-    if(ln>1){
+    if(ln>1 & pop!="Hunter_Gatherers"){
         segments(-int.ends[1:(ln-1)], ht[1:(ln-1)], -int.starts[2:ln], ht[2:ln], col=cols[i], lwd=2)
     }
 }
