@@ -227,8 +227,9 @@ for(pop in pops.to.use){
     }
 
     #Eek
-    f <- unlist(sapply(pop.freq.data.list, fit.unconstrained.model.reads, error.prob=error.prob)[1,])
-
+    ## f <- unlist(sapply(pop.freq.data.list, fit.unconstrained.model.reads, error.prob=error.prob)[1,])
+    f <- runif(NROW(data))
+    
     cat("Burn in...")
     accept <- c(0,0)
     for(i in 1:burn.in){
