@@ -187,7 +187,7 @@ proposal <- function(x, sd=0.001){
     return(prop)
 }
 
-## Implicit uniform prior on frequencies. 
+## Implicit uniform (0,1) prior on frequencies
 mh.step <- function(f, prop.freq.data.list, proposal.sd=0.001){
     new.f <- proposal(f, sd=proposal.sd)
 
@@ -196,7 +196,9 @@ mh.step <- function(f, prop.freq.data.list, proposal.sd=0.001){
     }else{
         old.ll <- sum(mapply(likelihood.reads, f, pop.freq.data.list))
         new.ll <- sum(mapply(likelihood.reads, new.f, pop.freq.data.list))
-        ratio <- exp(new.ll-old.ll)
+        #Normalising constant because we are truncating the proposal density. 
+        trunc.const <- sum(log((pnorm(1,mean=f,sd=proposal.sd)-pnorm(0,mean=f,sd=proposal.sd))/(pnorm(1,mean=new.f,sd=proposal.sd)-pnorm(0,mean=new.f,sd=proposal.sd))))
+        ratio <- exp(new.ll-old.ll+trunc.const)
     }
     if(ratio>1 | runif(1)<ratio){
         return(list(f=new.f, accept=TRUE))
