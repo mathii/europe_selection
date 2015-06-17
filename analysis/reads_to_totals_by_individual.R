@@ -64,7 +64,7 @@ for(i in 1:NROW(data)){
     if(this.chr!=data[i,"CHR"]){
         this.chr <- data[i,"CHR"]
         cat(paste0("Loading chromosome ", this.chr, " reads..."))
-        reads <- read.table(paste0(read.root, ".chr", data[i,"CHR"], ".readcounts"), as.is=TRUE, header=FALSE)
+        reads <- read.table(paste0(read.root, ".chr", data[i,"CHR"], ".readcounts.gz"), as.is=TRUE, header=FALSE)
         this.chr.ID.order <- data[data[,"CHR"]==this.chr,"ID"]
         reads <- reads[order(match(reads[,1],this.chr.ID.order), reads[,2]),]
         reads <- reads[reads[,2]%in%include.read.samples,]
