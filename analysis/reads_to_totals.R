@@ -23,11 +23,11 @@ root <- paste0("~/selection/counts/", version, "/all")
 out <- paste0("~/selection/counts/", version, "/all.reads")
 read.root <- paste0("~/data/", version, "/reads/jj2")
 indfile <- paste0("~/data/", version, "/use/", version, "1kg_europe2names.ind")
-error.prob <- 0.01
+
 ########################################################################
 
 #Include these populations as hard calls
-include.totals <- c( "Loschbour", "Stuttgart", "CEU", "GBR", "IBS", "TSI", "FIN", "YRI")
+include.totals <- c( "Loschbour", "Stuttgart", "CEU", "GBR", "IBS", "TSI", "YRI")
 
 ## Setup the data. 
 totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)

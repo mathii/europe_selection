@@ -1,12 +1,13 @@
 #Which version - v6, v7
 #Data should be in the directory ~/data/$VERSION/{use,reads} 
 #Output will be in ~/selection/analysis/$VERSION/
-V=v7
+V=v8
 
 for dir in effsize  gscan  series  s_estimates poly
 do
 	mkdir -p ~/selection/analysis/${V}/${dir}
 done
+mkdir -p ~/selection/counts/${V}/
 
 #0. Initial processing - rename to europe2 names in data/${VERSION}/use
 # Create symlinks TODO, perhaps add polypops names
@@ -17,11 +18,11 @@ ln -s ~/data/${V}/use/${V}1kgx.snp ~/data/${V}/use/${V}1kg_europe2names.snp
 #1. Pull out allele counts from eigenstrat data
 
 python ~/spindrift/Freq.py \
-	-d ~/data/${V}/use/${V}1kg_europe2names \
-	-p ~/selection/code/files/used_all.txt \
-	-n ~/selection/code/files/used_ancient_pseudodiploid.txt \
-	-o ~/selection/counts/${V}/all \
-	-s ~/data/${V}/use/${V}1kg_europe2names
+-d ~/data/${V}/use/${V}1kg_europe2names \
+-p ~/selection/code/files/${V}/used_all.txt \
+-n ~/selection/code/files/${V}/used_ancient_pseudodiploid.txt \
+-o ~/selection/counts/${V}/all \
+-s ~/data/${V}/use/${V}1kg_europe2names
 
 #2. Compute sample size
 for chr in {1..23}; do R --vanilla --args $chr $V < ~/selection/code/analysis/reads_to_totals.R; done

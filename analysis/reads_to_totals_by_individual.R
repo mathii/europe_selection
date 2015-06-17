@@ -12,20 +12,21 @@ chrs <- 1:22                                #set manually, or from --args
 verbose=TRUE
 if(length(commandArgs(TRUE))){
     chrs <- as.numeric(commandArgs(TRUE)[1])
+    version <- commandArgs(TRUE)[2]
     verbose=FALSE
 }
 
 
 ########################################################################
 ## Details
-root <- "~/selection/counts/all"
-out <- "~/selection/counts/all.reads"
-read.root <- "~/data/v6/reads/jj2"
-indfile <- "~/data/v6/use/v61kg_europe2names.ind"
-error.prob <- 0.01
+root <- paste0("~/selection/counts/", version, "/all")
+out <- paste0("~/selection/counts/", version, "/all.reads")
+read.root <- paste0("~/data/", version, "/reads/jj2")
+indfile <- paste0("~/data/", version, "/use/", version, "1kg_europe2names.ind")
+
 ########################################################################
 
-include.totals <- c( "Loschbour", "Stuttgart", "CEU", "GBR", "IBS", "TSI", "FIN", "YRI")
+include.totals <- c( "Loschbour", "Stuttgart", "CEU", "GBR", "IBS", "TSI", "YRI")
 
 ## Setup the data. 
 totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
@@ -87,18 +88,18 @@ for(i in 1:NROW(data)){
 
 results <- data.frame(IID=include.read.samples, coverage=colMeans(new.totals), hit.once=colMeans(new.totals>0), effective=colMeans(2-0.5^(new.totals-1)))
 
-tag=paste0("~/selection/analysis/effsize/effsize_reads_by_ind", ".chr", paste(chrs, collapse="_"), ".txt")
+tag=paste0("~/selection/analysis/", version, "/effsize/effsize_reads_by_ind", ".chr", paste(chrs, collapse="_"), ".txt")
 if(all(chrs==1:22)){
-    tag <- "~/selection/analysis/effsize/effsize_reads_by_ind.txt"
+    tag <- "~/selection/analysis/", version, "/effsize/effsize_reads_by_ind.txt"
 }
 write.table(results, tag, row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
 
-pdf("~/Desktop/Coverage_vs_Hits.pdf")
-plot(results$coverage, results$hit.once, ylab="Proportion of sites hit at least once", xlab="Mean coverage", pch=16, col="#377EBA", log="x")
-xpts <- 10^seq(-2, 2, length.out=100)
-ypts=1-exp(-xpts)
-lines(xpts, ypts, col="red")
-abline(h=0.95, col="grey", lty=2)
-abline(v=3, col="grey", lty=2)
-abline(v=8, col="grey", lty=2)
-dev.off()
+## pdf("~/Desktop/Coverage_vs_Hits.pdf")
+## plot(results$coverage, results$hit.once, ylab="Proportion of sites hit at least once", xlab="Mean coverage", pch=16, col="#377EBA", log="x")
+## xpts <- 10^seq(-2, 2, length.out=100)
+## ypts=1-exp(-xpts)
+## lines(xpts, ypts, col="red")
+## abline(h=0.95, col="grey", lty=2)
+## abline(v=3, col="grey", lty=2)
+## abline(v=8, col="grey", lty=2)
+## dev.off()
