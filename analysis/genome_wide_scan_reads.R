@@ -46,25 +46,35 @@ A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.71
 
 ########################################################################
 
-include.reads <- list(                  #Include these populations as reads
-    ## "WHG"=c("LaBrana1", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
-    "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
-    "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"), 
-    "Yamnaya"="Yamnaya")
 include.counts <- list(                 #Include these populations as hard calls. 
     "WHG"="Loschbour",
     "EN"="Stuttgart",
     "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
 
-# version specific.
-if(results.tag=="incSHG"){
-  include.reads[["WHG"]] <- c("Iberian_Mesolithic", "HungaryGamba_HG", "Motala_HG")
-}
-if(results.tag=="onlySHG"){
-  include.reads[["WHG"]] <- c("Motala_HG")
+if(version=="v6" | version=="v7"){
+include.reads <- list(                  #Include these populations as reads
+    ## "WHG"=c("LaBrana1", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
+    "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
+    "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"), 
+    "Yamnaya"="Yamnaya")
 }
 if(version=="v7"){
   include.reads[["WHG"]] <- gsub("SpanishMesolithic", "Iberian_Mesolithic", include.reads[["WHG"]], fixed=TRUE)
+}
+if(version=="v8"){
+include.reads <- list(                  #Include these populations as reads
+    "WHG"=c("WHG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
+    "EN"=c("Central_EN", "Iberia_EN", "Anatolian_Neolithic"), 
+    "Yamnaya"="Steppe")
+monocheck <- c("CEU", "GBR", "IBS", "TSI", "Central_EN", "Iberia_EN", "Anatolian_Neolithic", "Loschbour", "Stuttgart",
+               "Steppe", "WHG")
+}
+# version specific.
+if(results.tag=="incSHG"){
+  include.reads[["WHG"]] <- c(include.reads[["WHG"]], "Motala_HG")
+}
+if(results.tag=="onlySHG"){
+  include.reads[["WHG"]] <- c("Motala_HG")
 }
 
 ## Setup the data. 

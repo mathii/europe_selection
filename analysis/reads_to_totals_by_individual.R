@@ -11,7 +11,12 @@ source("~/selection/code/lib/3pop_lib.R")
 chrs <- 1:22                                #set manually, or from --args
 verbose=TRUE
 if(length(commandArgs(TRUE))){
-    chrs <- as.numeric(commandArgs(TRUE)[1])
+    cc <- commandArgs(TRUE)[1]
+    if(cc=="All"){
+        chrs <- 1:22
+    } else{
+        chrs <- as.numeric(cc)
+    }
     version <- commandArgs(TRUE)[2]
     verbose=FALSE
 }
