@@ -90,7 +90,7 @@ results <- data.frame(IID=include.read.samples, coverage=colMeans(new.totals), h
 
 tag=paste0("~/selection/analysis/", version, "/effsize/effsize_reads_by_ind", ".chr", paste(chrs, collapse="_"), ".txt")
 if(all(chrs==1:22)){
-    tag <- "~/selection/analysis/", version, "/effsize/effsize_reads_by_ind.txt"
+    tag <- paste0("~/selection/analysis/", version, "/effsize/effsize_reads_by_ind.txt")
 }
 write.table(results, tag, row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
 
