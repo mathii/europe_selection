@@ -74,6 +74,13 @@ include.extra <- list("SpanishMesolithic"="WHG")         #High coverage LaBrana
     include.extra <- list()
 }
 
+if(version=="v8"){
+include.counts <- list(                 #Include these populations as hard calls. 
+    "WHG"="Loschbour",
+    "Central_EN"="Stuttgart",
+    "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
+}
+
 ########################################################################
 #Standard setup
 
