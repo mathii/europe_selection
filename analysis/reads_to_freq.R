@@ -27,8 +27,8 @@ if( Sys.info()["login"]!=Sys.info()["user"]){
 ## Details
 root <- paste0("~/selection/counts/",version,"/all")
 read.root <- paste0("~/data/",version,"/reads/jj2")
-indfile <- paste0("~/data/",version,"/use/v61kg_europe2names.ind")
-snpfile <- paste0("~/data/",version,"/use/v61kg_europe2names.snp")
+indfile <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.ind")
+snpfile <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.snp")
 polymap <- paste0("~/selection/code/files/",version, "/polymap.txt")
 out <- paste0("~/selection/counts/",version,"/all.reads")
 if(which.map!=""){
