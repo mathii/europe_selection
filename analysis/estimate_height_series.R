@@ -89,13 +89,14 @@ for(i in 1:NROW(polymap)){
     }
 }
 
-for(i in 1:length(include.extra)){
-     if(include.extra[[i]] %in% names(include.reads)){
-        include.reads[[include.extra[[i]]]] <- c(include.reads[[include.extra[[i]]]], names(include.extra)[i])
-    } else{
-        include.reads[[include.extra[[i]]]] <- names(include.extra)[i]
+if(length(include.extra)){
+    for(i in 1:length(include.extra)){
+        if(include.extra[[i]] %in% names(include.reads)){
+            include.reads[[include.extra[[i]]]] <- c(include.reads[[include.extra[[i]]]], names(include.extra)[i])
+        } else{
+            include.reads[[include.extra[[i]]]] <- names(include.extra)[i]
+        }
     }
-
 }
 
 pops <- unique(sort(c(names(include.reads), names(include.counts))))
