@@ -1,0 +1,15 @@
+Anatolian_Neolithic	Anatolian_Neolithic
+Central_EN	Central_EN
+Central_LNBA	Central_LNBA
+Central_MN	Central_MN
+Iberia_EN	Iberia_EN
+Iberia_LNBA	Iberia_LNBA
+Iberia_MN	Iberia_MN
+Northern_EN	Northern_EN
+Northern_LNBA	Northern_LNBA
+Poltavka	Steppe
+Potapovka	Steppe
+SHG	SHG
+Yamnaya	Steppe
+WHG	WHG
+Srubnaya	Steppe

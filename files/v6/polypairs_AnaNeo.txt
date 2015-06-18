@@ -1,0 +1,6 @@
+AnatolianNeolithic,Spain_EN
+AnatolianNeolithic,Germany_EN
+AnatolianNeolithic,Spain_MN
+AnatolianNeolithic,Germany_MN
+AnatolianNeolithic,CEU
+AnatolianNeolithic,IBS
