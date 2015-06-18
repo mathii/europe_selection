@@ -29,10 +29,10 @@ root <- paste0("~/selection/counts/",version,"/all")
 read.root <- paste0("~/data/",version,"/reads/jj2")
 indfile <- paste0("~/data/",version,"/use/v61kg_europe2names.ind")
 snpfile <- paste0("~/data/",version,"/use/v61kg_europe2names.snp")
-polymap <- "~/selection/code/files/polymap.txt"
+polymap <- "~/selection/code/files/",version, "/polymap.txt"
 out <- paste0("~/selection/counts/",version,"/all.reads")
 if(which.map!=""){
-    polymap <- paste0("~/selection/code/files/polymap.", which.map, ".txt" )
+    polymap <- paste0("~/selection/code/files/", version, "/polymap.", which.map, ".txt" )
     out <- paste0("~/selection/counts/",version,"/all.reads.", which.map)
 }
 
@@ -47,7 +47,12 @@ include.counts <- list(                 #Include these populations as hard calls
 exclude <- c("LaBrana1")
 ## exclude <- c()
                                         # include these
+if(version=="v6"){
 include.extra <- list("SpanishMesolithic"="WHG")         #High coverage LaBrana
+}else{
+    include.extra <- list()
+}
+
 monocheck <- c("CEU", "IBS", "GBR", "IBS", "TSI")
 ########################################################################
 

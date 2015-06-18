@@ -65,9 +65,9 @@ if(version=="v8"){
 include.reads <- list(                  #Include these populations as reads
     "WHG"=c("WHG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
     "EN"=c("Central_EN", "Iberia_EN", "Anatolian_Neolithic"), 
-    "Yamnaya"="Steppe")
+    "YPP"=c("Yamnaya", "Poltavka", "Potapovka"))
 monocheck <- c("CEU", "GBR", "IBS", "TSI", "Central_EN", "Iberia_EN", "Anatolian_Neolithic", "Loschbour", "Stuttgart",
-               "Steppe", "WHG")
+               "Yamnaya", "Poltavka", "Potapovka", "WHG")
 }
 # version specific.
 if(results.tag=="incSHG"){
