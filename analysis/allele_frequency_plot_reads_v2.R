@@ -19,10 +19,11 @@ version="v6"
 what <- "figure2"
 
 cA <- commandArgs(TRUE)
-if(length(cA)>0){what <- cA[1]}
+if(length(cA)>0){version <- cA[1]}
+if(length(cA)>1){what <- cA[2]}
 
 outname <- paste0(what, "v2.pdf")
-readmefile <- paste0("~/selection/code/files/", what, ".readme")
+readmefile <- paste0("~/selection/code/files/",version, "/",  what, ".readme")
 root <- paste0("~/selection/counts/",version,"/all")
 read.root <- paste0("~/data/",version,"/reads/")
 indfile <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.ind")
@@ -30,17 +31,11 @@ out <- paste0("~/selection/analysis/",version,"/series/")
 
 ## ########################################################################
 
-## int.names <- c("SHG", "WHG", "EN", "MN", "LN/BA", "Yamnaya", "Poltavka", "Srubnaya")
-## long.names <- c("SHG", "WHG", "ENeo", "MNeo", "LNeo/BA", "Yamn", "Polt", "Srub")
-## int.include <- c("SHG", "WHG", "WHG", "WHG", "EN", "EN", "EN", "EN", "EN", "EN", "MN", "MN", "MN", "MN", "Yamnaya", "Poltavka", "Srubnaya", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "CEU/IBS", "CEU/IBS")
-
+if(version=="v6"){
 int.names <- c("SHG", "WHG", "EN", "MN", "SteppeBA","LN/BA")
 long.names <- c("SHG", "WHG", "ENeo", "MNeo", "SteppeBA", "LNeo/BA")
 int.include <- c("SHG", "WHG", "WHG", "WHG", "EN", "EN", "EN", "EN", "EN", "EN", "MN", "MN", "MN", "MN", "SteppeBA", "SteppeBA", "SteppeBA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "LN/BA", "CEU/IBS", "CEU/IBS")
-
-
 names(int.include) <-c("Motala_HG", "Loschbour", "Iberian_Mesolithic", "HungaryGamba_HG", "Starcevo_EN", "Stuttgart", "Spain_EN", "LBK_EN", "LBKT_EN", "HungaryGamba_EN", "Spain_MN", "Baalberge_MN", "Iceman", "Esperstedt_MN", "Yamnaya", "Poltavka", "Srubnaya", "HungaryGamba_CA", "Alberstedt_LN", "Corded_Ware_LN", "Bell_Beaker_LN", "BenzigerodeHeimburg_LN", "Unetice_EBA", "HungaryGamba_BA", "Halberstadt_LBA")
-
 include.reads <- list(                  #Include these populations as reads
     "SHG"=c("SwedenSkoglund_MHG", "Motala_HG", "SwedenSkoglund_NHG"),
     "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #SpanishMesolithic is the high coverage LaBrana1 I0585 and LaBrana2
@@ -58,6 +53,34 @@ include.counts <- list(                 #Include these populations as hard calls
      )
 
 mod.pops <- c("CEU", "GBR", "IBS", "TSI")
+}
+########################################################################
+if(version=="v8"){
+int.names <- c("SHG", "WHG", "AN", "BN", "CEN", "IEN", "CMN", "IMN", "NLNBA", "CLNBA", "ILNBA", "SBA")
+long.names <- c("SHG", "WHG", "Anatolian Neolithic", "Balkan Neolithic", "Central_EN", "Iberia_EN", "Central_MN", "Iberia_MN", "Northern_LNBA", "Central_LNBA", "Iberia_LNBA", "Steppe_BA")
+int.include <- c("SHG", "WHG", "WHG", "AN", "BN", "CEN", "CEN", "IEN", "CMN", "IMN", "NLNBA", "CLNBA", "ILNBA", "SBA", "SBA", "SBA", "SBA")
+names(int.include) <-c("Motala_HG", "Loschbour", "WHG", "Anatolian_Neolithic", "Balkan_Neolithic", "Stuttgart", "Central_EN", "Iberia_EN", "Central_MN", "Iberia_MN", "Northern_LNBA", "Central_LNBA", "Iberia_LNBA", "Yamnaya", "Poltavka", "Srubnaya", "Potapovka")
+include.reads <- list(                  #Include these populations as reads
+"SHG"=c("SHG"),
+"WHG"=c("WHG"), #SpanishMesolithic is the high coverage LaBrana1 I0585 and LaBrana2
+"AN"="Anatolian_Neolithic",
+"BN"="Balkan_Neolithic",
+"CEN"="Central_EN",
+"IEN"="Iberia_EN",
+"CMN"="Central_MN",
+"IMN"="Iberia_MN",
+"NLNBA"="Northern_LNBA",
+"CLNBA"="Central_LNBA",
+"ILNBA"="Iberia_LNBA",
+"SBA"=c("Yamnaya", "Poltavka", "Srubnaya", "Potapovka")
+)
+include.counts <- list(                 #Include these populations as hard calls. 
+    "WHG"="Loschbour",
+    "EN"="Stuttgart"
+     )
+
+mod.pops <- c("CEU", "GBR", "IBS", "TSI")
+}
 
 ########################################################################
 
@@ -130,7 +153,7 @@ for(i in 1:NROW(data)){
     abline(h=mod.f[k], lty=2, lwd=2)
   }
 
-  mtext(long.names, side=1, cex=1, line=1, at=1:length(int.names))
+  mtext(int.names, side=1, cex=1, line=1, at=1:length(int.names), las=2)
 }
   
 dev.off()
