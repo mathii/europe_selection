@@ -22,4 +22,4 @@ Samara_HG
 SHG
 Srubnaya
 WHG
-Yamnaya_Samara
+Yamnaya

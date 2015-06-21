@@ -26,5 +26,7 @@ SHG
 Srubnaya
 TSI
 WHG
-Yamnaya_Samara
+Yamnaya
 YRI
+Loschbour
+Stuttgart

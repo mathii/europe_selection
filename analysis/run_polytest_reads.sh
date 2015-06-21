@@ -1,6 +1,6 @@
 dataset=$1
-V=v6
-LDIR=~/selection/code/files/
+V=v8
+LDIR=~/selection/code/files/${V}/
 DATA=~/selection/counts/${V}/all.reads${dataset}.freq
 
 while read a b
@@ -10,7 +10,7 @@ OUT=~/selection/analysis/${V}/poly/${a}
 for what in pairs
 do
 bsub -q reich "python \
-~/spindrift/Qx.py -q ${DATA} -n 100000 \
+~/spindrift/Qx.py -q ${DATA} -n 10000 \
 -p ${LDIR}/polypairs_${what}.txt \
 -o ${OUT}/${a}_${what}_reads${dataset} -v \
 -g ${b} 2> ${OUT}/${a}_${what}_reads${dataset}.log"
