@@ -38,20 +38,24 @@ read.root <- paste0("~/data/", version, "/reads/jj2")
 indfile <- paste0("~/data/", version, "/use/", version,"1kg_europe2names.ind")
 error.prob <- 0.001
 
-pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
-#Check if the SNP is monomorphic in these populations. 
-monocheck <- c("CEU", "GBR", "IBS", "TSI", "HungaryGamba_HG", "Loschbour", "Stuttgart",
-               "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")
-A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.712, 0.288),3, 4) 
-
+pops <- monocheck <- A <- NA            #To fill in
+include.reads <- include.counts <- list()
 ########################################################################
+## Setup according to version.
 
-include.counts <- list(                 #Include these populations as hard calls. 
+if(version=="v6" | version=="v7"){
+
+  pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
+#Check if the SNP is monomorphic in these populations. 
+  monocheck <- c("CEU", "GBR", "IBS", "TSI", "HungaryGamba_HG", "Loschbour", "Stuttgart",
+               "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")
+  A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.712, 0.288),3, 4) 
+
+  include.counts <- list(                 #Include these populations as hard calls. 
     "WHG"="Loschbour",
     "EN"="Stuttgart",
     "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
-
-if(version=="v6" | version=="v7"){
+  
 include.reads <- list(                  #Include these populations as reads
     ## "WHG"=c("LaBrana1", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
     "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
@@ -62,20 +66,36 @@ if(version=="v7"){
   include.reads[["WHG"]] <- gsub("SpanishMesolithic", "Iberian_Mesolithic", include.reads[["WHG"]], fixed=TRUE)
 }
 if(version=="v8"){
-include.reads <- list(                  #Include these populations as reads
-    "WHG"=c("WHG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
-    "EN"=c("Central_EN", "Iberia_EN", "Anatolian_Neolithic"), 
-    "YPP"=c("Yamnaya", "Poltavka", "Potapovka"))
-monocheck <- c("CEU", "GBR", "IBS", "TSI", "Central_EN", "Iberia_EN", "Anatolian_Neolithic", "Loschbour", "Stuttgart",
-               "Yamnaya", "Poltavka", "Potapovka", "WHG")
+  mix.dir <- "~/selection/code/files/v8/mixtures/"
+  
+  if(results.tag==""){stop("Must specify results tag - group from 1-6 - for v8 analysis")}
+  include.counts <- list( "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
+  always.counts <- c("Loschbour", "Stuttgart")
+  group <- results.tag
+  choice <- read.table(paste0(mix.dir, "Choice", results.tag), as.is=TRUE, header=FALSE)
+  include.reads <- list(c(), c(), c())
+  names(include.reads) <- unique(choice[,2])
+  for(i in 1:NROW(choice)){
+    if(choice[i,1] %in% c("Loschbour", "Stuttgart")){
+      include.counts[[choice[i,2]]] <- choice[i,1]
+    } else{
+      include.reads[[choice[i,2]]] <- c(include.reads[[choice[i,2]]], choice[i,1])
+    }
+  }
+  mix.mat <- read.table(paste0(mix.dir, "Proportion", results.tag), as.is=TRUE, header=TRUE)
+  rownames(mix.mat) <- mix.mat[,1]
+  mix.mat <- mix.mat[,2:NCOL(mix.mat)]
+  
+  anc.pops <- names(include.reads)
+  mod.pops <- c("CEU", "GBR", "IBS", "TSI")
+  pops <- c(anc.pops, mod.pops)
+  A <- t(mix.mat)[anc.pops,mod.pops]
+
+  monocheck <- c(unlist(include.reads), unlist(include.counts))
+  names(monocheck) <- NULL
 }
-# version specific.
-if(results.tag=="incSHG"){
-  include.reads[["WHG"]] <- c(include.reads[["WHG"]], "Motala_HG")
-}
-if(results.tag=="onlySHG"){
-  include.reads[["WHG"]] <- c("Motala_HG")
-}
+
+########################################################################
 
 ## Setup the data. 
 counts <- read.table(paste0(root, ".count"), header=TRUE, as.is=TRUE)
