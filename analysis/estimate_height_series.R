@@ -19,20 +19,20 @@ if( Sys.info()["login"]!=Sys.info()["user"]){
 #Arguments
 
 cA <- commandArgs(TRUE)
-if(!length(cA)){
-    stop("Must specify version")
+if(!length(cA)!=2){
+    stop("Must specify version and snplist")
 }
 version <- cA[1]
+snplist <- cA[2]
 pops.to.use <- NA
 extag <- ""
-if(length(cA)>1){
-    pops.to.use <- strsplit(cA[2], ",", fixed=TRUE)[[1]]
-    extag <- paste0("_",gsub(",", "_", cA[2], fixed=TRUE))
+if(length(cA)>3){
+    pops.to.use <- strsplit(cA[3], ",", fixed=TRUE)[[1]]
+    extag <- paste0("_",gsub(",", "_", cA[3], fixed=TRUE))
 }
 
 ########################################################################
 #MCMC parameters
-
 burn.in <- 100
 N.iter <- 1000
 if(length(cA)>2){
@@ -49,8 +49,7 @@ read.root <- paste0("~/data/",version,"/reads/jj2")
 indfile <- paste0("~/data/",version,"/use/", version, "1kg_europe2names.ind")
 snpfile <- paste0("~/data/",version,"/use/",version ,"1kg_europe2names.snp")
 polymap <- paste0("~/selection/code/files/",version,"/polymap.txt")
-out <- paste0("~/selection/counts/",version,"/all.reads")
-gwas <- read.table("~/selection/data/gwas/wood_snps.gwas", as.is=TRUE)
+gwas <- read.table(paste0("~/selection/data/gwas/",snplist,".gwas"), as.is=TRUE)
 colnames(gwas) <- c("CHR", "POS", "EFFECT", "OTHER", "BETA")
 if(which.map!=""){
     polymap <- paste0("~/selection/code/files/",version ,"/polymap.", which.map, ".txt" )
@@ -272,7 +271,7 @@ for(pop in pops.to.use){
 }
 
 
-write.table(results, paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates", extag,".txt"), col.names=TRUE, row.names=TRUE, quote=FALSE, sep="\t") 
+write.table(results, paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates", extag,".",snplist,".txt"), col.names=TRUE, row.names=TRUE, quote=FALSE, sep="\t") 
 
 
 

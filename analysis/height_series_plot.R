@@ -4,12 +4,18 @@
 library(plotrix)
 library(RColorBrewer)
 
+version <- NA
+cA <- commandArgs(TRUE)
+if(length(cA)){
+  version <- cA[1]
+}
+
 ########################################################################
 ## Details
-readmefile <- "~/selection/analysis/v6/series/figure2.readme"
-out <- "~/selection/analysis/v6/series/heighseries.pdf"
-height.values <- "~/selection/analysis/v6/series/height_series_mcmc_estimates.txt"
-dates <- "~/selection/code/files/population_dates.txt"
+readmefile <- paste0("~/selection/analysis/", version, "/series/figure2.readme")
+out <-  paste0("~/selection/analysis/", version, "/series/heighseries.pdf")
+height.values <-  paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates.txt")
+dates <- paste0("~/selection/code/files/",version,"/population_dates.txt")
 ang <- 20
 ylim <- c(-0.5,0.5)
 
@@ -29,7 +35,7 @@ cols <- brewer.pal( length(pops), "Set1")
 cols[6] <- "darkgrey"
 
 pdf(out, width=12, height=6)
-plot(0,0, col="white", xlim=c(-8000, 0), ylim=ylim, bty="n", xlab="Years before present", ylab="Genetic height", xaxt="n")
+plot(0,0, col="white", xlim=c(-8500, 0), ylim=ylim, bty="n", xlab="Years before present", ylab="Genetic height", xaxt="n")
 
 for(i in 1:length(pops)){
     pop <- pops[i]
