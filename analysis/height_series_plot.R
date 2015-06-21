@@ -8,13 +8,14 @@ version <- NA
 cA <- commandArgs(TRUE)
 if(length(cA)){
   version <- cA[1]
+  snplist <- cA[2]
 }
 
 ########################################################################
 ## Details
 readmefile <- paste0("~/selection/analysis/", version, "/series/figure2.readme")
-out <-  paste0("~/selection/analysis/", version, "/series/heighseries.pdf")
-height.values <-  paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates.txt")
+out <-  paste0("~/selection/analysis/", version, "/series/heightseries.",snplist,".pdf")
+height.values <-  paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates.",snplist,".txt")
 dates <- paste0("~/selection/code/files/",version,"/population_dates.txt")
 ang <- 20
 ylim <- c(-0.5,0.5)
