@@ -36,8 +36,8 @@ if(length(cA)>3){
 burn.in <- 100
 N.iter <- 1000
 if(length(cA)>2){
-    burn.in <- as.numeric(cA[3])
-    N.iter <- as.numeric(cA[4])
+    burn.in <- as.numeric(cA[4])
+    N.iter <- as.numeric(cA[5])
 }
 thin <- 1                               #Why bother?
 
