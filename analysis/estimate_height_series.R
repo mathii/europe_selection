@@ -272,8 +272,8 @@ for(pop in pops.to.use){
     popi <- popi+1
 }
 
-
-write.table(results, paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates", extag,".",snplist,".txt"), col.names=TRUE, row.names=TRUE, quote=FALSE, sep="\t") 
+ifelse(which.map=="", "", paste0(".", which.map))
+write.table(results, paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates", extag,".",snplist, ifelse(which.map=="", "", paste0(".", which.map)), ".txt"), col.names=TRUE, row.names=TRUE, quote=FALSE, sep="\t") 
 
 
 
