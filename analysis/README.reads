@@ -61,7 +61,7 @@ R --vanilla --args figure2 c ${V} < ~/selection/code/analysis/allele_frequency_p
 for chr in {1..23}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_freq.R"; done
 #for what in Steppe_MN Steppe_MN_no_Srubs LargeScale SmallScale;
 #do
-#for chr in {1..23}; do R --vanilla --args $chr $V ${what} <  ~/selection/code/analysis/reads_to_freq.R; done
+#for chr in {1..23}; do bsub -q reich "R --vanilla --args $chr $V ${what} \<  ~/selection/code/analysis/reads_to_freq.R"; done
 #done
 
 CDIR=~/selection/counts/${V}
@@ -80,3 +80,4 @@ do
 bsub -q reich "R --vanilla --args $V wood $pop 100000 500000 \
 \< ~/selection/code/analysis/estimate_height_series.R"
 done < ~/selection/code/files/${V}/height_series_list.txt
+

@@ -11,7 +11,7 @@ for what in pairs
 do
 bsub -q reich "python \
 ~/spindrift/Qx.py -q ${DATA} -n 10000 \
--p ${LDIR}/polypairs_${what}.txt \
+-p ${LDIR}/polypairs_${what}${dataset}.txt \
 -o ${OUT}/${a}_${what}_reads${dataset} -v \
 -g ${b} 2> ${OUT}/${a}_${what}_reads${dataset}.log"
 done
