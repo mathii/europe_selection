@@ -1,7 +1,7 @@
 #Calculate the effective sample size
 source("~/selection/code/lib/readlib.R")
 
-version="v6"
+version=NA
 if(length(commandArgs(TRUE))){
   version=commandArgs(TRUE)[1]
 }

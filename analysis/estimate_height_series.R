@@ -30,7 +30,6 @@ if(length(cA)>3){
     pops.to.use <- strsplit(cA[3], ",", fixed=TRUE)[[1]]
     extag <- paste0("_",gsub(",", "_", cA[3], fixed=TRUE))
 }
-
 ########################################################################
 #MCMC parameters
 burn.in <- 100
@@ -41,6 +40,9 @@ if(length(cA)>2){
 }
 thin <- 1                               #Why bother?
 
+if(length(cA)>6){
+    which.map <- cA[6]
+}
 
 ########################################################################
 ## Details
