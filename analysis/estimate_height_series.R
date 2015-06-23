@@ -40,7 +40,8 @@ if(length(cA)>2){
 }
 thin <- 1                               #Why bother?
 
-if(length(cA)>5){
+if(length(cA)>5
+){
     which.map <- cA[6]
 }
 

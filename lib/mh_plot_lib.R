@@ -1,10 +1,4 @@
-## Very sorry about these hardcoded paths.
-## if(Sys.info()[4]=="dhcp179.well.ox.ac.uk"){
-##   source("~/mathii/gwas/whr-strat-t2d/meta_hits.R")
-## }else{
-##   source("~/gwas/whr-strat-t2d/meta_hits.R")
-## }
-
+## Library of functions for plotting genome-wide scan results. 
 
 MH.plot <- function(data, flip=FALSE, add=FALSE, chr.labels=TRUE, shift = 0, cap = 100, color.loci=data.frame(),range.shift=2, log10=TRUE, ylab="-log10 p-value", .ylim=NA, ...){
 
@@ -292,4 +286,25 @@ get.chr.starts <- function(chr,pos){
     }
   x <- c(0,x)
   return( x )
+}
+
+################################################################################
+## Take a list of results and return a list of 'independent' signals, 
+## rougly merging everything within +/- width. Counts everything over sig
+## and adds number of snps at gw.sig
+################################################################################
+
+indep.signals <- function(res, sig, gw.sig, width=5e5){
+    cc=character()
+    nn=numeric()
+    signals <- data.frame(lead.snp=cc, chr=cc, pos=nn, lead.p=nn, n.snps=nn, n.sig=nn, n.gw.sig=nn, stringsAsFactors=FALSE)
+    res <- res[order(res$PVAL),]
+    while(res$PVAL[1]<sig){
+        snps <- res$CHR==res[1,"CHR"] & abs(res$POS-res[1,"POS"])<width
+        n.sig <- sum(res[snps,"PVAL"]<sig)
+        n.gw.sig <- sum(res[snps,"PVAL"]<gw.sig)
+        signals[NROW(signals)+1,] <- list(res[1,"ID"],res[1,"CHR"],res[1,"POS"], res[1,"PVAL"], sum(snps), n.sig, n.gw.sig)
+        res <- res[!snps,]
+    }
+    return(signals)
 }

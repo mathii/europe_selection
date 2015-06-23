@@ -48,7 +48,7 @@ cat(paste0("Used lambda = ", lambda, "\n"))
 ## }else{cat("Using corrected p-values\n")}
 
 ## Merge SNP position data with results
-res <- data.frame(ID=results$ID, PVAL=results$corrected.p)
+res <- data.frame(ID=results$ID, PVAL=results$corrected.p, stringsAsFactors=FALSE)
 res <- res[include,]
 dat <- data[,c(1,2,4)]
 colnames(dat) <- c("ID", "CHR", "POS")
@@ -108,3 +108,6 @@ for(i in 1:length(cats)){
 }
 legend("topleft", cats, col=cols, pch=16, bty="n")
 dev.off()
+
+isig <- indep.signals(res, 1e-5, 10^(-sig.level), 5e5)
+write.table(isig, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
