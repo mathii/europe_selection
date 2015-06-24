@@ -75,9 +75,7 @@ done
 done
 
 #estimate height series
-while read pop;
-do
+while read pop; do
 bsub -q reich "R --vanilla --args $V wood $pop 100000 500000 \
 \< ~/selection/code/analysis/estimate_height_series.R"
 done < ~/selection/code/files/${V}/height_series_list.txt
-

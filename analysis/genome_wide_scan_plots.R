@@ -30,7 +30,7 @@ snpdata <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.snp")
 
 ## Read inputs
 results <- read.table(results, header=TRUE, as.is=TRUE)
-selection <- read.table("~/selection/data/cms/All_selection.snp", as.is=TRUE)
+selection <- read.table(paste0("~/data/",version, "/use/All_selection.snp"), as.is=TRUE)
 neutral <- !(results[,"ID"] %in% selection[,1])
 data <- read.table(snpdata, as.is=TRUE)
 
@@ -92,14 +92,15 @@ draw.qq.ci(NROW(selection), border.col="#E41A1C20", fill.col="#E41A1C20")
 dev.off()
 
 #Now plot the selection snps spit up by functional category.
-cat.data <- read.table("~/selection/data/Selection_snps_by_category.txt", as.is=TRUE, header=TRUE)
+cat.data <- read.table(paste0("~/data/",version, "/use/Cat_selection.snp"), as.is=TRUE, header=TRUE)
 cat.data$GWAS <- ifelse(cat.data$GWAS|cat.data$Pheno1|cat.data$Pheno2,1,0)
 cat.data$Immune <- cat.data$Pheno3
 cat.data$TAG <- paste(cat.data$CHR, cat.data$POS, sep=":")
 
 png(paste0("~/selection/analysis/",version,"/", what ,"/qq_plot_cat", results.tag, ".png"), width=400, height=400)
 par(mar=c(4.1,4.1,1,1))
-cats <- c("GWAS", "CMS", "HiDiff", "Immune", "HLA")
+cats <- c("GWAS", "CMS", "HiDiff", "Immune", "HLA", "eQTL")
+cats <- cats[cats %in% colnames(cat.data)]
 cols <- brewer.pal(length(cats), "Set1")
 for(i in 1:length(cats)){
     this.lot <- res[res$TAG %in% cat.data$TAG[cat.data[,cats[i]]==1],]
