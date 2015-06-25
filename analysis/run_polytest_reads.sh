@@ -7,7 +7,7 @@ while read a b
 do
 mkdir -p ~/selection/analysis/${V}/poly/${a}
 OUT=~/selection/analysis/${V}/poly/${a}
-for what in pairs allpops
+for what in pairs
 do
 bsub -q reich "python \
 ~/spindrift/Qx.py -q ${DATA} -n 10000 \

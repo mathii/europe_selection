@@ -26,6 +26,10 @@ if(is.na(degf)){stop("Must specify degrees of freedom as third argument")}
 results <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt")
 snpdata <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.snp")
 
+logfile <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".log")
+cat("SCRIPT: genome_wide_scan_plots.R\n", file=logfile)
+cat(paste0(paste("ARGS:", cA),"\n"), file=logfile, append=TRUE)
+
 ##############################################################
 
 ## Read inputs
@@ -35,7 +39,7 @@ neutral <- !(results[,"ID"] %in% selection[,1])
 data <- read.table(snpdata, as.is=TRUE)
 
 include <- results$ChiSq>0
-cat(paste0("Ignoring ", sum(!include), " SNPs with non-positiveq test statistics\n"))
+cat(paste0("IGNORE: ", sum(!include), " SNPs with non-positive test statistics\n"), file=logfile, append=TRUE)
 
 ## Apply genomic control if we haven't already
 ## if(!("corrected.p"  %in% names(results))){
@@ -44,7 +48,7 @@ corrected.p <- pchisq(results[,"ChiSq"]/lambda, df=degf, lower.tail=F)
 results <- cbind(results, corrected.p)
 ## write.table(results, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt"),
 ##             row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
-cat(paste0("Used lambda = ", lambda, "\n"))
+cat(paste0("LAMBDA: ", lambda, "\n"), file=logfile, append=TRUE)
 ## }else{cat("Using corrected p-values\n")}
 
 ## Merge SNP position data with results
@@ -57,7 +61,9 @@ res <- res[order(res$CHR, res$POS),]
 
 
 sig.level <- -log10(0.05/NROW(res))
-cat(paste0("Used sig.level = ", sig.level, "\n"))
+lo.sig <- sig.level-2
+cat(paste0("GWSIG: ", sig.level, "\n"),file=logfile, append=TRUE)
+cat(paste0("LOSIG: ", lo.sig, "\n"),file=logfile, append=TRUE)
 
 ## Manhattan plot
 png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".png"), width=800, height=400)
@@ -110,5 +116,21 @@ for(i in 1:length(cats)){
 legend("topleft", cats, col=cols, pch=16, bty="n")
 dev.off()
 
-isig <- indep.signals(res, 1e-5, 10^(-sig.level), 5e5)
+isig <- indep.signals(res, 10^(-lo.sig), 10^(-sig.level), 5e5)
 write.table(isig, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
+
+## Now make a cleaned Manhatten plot, remiving everything that's genome-wide significant
+## But not supported by anything within two p-value orders of magnitude. 
+to.remove <- isig$lead.snp[isig$n.sig<2]
+cat(paste0("REMOVE: ", sum(isig$n.sig<2)),file=logfile, append=TRUE)
+clean.res <- res
+clean.res <- clean.res[!(clean.res$ID %in% to.remove),]
+png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned.png"), width=800, height=400)
+par(mar=c(2,4,1,1))
+MH.plot(clean.res, color.loci=data.frame())
+abline(h=sig.level, col="red", lty=2)
+dev.off()
+
+
+
+
