@@ -28,7 +28,7 @@ snpdata <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.snp")
 
 logfile <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".log")
 cat("SCRIPT: genome_wide_scan_plots.R\n", file=logfile)
-cat(paste0(paste("ARGS:", cA),"\n"), file=logfile, append=TRUE)
+cat(paste0(paste("ARGS:", paste(cA)),"\n"), file=logfile, append=TRUE)
 
 ##############################################################
 
