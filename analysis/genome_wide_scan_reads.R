@@ -19,7 +19,7 @@ cA <- commandArgs(TRUE)
 if(length(cA)){
   chr <- cA[1]
   version <- cA[2]
-  if(length(cA)>2){
+  if(length(cA)>3){
     results.tag <- cA[3]
   }
 }

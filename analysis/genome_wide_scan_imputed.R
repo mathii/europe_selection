@@ -16,6 +16,7 @@ source("~/selection/code/lib/3pop_lib.R")
 chr <- 1                                #set manually, or from --args
 version <- "vx" #v6, v7 etc...
 results.tag <- ""
+which.impute <- "within"
 
 cA <- commandArgs(TRUE)
 if(length(cA)){
@@ -23,6 +24,9 @@ if(length(cA)){
   version <- cA[2]
   if(length(cA)>2){
     results.tag <- cA[3]
+  }
+  if(length(cA)>3){
+    which.impute <- cA[4]
   }
 }
 
@@ -37,7 +41,7 @@ if( Sys.info()["login"]!=Sys.info()["user"]){
 root <- paste0("~/selection/counts/", version, "/all")
 out <- paste0("~/selection/analysis/", version, "/gscan/")
 indfile <- paste0("~/data/", version, "/use/", version,"1kg_europe2names.ind")
-impute.file <- paste0("~/selection/imputation/", version, "/imputed.within.chr", chr, ".vcf.gz")
+impute.file <- paste0("~/selection/imputation/", version, "/imputed.", which.impute ,".chr", chr, ".vcf.gz")
 error.prob <- 0.001
 
 pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
@@ -154,7 +158,7 @@ results <- results[!is.na(results[,2]),]
 results <- cbind(rownames(results), results)
 colnames(results) <- c("ID", "ChiSq", "uncorrected.p", "AR2")
 results <- data.frame(results)
-out.file <-  paste0("~/selection/analysis/",version,"/gscan/scan_results_imputed", results.tag, ".chr", chr, ".txt")
+out.file <-  paste0("~/selection/analysis/",version,"/gscan/scan_results_imputed", results.tag, ".", which.impute, ".chr", chr, ".txt")
 print(out.file)
 write.table(results,out.file, row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
 
