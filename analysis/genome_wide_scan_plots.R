@@ -122,7 +122,7 @@ write.table(isig, paste0("~/selection/analysis/",version,"/", what ,"/scan_resul
 ## Now make a cleaned Manhatten plot, remiving everything that's genome-wide significant
 ## But not supported by anything within two p-value orders of magnitude. 
 to.remove <- isig$lead.snp[isig$n.sig<2]
-cat(paste0("REMOVE: ", sum(isig$n.sig<2)),file=logfile, append=TRUE)
+cat(paste0("REMOVE: ", sum(isig$n.sig<2), "\n"),file=logfile, append=TRUE)
 clean.res <- res
 clean.res <- clean.res[!(clean.res$ID %in% to.remove),]
 png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned.png"), width=800, height=400)
