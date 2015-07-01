@@ -11,6 +11,7 @@ version <- ""
 degf <- NA                      #degrees of freedom for test
 what <- "gscan"                #plot other things than gscan
 cA <- commandArgs(TRUE)
+cutoff <- 0
 if(length(cA)){
     results.tag <- cA[1]
     version <- cA[2]
@@ -34,6 +35,7 @@ cat(paste0(paste("ARGS:", paste(cA)),"\n"), file=logfile, append=TRUE)
 
 ## Read inputs
 results <- read.table(results, header=TRUE, as.is=TRUE)
+
 selection <- read.table(paste0("~/data/",version, "/use/All_selection.snp"), as.is=TRUE)
 neutral <- !(results[,"ID"] %in% selection[,1])
 data <- read.table(snpdata, as.is=TRUE)
