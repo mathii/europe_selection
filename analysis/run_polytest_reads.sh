@@ -9,7 +9,7 @@ mkdir -p ~/selection/analysis/${V}/poly/${a}
 OUT=~/selection/analysis/${V}/poly/${a}
 for what in pairs allpops
 do
-bsub -q reich -oo LDIR=~/selection/code/files/${V}/polypairs_${what}${dataset}.err "python \
+bsub -q reich -oo ~/selection/code/files/${V}/polypairs_${what}${dataset}.out "python \
 ~/spindrift/Qx.py -q ${DATA} -n 10000 \
 -p ${LDIR}/polypairs_${what}${dataset}.txt \
 -o ${OUT}/${a}_${what}_reads${dataset} -v \
