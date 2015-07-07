@@ -11,52 +11,31 @@ setwd(dir)
 #Ancient WHG, ENeo, Yamnaya
 
 ########################################################################
-## Details
-## Details
-root <- "~/selection/counts/all"
-snproot <- "~/data/v6/use/v61kg_europe2names"
-out <- "~/selection/analysis/power/"
-indfile <- "~/data/v6/use/v61kg_europe2names.ind"
 
-read.root <- "~/data/v6/reads/jj2"
-indfile <- "~/data/v6/use/v61kg_europe2names.ind"
-error.prob <- 0.001
+source("~/selection/code/analysis/setup_populations_reads.R")
 
-pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
-#Check if the SNP is monomorphic in these populations. 
-monocheck <- c("CEU", "GBR", "IBS", "TSI", "LaBrana1", "HungaryGamba_HG", "Loschbour", "Stuttgart",
-               "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")
-A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.712, 0.288),3, 4) 
-degf <- dim(A)[2]
+########################################################################
 
-selpops <- c("CEU", "GBR", "IBS", "TSI")
-
-include.reads <- list(                  #Include these populations as reads
-    "WHG"=c("LaBrana1", "HungaryGamba_HG"), #SpanishMesolithic is the high coverage LaBrana I0585
-    "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"), 
-    "Yamnaya"="Yamnaya")
-include.counts <- list(                 #Include these populations as hard calls. 
-    "WHG"="Loschbour",
-    "EN"="Stuttgart",
-    "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
-## Setup the data. 
-
-monocheck <- c("CEU", "GBR", "IBS", "TSI", "LaBrana1", "HungaryGamba_HG", "Loschbour", "Stuttgart",
-               "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")
-
-lambda=1.21
+if(version=="v6"){
+    lambda=1.21
+    sig <- 10^-6.79                                      #genome-wide significance level
+}else if(version=="v8"){
+    num.res.tag <- as.numeric(results.tag)
+    lambda=c(1.245, 1.292, 1.308, 1.308, 1.203, 1.258, 1.324, 1.319)[num.res.tag]
+    sig <- 10^-7.30                                      #genome-wide significance level
+}
 
 ########################################################################
 
 gss <- c(50, 100, 200)                               #Generations of selection
 ss <- 10^(seq(log10(0.002), log10(0.1), length.out=10)) #Selection coefficient
 Ne <- 6000                                          #2 Population size
-N <- 1000                                           #Number of replicates
+N <- 10                                           #Number of replicates
 sig <- 10^-6.79                                      #genome-wide significance level
 
 ########################################################################
 
-pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
+selpops <- c( "CEU", "GBR", "IBS", "TSI")
 #Check if the SNP is monomorphic in these populations. 
 A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.712, 0.288),3, 4) 
 degf <- dim(A)[2]
@@ -76,15 +55,20 @@ empty.data <- make.empty.data(pops)
 #Sample uniformly per chromosome. 
 counts.per.chr <- table(sample(data$CHR[data$CHR<=22], N))
 
-#Select sites with f0 < 0.1
+#Select sites with f0 < 0.2
 #Now these are lists of frequencies. 
 tf <- list()
 i=1
 for(chr in 1:22){
-    cat(paste0("chr", chr))
-    reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts"), as.is=TRUE, header=FALSE)
+    cat(paste0("\rchr", chr))
+    if(!(as.character(chr) %in% names(counts.per.chr))){
+        next
+    }
+    
+    reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts.gz"), as.is=TRUE, header=FALSE)
     k=1
-    while(k <= counts.per.chr[chr]){
+
+    while(k <= counts.per.chr[as.character(chr)]){
         cat(paste0("\rchr", chr, " ", k, "/", counts.per.chr[chr]))
         inc <- data$CHR==chr
         try <- sample(sum(inc), 1)
@@ -153,7 +137,7 @@ results.all <- results.all/N
 results.one <- results.one/N
 
 
-pdf("~/selection/analysis/power/read_power.pdf")
+pdf(paste0("~/selection/analysis/",version,"/power/read_power", results.tag,".pdf"))
 plot(ss, results.all[,1], col="#377EBA", type="b", pch=16, bty="n", lty=2, ylim=c(0,1), log="x", xlab="Selection coefficient", ylab="power")
 lines(ss, results.all[,2], col="#E41A1C", type="b", pch=16, lty=2)
 lines(ss, results.all[,3], col="#4DAF4A", type="b", pch=16, lty=2)
@@ -171,4 +155,4 @@ m2[,1] <- "One"
 mres <- rbind(m1, m2)
 mres <- cbind(mres, "Likelihood")
 colnames(mres) <- c("Populations", "Generations", "Power", "Analysis")
-write.table(mres, paste0(out, "power.reads.txt"), col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+write.table(mres,paste0("~/selection/analysis/",version,"/power/read_power", results.tag,".txt"), col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
