@@ -30,8 +30,7 @@ if(version=="v6"){
 gss <- c(50, 100, 200)                               #Generations of selection
 ss <- 10^(seq(log10(0.002), log10(0.1), length.out=10)) #Selection coefficient
 Ne <- 6000                                          #2 Population size
-N <- 10                                           #Number of replicates
-sig <- 10^-6.79                                      #genome-wide significance level
+N <- 1000                                           #Number of replicates
 
 ########################################################################
 
