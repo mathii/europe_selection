@@ -31,7 +31,7 @@ gss <- c(50, 100, 200)                               #Generations of selection
 ## ss <- 10^(seq(log10(0.002), log10(0.1), length.out=10)) #Selection coefficient
 ss <- c(0.002, 0.003, 0.005, 0.08, 0.01, 0.02, 0.03, 0.05, 0.08, 0.1)
 Ne <- 6000                                          #2 Population size
-N <- 10                                           #Number of replicates
+N <- 1000                                           #Number of replicates
 
 ########################################################################
 
