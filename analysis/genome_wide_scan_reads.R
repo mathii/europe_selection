@@ -41,7 +41,7 @@ if(!all(read.sample.counts==N.read.samples)){stop("Different number of read samp
 
 
 ## set up results
-results <- matrix(0, nrow=NROW(data), ncol=2)
+results <- matrix(0, nrow=NROW(data), ncol=5)
 rownames(results) <- data$ID
 
 ## Data structure
@@ -64,14 +64,15 @@ for(i in 1:NROW(data)){
     if(monomorphic){
         results[i,] <- NA
     }else{
-        results[i,] <- test.3pop.reads(freq.data, A, error.prob=error.prob)
+        eff.N <-  round(effective.data.size(freq.data)[1:3], 2)
+        results[i,] <- c(test.3pop.reads(freq.data, A, error.prob=error.prob), eff.N)
     }
 }
 
 results <- results[!is.na(results[,2]),]
 
 results <- cbind(rownames(results), results)
-colnames(results) <- c("ID", "ChiSq", "uncorrected.p")
+colnames(results) <- c("ID", "ChiSq", "uncorrected.p", "eff.N1", "eff.N2", "eff.N3")
 results <- data.frame(results)
 out.file <-  paste0("~/selection/analysis/",version,"/gscan/scan_results_read", results.tag, ".chr", chr, ".txt")
 print(out.file)

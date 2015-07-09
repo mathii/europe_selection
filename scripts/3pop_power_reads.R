@@ -28,9 +28,10 @@ if(version=="v6"){
 ########################################################################
 
 gss <- c(50, 100, 200)                               #Generations of selection
-ss <- 10^(seq(log10(0.002), log10(0.1), length.out=10)) #Selection coefficient
+## ss <- 10^(seq(log10(0.002), log10(0.1), length.out=10)) #Selection coefficient
+ss <- c(0.002, 0.003, 0.005, 0.08, 0.01, 0.02, 0.03, 0.05, 0.08, 0.1)
 Ne <- 6000                                          #2 Population size
-N <- 1000                                           #Number of replicates
+N <- 10                                           #Number of replicates
 
 ########################################################################
 
@@ -147,11 +148,14 @@ legend("topleft", c("Selected in all populations", "Selected in one population",
 dev.off()
 
 colnames(results.all) <- colnames(results.one) <- gss
-m1 <- melt(results.all)
-m1[,1] <- "All"
-m2 <- melt(results.one)
-m2[,1] <- "One"
+rownames(results.all) <- rownames(results.one) <- ss
+m1 <- cbind(pop="All", melt(results.all))
+m2 <- cbind(pop="One", melt(results.one))
 mres <- rbind(m1, m2)
-mres <- cbind(mres, "Likelihood")
-colnames(mres) <- c("Populations", "Generations", "Power", "Analysis")
+if(results.tag!=""){
+    mres <- cbind(results.tag, mres)
+    names(mres)[1]<-"Tag"
+}
+mres <- cbind(mres, round(sum(rowMeans(sapply(tf,  effective.data.size)[1:3,])), 1))
+names(mres)[NCOL(mres)] <- "Eff.N"
 write.table(mres,paste0("~/selection/analysis/",version,"/power/read_power", results.tag,".txt"), col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")

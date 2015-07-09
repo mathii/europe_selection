@@ -61,11 +61,20 @@ colnames(dat) <- c("ID", "CHR", "POS")
 res <- merge(res,dat,by="ID")
 res <- res[order(res$CHR, res$POS),]
 
-
 sig.level <- -log10(0.05/NROW(res))
 lo.sig <- sig.level-2
 cat(paste0("GWSIG: ", sig.level, "\n"),file=logfile, append=TRUE)
 cat(paste0("LOSIG: ", lo.sig, "\n"),file=logfile, append=TRUE)
+if(version=="v8"){
+    mixmap <- read.table(paste0("~/selection/code/files/v8/mixtures/Choice", substr(results.tag, nchar(results.tag), nchar(results.tag))), as.is=TRUE, header=FALSE)
+    pops <- unique(mixmap[,2])
+    for(i in 1:length(pops)){
+        cat(paste0("MPOP", i, ": ", paste(mixmap[mixmap[,2]==pops[i],1], collapse=","), "\n"),file=logfile, append=TRUE)
+    }
+}                       
+if(all(c("eff.N1", "eff.N2", "eff.N3") %in% names(results))){
+    cat(paste0("EFSIZ: ", paste(round(colMeans(results[,c("eff.N1", "eff.N2", "eff.N3")]),2), collapse=" "), "\n"),file=logfile, append=TRUE)
+}
 
 ## Manhattan plot
 png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".png"), width=800, height=400)
@@ -120,6 +129,7 @@ dev.off()
 
 isig <- indep.signals(res, 10^(-lo.sig), 10^(-sig.level), 5e5)
 write.table(isig, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
+write.table(isig[isig$n.sig>2,], paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".clean_signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
 
 ## Now make a cleaned Manhatten plot, remiving everything that's genome-wide significant
 ## But not supported by anything within two p-value orders of magnitude. 
