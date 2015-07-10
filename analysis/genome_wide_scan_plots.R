@@ -127,9 +127,9 @@ for(i in 1:length(cats)){
 legend("topleft", cats, col=cols, pch=16, bty="n")
 dev.off()
 
-isig <- indep.signals(res, 10^(-lo.sig), 10^(-sig.level), 5e5)
+isig <- indep.signals(res, 10^(-lo.sig), 10^(-sig.level), 1e6)
 
-if(file.exists("~/selection/data/genes/refseq_inm.txt"){
+if(file.exists("~/selection/data/genes/refseq_inm.txt")){
     gene.names<-read.table("~/selection/data/genes/refseq_inm.txt", header=TRUE, as.is=TRUE)
     isig <- annotate.with.genes(isig, gene.names)
 }
@@ -147,6 +147,8 @@ png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,"
 par(mar=c(2,4,1,1))
 MH.plot(clean.res, color.loci=data.frame())
 abline(h=sig.level, col="red", lty=2)
+csig <- isig[isig$n.sig>2 & isig$n.gw.sig>1,]
+
 dev.off()
 
 
