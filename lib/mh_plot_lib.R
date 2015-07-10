@@ -308,3 +308,32 @@ indep.signals <- function(res, sig, gw.sig, width=5e5){
     }
     return(signals)
 }
+
+################################################################################
+## Annotate with gene names - a table with headers: sym, chr, start, end
+################################################################################
+
+collapse.genes <- function(gl){
+    if(length(gl)<4){
+        return(sort(gl))
+    }else{
+        return(c(sort(gl)[1:3], "..."))
+    }
+}
+
+annotate.with.genes <- function(sig, gene.names, close=20000){
+    sig$gene.in <- "."
+    sig$gene.close <- "."
+    
+    for(i in 1:NROW(sig)){
+        chr <- sig$chr[i]
+        pos <- sig$pos[i]
+        gi <- gene.names$chr==chr & gene.names$start<pos & gene.names$end>pos
+        sig$gene.in[i] <- paste0(collapse.genes(gene.names$sym[gi]), collapse=",")
+
+        gc <- gene.names$chr==chr & ((gene.names$start<(pos+close) & gene.names$start>pos) | (gene.names$end<pos & gene.names$end>(pos-close)))
+        sig$gene.close[i] <- paste0(collapse.genes(gene.names$sym[gc]), collapse=",")
+    }
+    names(sig)[which(names(sig)=="gene.close")] <- paste0("gene.", close/1000, "kb")
+    return(sig)
+}

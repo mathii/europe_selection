@@ -128,6 +128,12 @@ legend("topleft", cats, col=cols, pch=16, bty="n")
 dev.off()
 
 isig <- indep.signals(res, 10^(-lo.sig), 10^(-sig.level), 5e5)
+
+if(file.exists("~/selection/data/genes/refseq_inm.txt"){
+    gene.names<-read.table("~/selection/data/genes/refseq_inm.txt", header=TRUE, as.is=TRUE)
+    isig <- annotate.with.genes(isig, gene.names)
+}
+   
 write.table(isig, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
 write.table(isig[isig$n.sig>2,], paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".clean_signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
 
