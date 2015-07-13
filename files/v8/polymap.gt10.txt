@@ -5,7 +5,7 @@ Iberia_LNBA	Iberia_MNLNBA
 Iberia_MN	Iberia_MNLNBA
 Poltavka	Steppe
 Potapovka	Steppe
-SHG	HG
+SHG	WHG
 Yamnaya	Steppe
-WHG	HG
+WHG	WHG
 Srubnaya	Steppe

@@ -11,6 +11,7 @@ version <- ""
 degf <- NA                      #degrees of freedom for test
 what <- "gscan"                #plot other things than gscan
 cA <- commandArgs(TRUE)
+cutoff <- 0
 if(length(cA)){
     results.tag <- cA[1]
     version <- cA[2]
@@ -28,12 +29,13 @@ snpdata <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.snp")
 
 logfile <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".log")
 cat("SCRIPT: genome_wide_scan_plots.R\n", file=logfile)
-cat(paste0(paste("ARGS:", cA),"\n"), file=logfile, append=TRUE)
+cat(paste0(paste("ARGS:", paste(cA)),"\n"), file=logfile, append=TRUE)
 
 ##############################################################
 
 ## Read inputs
 results <- read.table(results, header=TRUE, as.is=TRUE)
+
 selection <- read.table(paste0("~/data/",version, "/use/All_selection.snp"), as.is=TRUE)
 neutral <- !(results[,"ID"] %in% selection[,1])
 data <- read.table(snpdata, as.is=TRUE)
@@ -59,11 +61,20 @@ colnames(dat) <- c("ID", "CHR", "POS")
 res <- merge(res,dat,by="ID")
 res <- res[order(res$CHR, res$POS),]
 
-
 sig.level <- -log10(0.05/NROW(res))
 lo.sig <- sig.level-2
 cat(paste0("GWSIG: ", sig.level, "\n"),file=logfile, append=TRUE)
 cat(paste0("LOSIG: ", lo.sig, "\n"),file=logfile, append=TRUE)
+if(version=="v8"){
+    mixmap <- read.table(paste0("~/selection/code/files/v8/mixtures/Choice", substr(results.tag, nchar(results.tag), nchar(results.tag))), as.is=TRUE, header=FALSE)
+    pops <- unique(mixmap[,2])
+    for(i in 1:length(pops)){
+        cat(paste0("MPOP", i, ": ", paste(mixmap[mixmap[,2]==pops[i],1], collapse=","), "\n"),file=logfile, append=TRUE)
+    }
+}                       
+if(all(c("eff.N1", "eff.N2", "eff.N3") %in% names(results))){
+    cat(paste0("EFSIZ: ", paste(round(colMeans(results[,c("eff.N1", "eff.N2", "eff.N3")]),2), collapse=" "), "\n"),file=logfile, append=TRUE)
+}
 
 ## Manhattan plot
 png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".png"), width=800, height=400)
@@ -116,19 +127,28 @@ for(i in 1:length(cats)){
 legend("topleft", cats, col=cols, pch=16, bty="n")
 dev.off()
 
-isig <- indep.signals(res, 10^(-lo.sig), 10^(-sig.level), 5e5)
+isig <- indep.signals(res, 10^(-lo.sig), 10^(-sig.level), 1e6)
+
+if(file.exists("~/selection/data/genes/refseq_inm.txt")){
+    gene.names<-read.table("~/selection/data/genes/refseq_inm.txt", header=TRUE, as.is=TRUE)
+    isig <- annotate.with.genes(isig, gene.names)
+}
+   
 write.table(isig, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
+write.table(isig[isig$n.sig>2,], paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".clean_signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
 
 ## Now make a cleaned Manhatten plot, remiving everything that's genome-wide significant
 ## But not supported by anything within two p-value orders of magnitude. 
 to.remove <- isig$lead.snp[isig$n.sig<2]
-cat(paste0("REMOVE: ", sum(isig$n.sig<2)),file=logfile, append=TRUE)
+cat(paste0("REMOVE: ", sum(isig$n.sig<2), "\n"),file=logfile, append=TRUE)
 clean.res <- res
 clean.res <- clean.res[!(clean.res$ID %in% to.remove),]
 png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned.png"), width=800, height=400)
 par(mar=c(2,4,1,1))
 MH.plot(clean.res, color.loci=data.frame())
 abline(h=sig.level, col="red", lty=2)
+csig <- isig[isig$n.sig>2 & isig$n.gw.sig>1,]
+
 dev.off()
 
 

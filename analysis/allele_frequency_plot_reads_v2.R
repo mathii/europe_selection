@@ -56,20 +56,24 @@ mod.pops <- c("CEU", "GBR", "IBS", "TSI")
 }
 ########################################################################
 if(version=="v8"){
-int.names <- c("SHG", "WHG", "AN", "BN", "CEN", "IEN", "CMN", "IMN", "NLNBA", "CLNBA", "ILNBA", "SBA")
-long.names <- c("SHG", "WHG", "Anatolian Neolithic", "Balkan Neolithic", "Central_EN", "Iberia_EN", "Central_MN", "Iberia_MN", "Northern_LNBA", "Central_LNBA", "Iberia_LNBA", "Steppe_BA")
-int.include <- c("SHG", "WHG", "WHG", "AN", "BN", "CEN", "CEN", "IEN", "CMN", "IMN", "NLNBA", "CLNBA", "ILNBA", "SBA", "SBA", "SBA", "SBA")
-names(int.include) <-c("Motala_HG", "Loschbour", "WHG", "Anatolian_Neolithic", "Balkan_Neolithic", "Stuttgart", "Central_EN", "Iberia_EN", "Central_MN", "Iberia_MN", "Northern_LNBA", "Central_LNBA", "Iberia_LNBA", "Yamnaya", "Poltavka", "Srubnaya", "Potapovka")
+## int.names <- c("SHG", "WHG", "AN", "BN", "CEN", "IEN", "CMN", "IMN", "NLNBA", "CLNBA", "ILNBA", "SBA")
+## long.names <- c("SHG", "WHG", "Anatolian Neolithic", "Balkan Neolithic", "Central_EN", "Iberia_EN", "Central_MN", "Iberia_MN", "Northern_LNBA", "Central_LNBA", "Iberia_LNBA", "Steppe_BA")
+## int.include <- c("SHG", "WHG", "WHG", "AN", "BN", "CEN", "CEN", "IEN", "CMN", "IMN", "NLNBA", "CLNBA", "ILNBA", "SBA", "SBA", "SBA", "SBA")
+## names(int.include) <-c("Motala_HG", "Loschbour", "WHG", "Anatolian_Neolithic", "Balkan_Neolithic", "Stuttgart", "Central_EN", "Iberia_EN", "Central_MN", "Iberia_MN", "Northern_LNBA", "Central_LNBA", "Iberia_LNBA", "Yamnaya", "Poltavka", "Srubnaya", "Potapovka")
+int.names <- c("SHG", "WHG", "AN", "CEN", "IEN", "CMN", "IMN", "CLNBA", "ILNBA", "SBA")
+long.names <- c("SHG", "WHG", "Anatolian Neolithic",  "Central_EN", "Iberia_EN", "Central_MN", "Iberia_MN",  "Central_LNBA", "Iberia_LNBA", "Steppe_BA")
+int.include <- c("SHG", "WHG", "WHG", "AN", "CEN", "CEN", "IEN", "CMN", "IMN",  "CLNBA", "ILNBA", "SBA", "SBA", "SBA", "SBA")
+names(int.include) <-c("Motala_HG", "Loschbour", "WHG", "Anatolian_Neolithic", "Stuttgart", "Central_EN", "Iberia_EN", "Central_MN", "Iberia_MN", "Central_LNBA", "Iberia_LNBA", "Yamnaya", "Poltavka", "Srubnaya", "Potapovka")
 include.reads <- list(                  #Include these populations as reads
 "SHG"=c("SHG"),
 "WHG"=c("WHG"), #SpanishMesolithic is the high coverage LaBrana1 I0585 and LaBrana2
 "AN"="Anatolian_Neolithic",
-"BN"="Balkan_Neolithic",
+## "BN"="Balkan_Neolithic",
 "CEN"="Central_EN",
 "IEN"="Iberia_EN",
 "CMN"="Central_MN",
 "IMN"="Iberia_MN",
-"NLNBA"="Northern_LNBA",
+## "NLNBA"="Northern_LNBA",
 "CLNBA"="Central_LNBA",
 "ILNBA"="Iberia_LNBA",
 "SBA"=c("Yamnaya", "Poltavka", "Srubnaya", "Potapovka")

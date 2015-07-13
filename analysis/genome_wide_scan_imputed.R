@@ -16,6 +16,7 @@ source("~/selection/code/lib/3pop_lib.R")
 chr <- 1                                #set manually, or from --args
 version <- "vx" #v6, v7 etc...
 results.tag <- ""
+which.impute <- "within"
 
 cA <- commandArgs(TRUE)
 if(length(cA)){
@@ -23,6 +24,9 @@ if(length(cA)){
   version <- cA[2]
   if(length(cA)>2){
     results.tag <- cA[3]
+  }
+  if(length(cA)>3){
+    which.impute <- cA[4]
   }
 }
 
@@ -37,7 +41,7 @@ if( Sys.info()["login"]!=Sys.info()["user"]){
 root <- paste0("~/selection/counts/", version, "/all")
 out <- paste0("~/selection/analysis/", version, "/gscan/")
 indfile <- paste0("~/data/", version, "/use/", version,"1kg_europe2names.ind")
-impute.file <- paste0("~/selection/imputation/", version, "/imputed.within.chr", chr, ".vcf.gz")
+impute.file <- paste0("~/selection/imputation/", version, "/imputed.", which.impute ,".chr", chr, ".vcf.gz")
 error.prob <- 0.001
 
 pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
@@ -48,25 +52,59 @@ A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.71
 
 ########################################################################
 
-include.probs <- list(                  #Include these populations as genotype probabilities
-    "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
-    "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"), 
-    "Yamnaya"="Yamnaya")
-include.counts <- list(                 #Include these populations as hard calls. 
+if(version=="v6" | version=="v7"){
+
+  pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
+#Check if the SNP is monomorphic in these populations. 
+  monocheck <- c("CEU", "GBR", "IBS", "TSI", "HungaryGamba_HG", "Loschbour", "Stuttgart",
+               "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")
+  A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.712, 0.288),3, 4) 
+
+  include.counts <- list(                 #Include these populations as hard calls. 
     "WHG"="Loschbour",
     "EN"="Stuttgart",
     "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
-
-# version specific.
-if(results.tag=="incSHG"){
-  include.reads[["WHG"]] <- c("Iberian_Mesolithic", "HungaryGamba_HG", "Motala_HG")
-}
-if(results.tag=="onlySHG"){
-  include.reads[["WHG"]] <- c("Motala_HG")
+  
+include.probs <- list(                  #Include these populations as reads
+    ## "WHG"=c("LaBrana1", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
+    "WHG"=c("SpanishMesolithic", "HungaryGamba_HG"), #Replace LaBrana1 with SpanishMesolithic for the high coverage LaBrana I0585
+    "EN"=c("LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN"), 
+    "Yamnaya"="Yamnaya")
 }
 if(version=="v7"){
-  include.reads[["WHG"]] <- gsub("SpanishMesolithic", "Iberian_Mesolithic", include.reads[["WHG"]], fixed=TRUE)
+  include.probs[["WHG"]] <- gsub("SpanishMesolithic", "Iberian_Mesolithic", include.probs[["WHG"]], fixed=TRUE)
 }
+if(version=="v8"){
+  mix.dir <- "~/selection/code/files/v8/mixtures/"
+  
+  if(results.tag==""){stop("Must specify results tag - group from 1-6 - for v8 analysis")}
+  include.counts <- list( "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
+  always.counts <- c("Loschbour", "Stuttgart")
+  group <- results.tag
+  choice <- read.table(paste0(mix.dir, "Choice", results.tag), as.is=TRUE, header=FALSE)
+  include.probs <- list(c(), c(), c())
+  names(include.probs) <- unique(choice[,2])
+  for(i in 1:NROW(choice)){
+    if(choice[i,1] %in% c("Loschbour", "Stuttgart")){
+      include.counts[[choice[i,2]]] <- choice[i,1]
+    } else{
+      include.probs[[choice[i,2]]] <- c(include.probs[[choice[i,2]]], choice[i,1])
+    }
+  }
+  mix.mat <- read.table(paste0(mix.dir, "Proportion", results.tag), as.is=TRUE, header=TRUE)
+  rownames(mix.mat) <- mix.mat[,1]
+  mix.mat <- mix.mat[,2:NCOL(mix.mat)]
+  
+  anc.pops <- names(include.probs)
+  mod.pops <- c("CEU", "GBR", "IBS", "TSI")
+  pops <- c(anc.pops, mod.pops)
+  A <- t(mix.mat)[anc.pops,mod.pops]
+
+  monocheck <- c(unlist(include.probs), unlist(include.counts))
+  names(monocheck) <- NULL
+}
+
+##################################################################################################
 
 ## Setup the count data. 
 counts <- read.table(paste0(root, ".count"), header=TRUE, as.is=TRUE)
@@ -120,7 +158,7 @@ results <- results[!is.na(results[,2]),]
 results <- cbind(rownames(results), results)
 colnames(results) <- c("ID", "ChiSq", "uncorrected.p", "AR2")
 results <- data.frame(results)
-out.file <-  paste0("~/selection/analysis/",version,"/gscan/scan_results_imputed", results.tag, ".chr", chr, ".txt")
+out.file <-  paste0("~/selection/analysis/",version,"/gscan/scan_results_imputed", results.tag, ".", which.impute, ".chr", chr, ".txt")
 print(out.file)
 write.table(results,out.file, row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
 

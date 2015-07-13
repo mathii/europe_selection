@@ -27,7 +27,7 @@ read.root <- paste0("~/data/",version,"/reads/jj2")
 indfile <- paste0(data.root, ".ind")
 snpfile <- paste0(data.root, ".snp")
 out <- paste0("~/selection/imputation/",version,"/pre.chr", chr, ".vcf")
-populations <- scan("~/selection/code/files/used_all.txt", "")
+populations <- scan(paste0("~/selection/code/files/",version,"/used_all.txt"), "")
 error.prob <- 0.01
 
 ########################################################################
