@@ -24,7 +24,7 @@ if(length(cA)){
 if(version==""){stop("Must specify version as second argument")}
 if(is.na(degf)){stop("Must specify degrees of freedom as third argument")}
 
-results <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt")
+results <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt.gz")
 snpdata <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.snp")
 
 logfile <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".log")
@@ -66,7 +66,7 @@ lo.sig <- sig.level-2
 cat(paste0("GWSIG: ", sig.level, "\n"),file=logfile, append=TRUE)
 cat(paste0("LOSIG: ", lo.sig, "\n"),file=logfile, append=TRUE)
 if(version=="v8"){
-    mixmap <- read.table(paste0("~/selection/code/files/v8/mixtures/Choice", substr(results.tag, nchar(results.tag), nchar(results.tag))), as.is=TRUE, header=FALSE)
+    mixmap <- read.table(paste0("~/selection/code/files/v8/mixtures/Choice", gsub( "_read", "", results.tag)), as.is=TRUE, header=FALSE)
     pops <- unique(mixmap[,2])
     for(i in 1:length(pops)){
         cat(paste0("MPOP", i, ": ", paste(mixmap[mixmap[,2]==pops[i],1], collapse=","), "\n"),file=logfile, append=TRUE)
@@ -135,7 +135,7 @@ if(file.exists("~/selection/data/genes/refseq_inm.txt")){
 }
    
 write.table(isig, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
-write.table(isig[isig$n.sig>2,], paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".clean_signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
+write.table(isig[isig$n.sig>2|isig$n.gw.sig>1,], paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".clean_signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
 
 ## Now make a cleaned Manhatten plot, remiving everything that's genome-wide significant
 ## But not supported by anything within two p-value orders of magnitude. 
