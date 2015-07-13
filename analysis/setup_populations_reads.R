@@ -85,5 +85,7 @@ if(version=="v8"){
 
   monocheck <- c(unlist(include.reads), unlist(include.counts))
   names(monocheck) <- NULL
+  cat("Monocheck\n")
+  print(monocheck)
 }
 
