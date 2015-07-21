@@ -27,8 +27,8 @@ bsub -q priority -W12:00 "python ~/spindrift/Freq.py \
 -s ~/data/${V}/use/${V}1kg_europe2names"
 
 #2. Compute sample size
-for chr in {1..23}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_totals.R"; done
-bsub -q reich "R --vanilla --args All $V \< ~/selection/code/analysis/reads_to_totals_by_individual.R"
+for chr in {1..22}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_totals.R"; done
+bsub -q reich -R rusage[mem=32000] "R --vanilla --args All $V \< ~/selection/code/analysis/reads_to_totals_by_individual.R"
 ED=~/selection/analysis/${V}/effsize
 head -n1 ${ED}/effsize_reads.chr1.txt > ${ED}/effsize_reads.txt
 grep -hv "^Ana" ${ED}/effsize_reads.chr*.txt >> ${ED}/effsize_reads.txt
@@ -71,11 +71,7 @@ R --vanilla --args figure2 c ${V} < ~/selection/code/analysis/allele_frequency_p
 
 #5 Polygenic selection scans
 #Estimate allele frequncies in polypops
-for chr in {1..23}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_freq.R"; done
-#for what in Steppe_MN Steppe_MN_no_Srubs LargeScale SmallScale;
-#do
-#for chr in {1..23}; do bsub -q reich "R --vanilla --args $chr $V ${what} \<  ~/selection/code/analysis/reads_to_freq.R"; done
-#done
+for chr in {1..22}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_freq.R"; done
 
 CDIR=~/selection/counts/${V}
 for what in freq lowCI.freq highCI.freq;
