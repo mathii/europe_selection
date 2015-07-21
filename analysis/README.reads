@@ -5,7 +5,7 @@
 #or just run the commands manually 
 V=v8
 
-for dir in effsize  gscan  series  s_estimates poly
+for dir in effsize  gscan  series poly
 do
 	mkdir -p ~/selection/analysis/${V}/${dir}
 done
@@ -31,8 +31,9 @@ for chr in {1..22}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/
 bsub -q reich -R rusage[mem=32000] "R --vanilla --args All $V \< ~/selection/code/analysis/reads_to_totals_by_individual.R"
 ED=~/selection/analysis/${V}/effsize
 head -n1 ${ED}/effsize_reads.chr1.txt > ${ED}/effsize_reads.txt
-grep -hv "^Ana" ${ED}/effsize_reads.chr*.txt >> ${ED}/effsize_reads.txt
+tail -qn+2 ${ED}/effsize_reads.chr*.txt >> ${ED}/effsize_reads.txt
 gzip  ${ED}/effsize_reads.txt
+rm ${ED}/effsize_reads.chr*.txt
 R --vanilla --args ${V} < ~/selection/code/analysis/effective_sample_size.R
 
 #3Genome-wide scan for selction
@@ -76,7 +77,7 @@ for chr in {1..22}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/
 CDIR=~/selection/counts/${V}
 for what in freq lowCI.freq highCI.freq;
 do
-for who in . .imputed.;
+for who in .;
 do
 grep ^ID ${CDIR}/all.reads.chr1${who}freq > ${CDIR}/all.reads${who}${what}
 grep -hv ^ID ${CDIR}/all.reads.chr+([0-9])${who}freq >> ${CDIR}/all.reads${who}${what} 
