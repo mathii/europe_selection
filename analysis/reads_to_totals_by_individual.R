@@ -31,7 +31,7 @@ indfile <- paste0("~/data/", version, "/use/", version, "1kg_europe2names.ind")
 
 ########################################################################
 
-include.totals <- c( "Loschbour", "Stuttgart", "CEU", "GBR", "IBS", "TSI", "YRI")
+include.totals <- c( "Loschbour", "Stuttgart", "CEU", "GBR", "IBS", "TSI", "YRI", "FIN")
 
 ## Setup the data. 
 totals <- read.table(paste0(root, ".total"), header=TRUE, as.is=TRUE)
