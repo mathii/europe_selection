@@ -80,7 +80,8 @@ do
 for who in .;
 do
 grep ^ID ${CDIR}/all.reads.chr1${who}freq > ${CDIR}/all.reads${who}${what}
-grep -hv ^ID ${CDIR}/all.reads.chr+([0-9])${who}freq >> ${CDIR}/all.reads${who}${what} 
+grep -hv ^ID ${CDIR}/all.reads.chr+([0-9])${who}freq >> ${CDIR}/all.reads${who}${what}
+rm  ${CDIR}/all.reads.chr+([0-9])${who}freq
 done
 done
 
