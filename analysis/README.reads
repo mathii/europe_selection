@@ -11,14 +11,7 @@ do
 done
 mkdir -p ~/selection/counts/${V}/
 
-#0. Initial processing - rename to europe2 names in data/${VERSION}/use
-# Create symlinks TODO, perhaps add polypops names
-R --vanilla --args ${V} < ~/selection/code/analysis/initial_process.R
-ln -s ~/data/${V}/use/${V}1kgx.geno ~/data/${V}/use/${V}1kg_europe2names.geno
-ln -s ~/data/${V}/use/${V}1kgx.snp ~/data/${V}/use/${V}1kg_europe2names.snp
-
 #1. Pull out allele counts from eigenstrat data
-
 bsub -q priority -W12:00 "python ~/spindrift/Freq.py \
 -d ~/data/${V}/use/${V}1kg_europe2names \
 -p ~/selection/code/files/${V}/used_all.txt \
@@ -32,7 +25,7 @@ bsub -q reich -R rusage[mem=32000] "R --vanilla --args All $V \< ~/selection/cod
 ED=~/selection/analysis/${V}/effsize
 head -n1 ${ED}/effsize_reads.chr1.txt > ${ED}/effsize_reads.txt
 tail -qn+2 ${ED}/effsize_reads.chr*.txt >> ${ED}/effsize_reads.txt
-gzip  ${ED}/effsize_reads.txt
+gzip -f ${ED}/effsize_reads.txt
 rm ${ED}/effsize_reads.chr*.txt
 R --vanilla --args ${V} < ~/selection/code/analysis/effective_sample_size.R
 
@@ -44,7 +37,7 @@ do bsub -q short -W12:00 "R --vanilla --args $chr $V $i \< ~/selection/code/anal
 ; done
 
 GD=~/selection/analysis/${V}/gscan
-for i in {1..8};
+for i in {1..2};
 do
 head -n1 ${GD}/scan_results_read${i}.chr1.txt > ${GD}/scan_results_read${i}.txt
 tail -qn+2 ${GD}/scan_results_read${i}.chr+([0-9]).txt >> ${GD}/scan_results_read${i}.txt
@@ -53,7 +46,7 @@ gzip -f ${GD}/scan_results_read${i}.txt
 done
 
 #3b Manhattan and qq plots
-for i in {1..8};
+for i in {1..2};
 do
 R --vanilla --args _read${i} ${V} 4 < ~/selection/code/analysis/genome_wide_scan_plots.R
 done
@@ -79,9 +72,9 @@ for what in freq lowCI.freq highCI.freq;
 do
 for who in .;
 do
-grep ^ID ${CDIR}/all.reads.chr1${who}freq > ${CDIR}/all.reads${who}${what}
-grep -hv ^ID ${CDIR}/all.reads.chr+([0-9])${who}freq >> ${CDIR}/all.reads${who}${what}
-rm  ${CDIR}/all.reads.chr+([0-9])${who}freq
+grep ^ID ${CDIR}/all.reads.chr1${who}${what} > ${CDIR}/all.reads${who}${what}
+grep -hv ^ID ${CDIR}/all.reads.chr+([0-9])${who}${what} >> ${CDIR}/all.reads${who}${what}
+rm  ${CDIR}/all.reads.chr+([0-9])${who}${what}
 done
 done
 
