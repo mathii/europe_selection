@@ -5,7 +5,7 @@
 #or just run the commands manually 
 V=v8
 
-for dir in effsize  gscan  series  s_estimates poly
+for dir in effsize  gscan  series poly
 do
 	mkdir -p ~/selection/analysis/${V}/${dir}
 done
@@ -27,22 +27,36 @@ bsub -q priority -W12:00 "python ~/spindrift/Freq.py \
 -s ~/data/${V}/use/${V}1kg_europe2names"
 
 #2. Compute sample size
-for chr in {1..23}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_totals.R"; done
-bsub -q reich "R --vanilla --args All $V \< ~/selection/code/analysis/reads_to_totals_by_individual.R"
+for chr in {1..22}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_totals.R"; done
+bsub -q reich -R rusage[mem=32000] "R --vanilla --args All $V \< ~/selection/code/analysis/reads_to_totals_by_individual.R"
 ED=~/selection/analysis/${V}/effsize
 head -n1 ${ED}/effsize_reads.chr1.txt > ${ED}/effsize_reads.txt
-grep -hv "^Ana" ${ED}/effsize_reads.chr*.txt >> ${ED}/effsize_reads.txt
+tail -qn+2 ${ED}/effsize_reads.chr*.txt >> ${ED}/effsize_reads.txt
 gzip  ${ED}/effsize_reads.txt
+rm ${ED}/effsize_reads.chr*.txt
 R --vanilla --args ${V} < ~/selection/code/analysis/effective_sample_size.R
 
 #3Genome-wide scan for selction
+for i in {1..8}; 
+do for chr in {1..23};
+do bsub -q short -W12:00 "R --vanilla --args $chr $V $i \< ~/selection/code/analysis/genome_wide_scan_reads.R"
+; done
+; done
 
 GD=~/selection/analysis/${V}/gscan
-grep ^ID ${GD}/scan_results_read.chr1.txt > ${GD}/scan_results_reads.txt
-grep -hv "^ID" ${GD}/scan_results_read.chr*.txt >> ${GD}/scan_results_reads.txt
+for i in {1..8};
+do
+head -n1 ${GD}/scan_results_read${i}.chr1.txt > ${GD}/scan_results_read${i}.txt
+tail -qn+2 ${GD}/scan_results_read${i}.chr+([0-9]).txt >> ${GD}/scan_results_read${i}.txt
+gzip -f ${GD}/scan_results_read${i}.txt
+# rm ${GD}/scan_results_read${i}.chr+([0-9]).txt
+done
 
 #3b Manhattan and qq plots
-R --vanilla --args _reads ${V} 4 < ~/selection/code/analysis/genome_wide_scan_plots.R
+for i in {1..8};
+do
+R --vanilla --args _read${i} ${V} 4 < ~/selection/code/analysis/genome_wide_scan_plots.R
+done
 
 #3c generate locuszoom plots (see ./locuszoom_commands).
 ./locuszoom.sh
@@ -58,19 +72,16 @@ R --vanilla --args figure2 c ${V} < ~/selection/code/analysis/allele_frequency_p
 
 #5 Polygenic selection scans
 #Estimate allele frequncies in polypops
-for chr in {1..23}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_freq.R"; done
-#for what in gt10;
-#do
-#for chr in {1..23}; do bsub -q reich "R --vanilla --args $chr $V ${what} \<  ~/selection/code/analysis/reads_to_freq.R"; done
-#done
+for chr in {1..22}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_freq.R"; done
 
 CDIR=~/selection/counts/${V}
 for what in freq lowCI.freq highCI.freq;
 do
-for who in . .imputed.;
+for who in .;
 do
 grep ^ID ${CDIR}/all.reads.chr1${who}freq > ${CDIR}/all.reads${who}${what}
-grep -hv ^ID ${CDIR}/all.reads.chr+([0-9])${who}freq >> ${CDIR}/all.reads${who}${what} 
+grep -hv ^ID ${CDIR}/all.reads.chr+([0-9])${who}freq >> ${CDIR}/all.reads${who}${what}
+rm  ${CDIR}/all.reads.chr+([0-9])${who}freq
 done
 done
 

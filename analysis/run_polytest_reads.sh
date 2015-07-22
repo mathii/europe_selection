@@ -6,10 +6,10 @@ DATA=~/selection/counts/${V}/all.reads${dataset}.freq
 while read a b
 do
 mkdir -p ~/selection/analysis/${V}/poly/${a}
-OUT=~/selection/analysis/${V}/poly/${a}
+OUT=~/selection/analysis/${V}/poly/${a}/
 for what in pairs allpops
 do
-bsub -q reich -oo ~/selection/code/files/${V}/polypairs_${what}${dataset}.out "python \
+bsub -q reich -oo ${OUT}/${a}_${what}_reads${dataset}.out "python \
 ~/spindrift/Qx.py -q ${DATA} -n 10000 \
 -p ${LDIR}/polypairs_${what}${dataset}.txt \
 -o ${OUT}/${a}_${what}_reads${dataset} -v \
@@ -31,5 +31,5 @@ done
 #    -o ${OUT}/${a}_reads -v \
 #    -g ${b} 2> ${OUT}/${a}_all_reads.log
 
-done < ~/selection/data/traits.txt
+done < ~/selection/data/giant_traits.txt
 	

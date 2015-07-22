@@ -12,11 +12,12 @@ degf <- NA                      #degrees of freedom for test
 what <- "gscan"                #plot other things than gscan
 cA <- commandArgs(TRUE)
 cutoff <- 0
+extra.plots <- c()
 if(length(cA)){
     results.tag <- cA[1]
     version <- cA[2]
     degf <- as.numeric(cA[3])
-    if(length(cA)>3){what <- cA[4]}
+    if(length(cA)>3){extra.plots <- strsplit(cA[4], ",", fixed=TRUE)[[1]]} #HLA, CHRS, CPG
 }else{
     stop("Must specify results tag as first argument")
 }
@@ -24,7 +25,7 @@ if(length(cA)){
 if(version==""){stop("Must specify version as second argument")}
 if(is.na(degf)){stop("Must specify degrees of freedom as third argument")}
 
-results <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt")
+results <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt.gz")
 snpdata <- paste0("~/data/",version,"/use/",version,"1kg_europe2names.snp")
 
 logfile <- paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".log")
@@ -66,7 +67,7 @@ lo.sig <- sig.level-2
 cat(paste0("GWSIG: ", sig.level, "\n"),file=logfile, append=TRUE)
 cat(paste0("LOSIG: ", lo.sig, "\n"),file=logfile, append=TRUE)
 if(version=="v8"){
-    mixmap <- read.table(paste0("~/selection/code/files/v8/mixtures/Choice", substr(results.tag, nchar(results.tag), nchar(results.tag))), as.is=TRUE, header=FALSE)
+    mixmap <- read.table(paste0("~/selection/code/files/v8/mixtures/Choice", gsub( "_read", "", results.tag)), as.is=TRUE, header=FALSE)
     pops <- unique(mixmap[,2])
     for(i in 1:length(pops)){
         cat(paste0("MPOP", i, ": ", paste(mixmap[mixmap[,2]==pops[i],1], collapse=","), "\n"),file=logfile, append=TRUE)
@@ -83,12 +84,32 @@ MH.plot(res, color.loci=data.frame())
 abline(h=sig.level, col="red", lty=2)
 dev.off()
 
-## Per-chromosome Manhattan plots
-sig.chrs <- unique(res$CHR[res$PVAL<(10^-(sig.level))])
-for(c in sig.chrs){
-    png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".chr", c, ".png"), width=250, height=250)
-    par(mar=c(1,2,1,1))
-    MH.plot(res[res$CHR==c,], color.loci=data.frame(), chr.labels=FALSE)
+
+if("CPG" %in% extra.plots){
+    CPGs <- scan(paste0("~/data/", version, "/CpG/list_of_CpG_rsids"), what="")
+    res.cpg <- res[!(res$ID %in% CPGs),]
+    png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".noCpG.png"), width=800, height=400)
+    par(mar=c(2,4,1,1))
+    MH.plot(res.cpg, color.loci=data.frame())
+    abline(h=sig.level, col="red", lty=2)
+    abline(h=-log10(0.05/NROW(res)), col="red", lty=2)
+    dev.off()
+}
+
+if("HLA" %in% extra.plots){
+    res.hla <- res[res$CHR==6 & res$POS>29e6 & res$POS<34e6,]
+    png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".HLA.png"), width=400, height=400)
+    par(mar=c(2,4,1,1))
+    MH.plot(res.hla, color.loci=data.frame())
+    abline(h=sig.level, col="red", lty=2)
+    dev.off()
+    lambda2 <- qchisq(median(res.hla$PVAL), df=4, lower.tail=FALSE)/qchisq(0.5, df=degf)
+    res.hla$PVAL <- pchisq(qchisq(res.hla$PVAL, df=4, lower.tail=FALSE)/lambda2, df=degf, lower.tail=FALSE)
+    cat(paste0("HLA2GC: ", lambda2, "\n"), file=logfile, append=TRUE)
+    png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".HLA2GC.png"), width=400, height=400)
+    par(mar=c(2,4,1,1))
+    cl <- data.frame("chr"=6, pos.from=29e6, pos.to=34e6, col="darkred", stringsAsFactors=FALSE)
+    MH.plot(res.hla,color.loci=cl, chr.labels=FALSE)
     abline(h=sig.level, col="red", lty=2)
     dev.off()
 }
@@ -135,7 +156,7 @@ if(file.exists("~/selection/data/genes/refseq_inm.txt")){
 }
    
 write.table(isig, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
-write.table(isig[isig$n.sig>2,], paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".clean_signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
+write.table(isig[isig$n.sig>2|isig$n.gw.sig>1,], paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".clean_signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
 
 ## Now make a cleaned Manhatten plot, remiving everything that's genome-wide significant
 ## But not supported by anything within two p-value orders of magnitude. 
@@ -148,8 +169,25 @@ par(mar=c(2,4,1,1))
 MH.plot(clean.res, color.loci=data.frame())
 abline(h=sig.level, col="red", lty=2)
 csig <- isig[isig$n.sig>2 & isig$n.gw.sig>1,]
-
 dev.off()
+
+## Per-chromosome Manhattan plots
+extra.chrs <- c()
+if("CHRS" %in% extra.plots){
+    extra.chrs <- unique(csig$chr)
+}
+if(any(grepl("CHR", extra.chrs))){
+    extra.chrs <- unique(c(extra.chrs, gsub("CHR", "", extra.chrs[grepl("CHR", extra.chrs)])))
+}
+if("CHRS" %in% extra.plots){
+    for(c in sig.chrs){
+        png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".chr", c, ".png"), width=250, height=250)
+        par(mar=c(1,2,1,1))
+        MH.plot(res[res$CHR==c,], color.loci=data.frame(), chr.labels=FALSE)
+        abline(h=sig.level, col="red", lty=2)
+        dev.off()
+    }
+}
 
 
 
