@@ -30,11 +30,11 @@ rm ${ED}/effsize_reads.chr*.txt
 R --vanilla --args ${V} < ~/selection/code/analysis/effective_sample_size.R
 
 #3Genome-wide scan for selction
-for i in {1..8}; 
-do for chr in {1..23};
+for i in {1..8} 
+do for chr in {1..22}
 do bsub -q short -W12:00 "R --vanilla --args $chr $V $i \< ~/selection/code/analysis/genome_wide_scan_reads.R"
-; done
-; done
+done
+done
 
 GD=~/selection/analysis/${V}/gscan
 for i in {1..2};
