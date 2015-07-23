@@ -56,7 +56,6 @@ gwas <- read.table(paste0("~/selection/data/gwas/",snplist,".gwas"), as.is=TRUE)
 colnames(gwas) <- c("CHR", "POS", "EFFECT", "OTHER", "BETA")
 if(which.map!=""){
     polymap <- paste0("~/selection/code/files/",version ,"/polymap.", which.map, ".txt" )
-    out <- paste0("~/selection/counts/",version,"/all.reads.", which.map)
 }
 
 error.prob <- 0.01
@@ -78,8 +77,8 @@ include.extra <- list("SpanishMesolithic"="WHG")         #High coverage LaBrana
 
 if(version=="v8"){
 include.counts <- list(                 #Include these populations as hard calls. 
-    "WHG"="Loschbour",
-    "Central_EN"="Stuttgart",
+    "HG"="Loschbour",
+    "CEM"="Stuttgart",
     "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
 }
 
