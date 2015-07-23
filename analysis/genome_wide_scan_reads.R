@@ -47,6 +47,11 @@ rownames(results) <- data$ID
 ## Data structure
 empty.data <- make.empty.data(pops)
 
+## Check monocheck
+if(!all(monocheck %in% colnames(counts))){
+    stop(paste0("Missing populations: ", monocheck[!(monocheck %in% colnames(counts))]))
+}
+
 for(i in 1:NROW(data)){
     this.snp <- data[i,1]
     if(verbose){cat(paste0("\r", i, " ", this.snp))}

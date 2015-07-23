@@ -62,6 +62,7 @@ R --vanilla --args _reads ${V} 1 < ~/selection/code/analysis/genome_wide_scan_pl
 R --vanilla --args figure2 ${V} < ~/selection/code/analysis/time_series_plot_reads.R
 R --vanilla --args figure2 b ${V} < ~/selection/code/analysis/allele_frequency_plot_reads.R
 R --vanilla --args figure2 c ${V} < ~/selection/code/analysis/allele_frequency_plot_reads.R
+~/selection/code/analysis/run_polytest_reads.sh
 
 #5 Polygenic selection scans
 #Estimate allele frequncies in polypops
@@ -79,7 +80,14 @@ done
 done
 
 #estimate height series
+what=wood  #wood? lango_allen?
+
 while read pop; do
-bsub -q reich "R --vanilla --args $V wood $pop 100000 500000 \
+bsub -q reich "R --vanilla --args $V ${what} $pop 100000 200000 \
 \< ~/selection/code/analysis/estimate_height_series.R"
 done < ~/selection/code/files/${V}/height_series_list.txt
+
+SD=~/selection/analysis/${V}/series
+head -n1 ${SD}/height_series_mcmc_estimates_HG.${what}.txt > ${SD}/height_series_mcmc_estimates.${what}.txt
+tail -qn+2 ${SD}/height_series_mcmc_estimates_*.${what}.txt >> ${SD}/height_series_mcmc_estimates.${what}.txt
+rm ${SD}/height_series_mcmc_estimates_*.${what}.txt

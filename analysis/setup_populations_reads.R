@@ -83,10 +83,11 @@ if(version=="v8"){
   pops <- c(anc.pops, mod.pops)
   A <- t(mix.mat)[anc.pops,mod.pops]
 
+  ## monocheck <- c(unlist(include.reads), unlist(include.counts))
+  ## names(monocheck) <- NULL
 
-  monocheck <- c(unlist(include.reads), unlist(include.counts))
+  monocheck <-  c("CEU", "GBR", "IBS", "TSI", "YRI")
   
-  names(monocheck) <- NULL
   cat("Monocheck\n")
   print(monocheck)
 }
