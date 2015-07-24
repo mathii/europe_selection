@@ -5,10 +5,10 @@ library(RColorBrewer)
 ############################################################
 snp <- "rs3827760"
 flank <- 150000
-root <- "~/data/v6/use/v61kg_europe2names"
+root <- "~/data/v8/use/v81kg_europe2names"
 pops <- c("CHB", "Motala_HG", "CEU")
-out <- "~/selection/analysis/v6/EDAR/EDAR_haplotype"
-read.root <- "~/data/v6/reads/jj2"
+out <- "~/selection/analysis/v8/EDAR/EDAR_haplotype"
+read.root <- "~/data/v8/reads/jj2"
 subsample <- TRUE
 pops.with.reads <- "Motala_HG"
 cols <- brewer.pal(3, "Set1")
@@ -27,12 +27,16 @@ write.table(data, paste0(out, ".snp"), col.names=FALSE, row.names=FALSE, quote=F
 ## python ~/spindrift/Freq.py -d ~/data/v6/use/v61kg_europe2names -p CHB,CEU -o CHB_CEU_EDAR_haps -s EDAR_haplotype -g
 
 ind <- read.table(paste0(root, ".ind"), as.is=TRUE)
-gt <- read.table("~/selection/analysis/v6/EDAR/CHB_CEU_EDAR_haps.gt", as.is=TRUE, header=TRUE)
+## Add this ignored sample back in - is it really contaminated?
+ind[ind[,3]=="Motala_HG_IGNORE",3]<-"Motala_HG"
+ind[ind[,3]=="Motala_HG_contam",3]<-"Motala_HG"
+
+gt <- read.table("~/selection/analysis/v8/EDAR/CHB_CEU_EDAR_haps.gt", as.is=TRUE, header=TRUE)
 gt.data <- gt[,1:5]
 gt <- gt[,6:NCOL(gt)]
 
 ## Load reads
-reads <- read.table(paste0(read.root, ".chr", this.snpinfo[,2], ".readcounts"), as.is=TRUE, header=FALSE)
+reads <- read.table(paste0(read.root, ".chr", this.snpinfo[,2], ".readcounts.gz"), as.is=TRUE, header=FALSE)
 reads <- reads[reads[,1] %in% gt.data[,1],]
 
 ntotal <- 0
@@ -106,12 +110,12 @@ subtotal <- length(sub)
 ## cols <- c("grey", "pink", "darkred", "white")
 ## s.cols <- c("grey", "lightblue", "darkblue", "white")
 
-cols <- c("white", "pink", "darkred", "white")
-s.cols <- c("white", "lightblue", "darkblue", "white")
+cols <- c("grey", "pink", "darkred", "white")
+s.cols <- c("grey", "lightblue", "darkblue", "white")
 
-snpi <- which(data[,1]==snp)-1
+snpi <- which(gt.data[,1]==snp)
 
-    nsnp <- NROW(gt)
+nsnp <- NROW(gt)
 
 if(subsample){
     pdf(paste0(out, "_subsampled.pdf"), width=12, height=6)

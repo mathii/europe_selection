@@ -93,3 +93,5 @@ SD=~/selection/analysis/${V}/series
 head -n1 ${SD}/height_series_mcmc_estimates_HG.${what}.txt > ${SD}/height_series_mcmc_estimates.${what}.txt
 tail -qn+2 ${SD}/height_series_mcmc_estimates_*.${what}.txt >> ${SD}/height_series_mcmc_estimates.${what}.txt
 rm ${SD}/height_series_mcmc_estimates_*.${what}.txt
+
+for chr in {1..22}; do bsub -q short -W12:00 "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_freq.R"; done
