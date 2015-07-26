@@ -23,7 +23,7 @@ bsub -q priority -W12:00 "python ~/spindrift/Freq.py \
 for chr in {1..22}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_totals.R"; done
 bsub -q reich -R rusage[mem=32000] "R --vanilla --args All $V \< ~/selection/code/analysis/reads_to_totals_by_individual.R"
 ED=~/selection/analysis/${V}/effsize
-head -n1 ${ED}/effsize_reads.chr1.txt > ${ED}/effsize_reads.txt
+head -n1 ${ED}/effsize_reads.chr3.txt > ${ED}/effsize_reads.txt
 tail -qn+2 ${ED}/effsize_reads.chr*.txt >> ${ED}/effsize_reads.txt
 gzip -f ${ED}/effsize_reads.txt
 #rm ${ED}/effsize_reads.chr*.txt
