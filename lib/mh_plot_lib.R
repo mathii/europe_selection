@@ -1,6 +1,6 @@
 ## Library of functions for plotting genome-wide scan results. 
 
-MH.plot <- function(data, flip=FALSE, add=FALSE, chr.labels=TRUE, shift = 0, cap = 100, color.loci=data.frame(),range.shift=2, log10=TRUE, ylab="-log10 p-value", .ylim=NA, ...){
+MH.plot <- function(data, flip=FALSE, add=FALSE, original.data=NA, chr.labels=TRUE, shift = 0, cap = 100, color.scheme=list(), color.loci=data.frame(),range.shift=2, log10=TRUE, ylab="-log10 p-value", .ylim=NA, ...){
 
   ## Deal with X chromosome
   if(typeof(data$CHR)=="character"){
@@ -23,16 +23,23 @@ MH.plot <- function(data, flip=FALSE, add=FALSE, chr.labels=TRUE, shift = 0, cap
   obspval <- obspval[sort.ind]
   
   x <- get.chr.starts(chr,pos)
-
+  if(add){
+      if(all(is.na(original.data)))(stop("Must provide original data to add points"))
+      x <- get.chr.starts(original.data$CHR, original.data$POS)
+  }
+  
   locX = trunc(pos/100) + x[chr]
   locY = -log10(obspval)
   plot.sym <- ifelse( locY>cap, 17, 20 )
 
   ## Set colours - alternating per chromosome and red for off the scale
   col1=rgb(0,0,108,maxColorValue=255)
+  if("odd.chr.col" %in% names(color.scheme)){col1=rep(color.scheme$odd.chr.col, length(col1))}
   col2=rgb(100,149,237,maxColorValue=255)
+  if("even.chr.col" %in% names(color.scheme)){col2=rep(color.scheme$even.chr.col, length(col2))}
   col3=rgb(205,50,50,maxColorValue=255)
   col4 <- ifelse (chr%%2==0, col1, col2)
+  if("all.chr.col" %in% names(color.scheme)){col4=rep(color.scheme$all.chr.col, length(col4))}
   curcol <- ifelse (locY>cap, col3, col4) 
   pcl <- rep(FALSE, length(curcol))
 
@@ -64,22 +71,22 @@ MH.plot <- function(data, flip=FALSE, add=FALSE, chr.labels=TRUE, shift = 0, cap
   }
 
   points(locX[pcl],locY[pcl],pch=plot.sym[pcl],col=curcol[pcl],cex=0.8, ...)
-  
-  if(NROW(color.loci)>0){
-    
-  }
 
-  put.text.at <- -obsmax/20
-  if( chr.labels ){
-    for (i in 1:21)
-      {
-        labpos = (x[i+1] + x[i]) / 2
-        text(labpos,put.text.at,i,cex=0.8)
+  if(!add){
+      put.text.at <- -obsmax/20
+      if( chr.labels ){
+          for (i in 1:21)
+              {
+                  labpos = (x[i+1] + x[i]) / 2
+                  text(labpos,put.text.at,i,cex=0.8)
+              }
+          labpos = (x[22]+((x[22]-x[21])/2))
+          text(labpos,put.text.at,"22",cex=0.8)
+          if(23 %in% chr){
+              labpos = (x[23]+750000)            #Midpoint of the X chromosome
+              text(labpos,put.text.at,"X",cex=0.8)
+          }
       }
-    labpos = (x[22]+((x[22]-x[21])/2))
-    text(labpos,put.text.at,"22",cex=0.8)
-    labpos = (x[23]+750000)            #Midpoint of the X chromosome
-    text(labpos,put.text.at,"X",cex=0.8)
   }
 }
 
@@ -294,19 +301,22 @@ get.chr.starts <- function(chr,pos){
 ## and adds number of snps at gw.sig
 ################################################################################
 
-indep.signals <- function(res, sig, gw.sig, width=5e5){
+indep.signals <- function(res, sig, gw.sig, width=5e5, remove.level=2){
     cc=character()
     nn=numeric()
-    signals <- data.frame(lead.snp=cc, chr=cc, pos=nn, lead.p=nn, n.snps=nn, n.sig=nn, n.gw.sig=nn, stringsAsFactors=FALSE)
+    to.remove <- c()
+    signals <- data.frame(lead.snp=cc, chr=cc, pos=nn, lead.p=nn, n.snps=nn, n.sig=nn, n.gw.sig=nn, range.low=nn, range.high=nn, stringsAsFactors=FALSE)
     res <- res[order(res$PVAL),]
     while(res$PVAL[1]<sig){
+        sig.snps <- res$PVAL<gw.sig
         snps <- res$CHR==res[1,"CHR"] & abs(res$POS-res[1,"POS"])<width
         n.sig <- sum(res[snps,"PVAL"]<sig)
         n.gw.sig <- sum(res[snps,"PVAL"]<gw.sig)
-        signals[NROW(signals)+1,] <- list(res[1,"ID"],res[1,"CHR"],res[1,"POS"], res[1,"PVAL"], sum(snps), n.sig, n.gw.sig)
+        signals[NROW(signals)+1,] <- list(res[1,"ID"],res[1,"CHR"],res[1,"POS"], res[1,"PVAL"], sum(snps), n.sig, n.gw.sig, min(res[snps & sig.snps,"POS"]), max(res[snps & sig.snps,"POS"]))
+        if(n.gw.sig<remove.level){to.remove <- c(to.remove, res[snps & sig.snps,"ID"])}
         res <- res[!snps,]
     }
-    return(signals)
+    return(list(signals=signals, to.remove=to.remove))
 }
 
 ################################################################################

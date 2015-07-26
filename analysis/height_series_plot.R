@@ -18,7 +18,7 @@ out <-  paste0("~/selection/analysis/", version, "/series/heightseries.",snplist
 height.values <-  paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates.",snplist,".txt")
 dates <- paste0("~/selection/code/files/",version,"/population_dates.txt")
 ang <- 20
-ylim <- c(-0.5,0.5)
+ylim <- c(-0.3,0.4)
 
 ########################################################################
 ## Details

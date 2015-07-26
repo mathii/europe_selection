@@ -1,7 +1,7 @@
 #Run this probably in the analysis directory where the results are. 
 
 LZ=~/Packages/locuszoom/bin/locuszoom
-RES=~/selection/analysis/gscan/scan_results_reads_01pcErr.txt
+RES=~/selection/analysis/v8/gscan/scan_results_read2.txt.gz
 
 for GENE in MCM6 SLC45A2 NADSYN1 HERC2 FADS1
 do

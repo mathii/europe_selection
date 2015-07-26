@@ -49,8 +49,8 @@ cat(paste0("IGNORE: ", sum(!include), " SNPs with non-positive test statistics\n
 lambda <- median(results[neutral&include,"ChiSq"])/qchisq(0.5, df=degf)
 corrected.p <- pchisq(results[,"ChiSq"]/lambda, df=degf, lower.tail=F)
 results <- cbind(results, corrected.p)
-## write.table(results, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".txt"),
-##             row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+write.table(results, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".corrected.txt"),
+            row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
 cat(paste0("LAMBDA: ", lambda, "\n"), file=logfile, append=TRUE)
 ## }else{cat("Using corrected p-values\n")}
 
@@ -98,7 +98,7 @@ if("CPG" %in% extra.plots){
 
 if("HLA" %in% extra.plots){
     res.hla <- res[res$CHR==6 & res$POS>29e6 & res$POS<34e6,]
-    png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".HLA.png"), width=400, height=400)
+    png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".HLA.png"), width=800, height=400)
     par(mar=c(2,4,1,1))
     MH.plot(res.hla, color.loci=data.frame())
     abline(h=sig.level, col="red", lty=2)
@@ -106,7 +106,7 @@ if("HLA" %in% extra.plots){
     lambda2 <- qchisq(median(res.hla$PVAL), df=4, lower.tail=FALSE)/qchisq(0.5, df=degf)
     res.hla$PVAL <- pchisq(qchisq(res.hla$PVAL, df=4, lower.tail=FALSE)/lambda2, df=degf, lower.tail=FALSE)
     cat(paste0("HLA2GC: ", lambda2, "\n"), file=logfile, append=TRUE)
-    png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".HLA2GC.png"), width=400, height=400)
+    png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".HLA2GC.png"), width=800, height=400)
     par(mar=c(2,4,1,1))
     cl <- data.frame("chr"=6, pos.from=29e6, pos.to=34e6, col="darkred", stringsAsFactors=FALSE)
     MH.plot(res.hla,color.loci=cl, chr.labels=FALSE)
@@ -121,13 +121,13 @@ selection$TAG <- paste(selection[,2], selection[,4], sep=":")
 #First show the effect of genomic control on "neutral" snps.
 neutral <- res[!(res$TAG %in% selection$TAG),]
 selection <- res[(res$TAG %in% selection$TAG),]
-png(paste0("~/selection/analysis/",version,"/", what ,"/qq_plot_all", results.tag, ".png"), width=400, height=400)
-par(mar=c(4,4,1,1))
-qqPlotOfPValues(neutral$PVAL, col="#377EBA", linecol="black", ci=FALSE, xlim=c(0,6), ylim=c(0,30))
-draw.qq.ci(NROW(neutral), border.col="#377EBA20", fill.col="#377EBA20")
-qqPlotOfPValues(selection$PVAL, col="#E41A1C", add=T)
-draw.qq.ci(NROW(selection), border.col="#E41A1C20", fill.col="#E41A1C20")
-dev.off()
+## png(paste0("~/selection/analysis/",version,"/", what ,"/qq_plot_all", results.tag, ".png"), width=400, height=400)
+## par(mar=c(4,4,1,1))
+## qqPlotOfPValues(neutral$PVAL, col="#377EBA", linecol="black", ci=FALSE, xlim=c(0,6), ylim=c(0,30))
+## draw.qq.ci(NROW(neutral), border.col="#377EBA20", fill.col="#377EBA20")
+## qqPlotOfPValues(selection$PVAL, col="#E41A1C", add=T)
+## draw.qq.ci(NROW(selection), border.col="#E41A1C20", fill.col="#E41A1C20")
+## dev.off()
 
 #Now plot the selection snps spit up by functional category.
 cat.data <- read.table(paste0("~/data/",version, "/use/Cat_selection.snp"), as.is=TRUE, header=TRUE)
@@ -135,20 +135,37 @@ cat.data$GWAS <- ifelse(cat.data$GWAS|cat.data$Pheno1|cat.data$Pheno2,1,0)
 cat.data$Immune <- cat.data$Pheno3
 cat.data$TAG <- paste(cat.data$CHR, cat.data$POS, sep=":")
 
-png(paste0("~/selection/analysis/",version,"/", what ,"/qq_plot_cat", results.tag, ".png"), width=400, height=400)
+## png(paste0("~/selection/analysis/",version,"/", what ,"/qq_plot_cat", results.tag, ".png"), width=400, height=400)
+## par(mar=c(4.1,4.1,1,1))
+## cats <- c("GWAS", "CMS", "HiDiff", "Immune", "HLA", "eQTL")
+## cats <- cats[cats %in% colnames(cat.data)]
+## cols <- brewer.pal(length(cats), "Set1")
+## for(i in 1:length(cats)){
+##     this.lot <- res[res$TAG %in% cat.data$TAG[cat.data[,cats[i]]==1],]
+##     qqPlotOfPValues(this.lot$PVAL, col=cols[i], ci=FALSE, add=(i!=1), xlim=c(0,4), ylim=c(0,20),  linecol="black" )
+##     draw.qq.ci(NROW(this.lot), border.col=paste0(cols[i],"20"), fill.col=paste0(cols[i],"20"))
+## }
+## legend("topleft", cats, col=cols, pch=16, bty="n")
+## dev.off()
+
+png(paste0("~/selection/analysis/",version,"/", what ,"/qq_plot_both", results.tag, ".png"), width=400, height=400)
 par(mar=c(4.1,4.1,1,1))
 cats <- c("GWAS", "CMS", "HiDiff", "Immune", "HLA", "eQTL")
 cats <- cats[cats %in% colnames(cat.data)]
 cols <- brewer.pal(length(cats), "Set1")
+qqPlotOfPValues(neutral$PVAL, col="#404040", linecol="black", ci=FALSE, xlim=c(0,6), ylim=c(0,30))
+draw.qq.ci(NROW(neutral), border.col="#40404020", fill.col="#40404020")
 for(i in 1:length(cats)){
     this.lot <- res[res$TAG %in% cat.data$TAG[cat.data[,cats[i]]==1],]
-    qqPlotOfPValues(this.lot$PVAL, col=cols[i], ci=FALSE, add=(i!=1), xlim=c(0,4), ylim=c(0,20),  linecol="black" )
+    qqPlotOfPValues(this.lot$PVAL, col=cols[i], ci=FALSE, add=TRUE, xlim=c(0,4), ylim=c(0,20),  linecol="black" )
     draw.qq.ci(NROW(this.lot), border.col=paste0(cols[i],"20"), fill.col=paste0(cols[i],"20"))
 }
-legend("topleft", cats, col=cols, pch=16, bty="n")
+legend("topleft", c("Neutral", cats), col=c("#404040", cols), pch=16, bty="n")
 dev.off()
 
-isig <- indep.signals(res, 10^(-lo.sig), 10^(-sig.level), 1e6)
+isig.data <- indep.signals(res, 10^(-sig.level), 10^(-sig.level), 1e6, remove.level=3)
+isig <- isig.data$signals
+to.remove <- isig.data$to.remove
 
 if(file.exists("~/selection/data/genes/refseq_inm.txt")){
     gene.names<-read.table("~/selection/data/genes/refseq_inm.txt", header=TRUE, as.is=TRUE)
@@ -156,19 +173,21 @@ if(file.exists("~/selection/data/genes/refseq_inm.txt")){
 }
    
 write.table(isig, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
-write.table(isig[isig$n.sig>2|isig$n.gw.sig>1,], paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".clean_signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
+write.table(isig[isig$n.gw.sig>2,], paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag ,".clean_signals.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
 
 ## Now make a cleaned Manhatten plot, remiving everything that's genome-wide significant
 ## But not supported by anything within two p-value orders of magnitude. 
-to.remove <- isig$lead.snp[isig$n.sig<2]
-cat(paste0("REMOVE: ", sum(isig$n.sig<2), "\n"),file=logfile, append=TRUE)
+## to.remove <- isig$lead.snp[isig$n.sig<2]
+cat(paste0("REMOVE: ", length(to.remove), "\n"),file=logfile, append=TRUE)
 clean.res <- res
-clean.res <- clean.res[!(clean.res$ID %in% to.remove),]
+clean.res <- res[!(res$ID %in% to.remove),]
+dirty.res <- res[res$ID %in% to.remove,]
 png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned.png"), width=800, height=400)
 par(mar=c(2,4,1,1))
-MH.plot(clean.res, color.loci=data.frame())
+MH.plot(clean.res)
+MH.plot(dirty.res, color.scheme=list(all.chr.col="#CCCCCC80"), add=TRUE, original.data=clean.res)
 abline(h=sig.level, col="red", lty=2)
-csig <- isig[isig$n.sig>2 & isig$n.gw.sig>1,]
+csig <- isig[isig$n.gw.sig>2,]
 dev.off()
 
 ## Per-chromosome Manhattan plots
@@ -176,17 +195,15 @@ extra.chrs <- c()
 if("CHRS" %in% extra.plots){
     extra.chrs <- unique(csig$chr)
 }
-if(any(grepl("CHR", extra.chrs))){
-    extra.chrs <- unique(c(extra.chrs, gsub("CHR", "", extra.chrs[grepl("CHR", extra.chrs)])))
+if(any(grepl("CHR", extra.plots))){
+    extra.chrs <- unique(c(extra.chrs, gsub("CHR", "", extra.plots[grepl("CHR", extra.plots)])))
 }
-if("CHRS" %in% extra.plots){
-    for(c in sig.chrs){
-        png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".chr", c, ".png"), width=250, height=250)
-        par(mar=c(1,2,1,1))
-        MH.plot(res[res$CHR==c,], color.loci=data.frame(), chr.labels=FALSE)
-        abline(h=sig.level, col="red", lty=2)
-        dev.off()
-    }
+for(c in extra.chrs){
+    png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".chr", c, ".png"), width=250, height=250)
+    par(mar=c(1,2,1,1))
+    MH.plot(res[res$CHR==c,], color.loci=data.frame(), chr.labels=FALSE)
+    abline(h=sig.level, col="red", lty=2)
+    dev.off()
 }
 
 
