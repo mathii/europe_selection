@@ -30,14 +30,13 @@ if(version=="v6"){
 gss <- c(50, 100, 200)                               #Generations of selection
 ## ss <- 10^(seq(log10(0.002), log10(0.1), length.out=10)) #Selection coefficient
 ss <- c(0.002, 0.003, 0.005, 0.08, 0.01, 0.02, 0.03, 0.05, 0.08, 0.1)
-Ne <- 6000                                          #2 Population size
+Ne <- 14000                                          #2 Population size
 N <- 1000                                           #Number of replicates
 
 ########################################################################
 
 selpops <- c( "CEU", "GBR", "IBS", "TSI")
 #Check if the SNP is monomorphic in these populations. 
-A <- matrix(c(0.164, 0.366, 0.470, 0.213, 0.337, 0.450, 0, 0.773, 0.227, 0, 0.712, 0.288),3, 4) 
 degf <- dim(A)[2]
 
 ## Prepare counts and totals
@@ -104,7 +103,7 @@ for( gsi in 1:length(gss)){
         this.tf <- tf
         for(i in 1:N){
             for(pop in selpops){
-                this.fr <- pmax(0.01, this.tf[[i]][[pop]][["counts"]][2]/this.tf[[i]][[pop]][["counts"]][1])
+                this.fr <- pmax(0.01, this.tf[[i]][[pop]][["counts"]][2]/sum(this.tf[[i]][[pop]][["counts"]]))
                 traj <- simulate.wright.fisher(Ne, gss[gsi], this.fr, ss[si])
                 new.fr <- rev(traj)[1]
                 this.tot <- sum(this.tf[[i]][[pop]][["counts"]])
@@ -120,7 +119,7 @@ for( gsi in 1:length(gss)){
         this.tf <- tf
         for(i in 1:N){
             pop <- sample(selpops, 1)
-            this.fr <- pmax(0.01, this.tf[[i]][[pop]][["counts"]][2]/this.tf[[i]][[pop]][["counts"]][1])
+            this.fr <- pmax(0.01, this.tf[[i]][[pop]][["counts"]][2]/sum(this.tf[[i]][[pop]][["counts"]]))
             traj <- simulate.wright.fisher(Ne, gss[gsi], this.fr, ss[si])
             new.fr <- rev(traj)[1]
             this.tot <- sum(this.tf[[i]][[pop]][["counts"]])
