@@ -1,5 +1,6 @@
 ## Set up the populations, include.reads, include counts file paths etc, required for
 ## genome_wide_scan_reads, and other analyses.
+## Reads the first two or three arguments. 
 
 ########################################################################
 ## Details
@@ -60,15 +61,16 @@ if(version=="v7"){
 if(version=="v8"){
   mix.dir <- "~/selection/code/files/v8/mixtures/"
   
-  if(results.tag==""){stop("Must specify results tag - group from 1-8 - for v8 analysis")}
+  if(results.tag==""){stop("Must specify results tag for v8 analysis")}
   include.counts <- list( "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
   always.counts <- c("Loschbour", "Stuttgart")
+  
   group <- results.tag
   choice <- read.table(paste0(mix.dir, "Choice", results.tag), as.is=TRUE, header=FALSE)
   include.reads <- list(c(), c(), c())
   names(include.reads) <- unique(choice[,2])
   for(i in 1:NROW(choice)){
-    if(choice[i,1] %in% c("Loschbour", "Stuttgart")){
+    if(choice[i,1] %in% always.counts){
       include.counts[[choice[i,2]]] <- choice[i,1]
     } else{
       include.reads[[choice[i,2]]] <- c(include.reads[[choice[i,2]]], choice[i,1])

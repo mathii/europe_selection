@@ -459,3 +459,51 @@ read.samples <- function(indfile, include.reads, exclude=c()){
     return(include.read.samples)
 }
 
+#########################################################
+## 
+## Sample some number of reads, uniformly distributed
+## over the autosomes, for power simulations. 
+## 
+#########################################################
+
+sample.data <- function(data, N, read.root, pops, include.reads, include.read.samples, include.counts, counts, totals, min.freq, monocheck){
+  counts.per.chr <- table(sample(data$CHR[data$CHR<=22], N))
+  empty.data <- make.empty.data(pops)
+
+  tf <- list()
+  i=1
+  for(chr in 1:22){
+    cat(paste0("\rchr", chr))
+    if(!(as.character(chr) %in% names(counts.per.chr))){
+      next
+    }
+    
+    reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts.gz"), as.is=TRUE, header=FALSE)
+    k=1
+    
+    while(k <= counts.per.chr[as.character(chr)]){
+        cat(paste0("\rchr", chr, " ", k, "/", counts.per.chr[chr]))
+        inc <- data$CHR==chr
+        try <- sample(sum(inc), 1)
+        snp <- data[inc,][try,"ID"]
+        this.reads <- reads[reads[,1]==snp,]
+        freq.data <- make.freq.data(pops, include.reads, include.read.samples, include.counts, this.reads, counts[inc,][try,], totals[inc,][try,], empty.data)
+
+
+        ## model fit gives us frequency of ref allele. 
+        fr <- 1-fit.unconstrained.model.reads(freq.data, error.prob=error.prob)$par
+        if(mean(fr)>min.freq){next}
+
+        ## Don't want it to me monomporphic. 
+        monomorphic <- all(counts[inc,][try,monocheck]==0)|all(counts[inc,][try,monocheck]==totals[inc,][try,monocheck])
+        if(monomorphic){next}
+
+        tf[[i]] <- freq.data
+        names(tf)[i] <- snp
+        
+        i <- i+1
+        k <- k+1
+      }
+  }
+  return(tf)
+}
