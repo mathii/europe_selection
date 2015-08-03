@@ -71,7 +71,6 @@ Npowersims <- Nlambdasims <- 1000                            #Number of replicat
 gens <- 100
 s <- 0.02
 Ne <- 14000
-min.freq <- 0.1
 
 ########################################################################
 
@@ -90,7 +89,8 @@ rownames(totals) <- data$ID
 ## setup for read data. 
 include.read.samples <- read.samples(indfile, include.reads)
 
-tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_N_", Nlambdasims,".obj")
+min.freq <- 0
+tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_round_", round, "_N_", Nlambdasims,".obj")
 if(file.exists(tf.file)){
   load(tf.file)
   cat(paste0("Loading seed file ", tf.file, "\n"))
@@ -126,6 +126,17 @@ dev.off()
 
 ###########################################################################################
 #Now test power.
+## Here we're restricting to things with a MAF < 0.1
+
+min.freq <- 0.1
+tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_round_", round, "_N_", Nlambdasims,".obj")
+if(file.exists(tf.file)){
+  load(tf.file)
+  cat(paste0("Loading seed file ", tf.file, "\n"))
+}else{
+  tf <- sample.data(data, Nlambdasims, read.root, pops, include.reads, include.read.samples, include.counts, counts, totals, min.freq, monocheck)
+  save(tf, file=tf.file)
+}
 
 all.power <- rep(0, length(rnds))
 for( rndi in 1:length(rnds)){
