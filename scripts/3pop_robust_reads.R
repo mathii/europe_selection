@@ -2,7 +2,7 @@ source("~/selection/code/lib/3pop_lib.R")
 source("~/Packages/s_lattice/simulation.R")
 
 ########################################################################
-## --args: x v8 2
+## --args: x v8 2 Proportion 12345
 ## This tests how lambda and power chage under different scenarios,
 ## Either when the admixture matrix A is misspecified, or if there is
 ## admixture from YRI into one of the populations. It first selects a
@@ -31,7 +31,8 @@ if(!(which.test %in% c("Proportion", "Admixture"))){
 }
 seed <- 12345
 if(length(cA>4)){
-  ssed <- cA[5]
+  seed <- cA[5]
+  set.seed(seed)
 }
 rnds <- seq(0,1,length.out=11)                               #proportions of randomness
 if(which.test=="Admixture"){
