@@ -30,7 +30,7 @@ if(!(which.test %in% c("Proportion", "Admixture"))){
 }
 rnds <- seq(0,1,length.out=11)                               #proportions of randomness
 if(which.test=="Admixture"){
-  rnds <- seq(0,0.1,length.out=11)
+  rnds <- seq(0,0.1,length.out=11)      #Proportions of admixture
 }
 
 ########################################################################
@@ -115,11 +115,8 @@ dev.off()
 
 ###########################################################################################
 #Now test power.
-gens <- 200
-s <- 0.01
-Ne <- 6000
 
-all.power <- c(0, length(rnds))
+all.power <- rep(0, length(rnds))
 for( rndi in 1:length(rnds)){
     rnd <- rnds[rndi]
     cat(paste0(rnd, "\n"))
@@ -132,7 +129,7 @@ for( rndi in 1:length(rnds)){
     for(i in 1:Npowersims){
         for(pop in selpops){
           this.fr <- pmax(0.01, this.tf[[i]][[pop]][["counts"]][2]/sum(this.tf[[i]][[pop]][["counts"]]))
-          traj <- simulate.wright.fisher(Ne, s, this.fr, s)
+          traj <- simulate.wright.fisher(Ne, gens, this.fr, s)
           new.fr <- rev(traj)[1]
           this.tot <- sum(this.tf[[i]][[pop]][["counts"]])
           this.alt <-  rbinom(1, this.tot, new.fr)
