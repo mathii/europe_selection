@@ -16,7 +16,6 @@ source("~/selection/code/analysis/setup_populations_reads.R")
 ########################################################################
 
 if(version=="v6"){
-    lambda=1.21
     sig <- 10^-6.79                                      #genome-wide significance level
 }else if(version=="v8"){
     num.res.tag <- as.numeric(results.tag)
@@ -55,13 +54,13 @@ randomize.A <- function(A, rnd){
 add.YRI.admixture <- function(this.tf, rnd, selpops, counts, totals){
   for(i in 1:length(this.tf)){
     snp=names(this.tf)[i]
-    pop <- sample(selpops, 1)
-    this.tot <- sum(this.tf[[i]][[pop]][["counts"]])
-    this.ref.fr <- sum(this.tf[[i]][[pop]][["counts"]][1])/this.tot
-    YRI.ref.fr <- counts[snp,"YRI"]/totals[snp,"YRI"]
-    new.ref.fr <- rnd*YRI.ref.fr+(1-rnd)*this.ref.fr
-    this.ref <-  rbinom(1, this.tot, new.ref.fr)
-    this.tf[[i]][[pop]][["counts"]] <- c(this.ref, this.tot-this.ref)
+    adm <- sample(selpops,1)
+    ttfc <- this.tf[[i]][[adm]][["counts"]]
+    nt <- sum(ttfc)
+    sub.ref.alt <- round((1-rnd)* ttfc)
+    to.fill <- nt-sum(sub.ref.alt)  #total number to pick from YRI
+    fill.c <- round(to.fill*counts[which(data$ID==snp),"YRI"]/totals[which(data$ID==snp),"YRI"])
+    this.tf[[i]][[adm]][["counts"]] <- sub.ref.alt+c(fill.c, to.fill-fill.c)
   }
   return(this.tf)
 }
@@ -72,7 +71,6 @@ Npowersims <- Nlambdasims <- 1000                            #Number of replicat
 gens <- 100
 s <- 0.02
 Ne <- 14000
-min.freq <- 0.2
 
 ########################################################################
 
@@ -91,7 +89,8 @@ rownames(totals) <- data$ID
 ## setup for read data. 
 include.read.samples <- read.samples(indfile, include.reads)
 
-tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_N_", Nlambdasims,".obj")
+min.freq <- 0
+tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_round_", round, "_N_", Nlambdasims,".obj")
 if(file.exists(tf.file)){
   load(tf.file)
   cat(paste0("Loading seed file ", tf.file, "\n"))
@@ -121,12 +120,23 @@ for( rndi in 1:length(rnds)){
   lambda.all[rndi] <- median(this.res[this.res[,1]>0,1])/qchisq(0.5, df=degf)
 }
 
-pdf(paste0("~/selection/analysis/",version,"/power/reads_robust_", which.test,"_seed_", seed,"_lambda.pdf"))
-plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", ylim=c(1.2, 1.4))
-dev.off()
+## pdf(paste0("~/selection/analysis/",version,"/power/reads_robust_", which.test,"_seed_", seed,"_lambda.pdf"))
+## plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", ylim=c(1.2, 1.4))
+## dev.off()
 
 ###########################################################################################
 #Now test power.
+## Here we're restricting to things with a MAF < 0.1
+
+min.freq <- 0.1
+tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_round_", round, "_N_", Nlambdasims,".obj")
+if(file.exists(tf.file)){
+  load(tf.file)
+  cat(paste0("Loading seed file ", tf.file, "\n"))
+}else{
+  tf <- sample.data(data, Nlambdasims, read.root, pops, include.reads, include.read.samples, include.counts, counts, totals, min.freq, monocheck)
+  save(tf, file=tf.file)
+}
 
 all.power <- rep(0, length(rnds))
 for( rndi in 1:length(rnds)){
@@ -165,13 +175,13 @@ for( rndi in 1:length(rnds)){
 results <- data.frame(random=rnds, lambda=lambda.all, power=all.power)
 write.table(results, paste0("~/selection/analysis/", version,"/power/reads_robust_power_", which.test,"_seed_", seed,"_lambda.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
 
-pdf(paste0("~/selection/analysis/", version,"/power/reads_robust_power_", which.test,"_seed_", seed,"_lambda.pdf"))
-par(mar=c(5,4,4,4))
-plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", yaxt="n", xaxt="n", ylim=c(1.2,1.4))
-axis(1, lwd=2)
-axis(2, col="#377EBA", lwd=2)
-par(new=TRUE)
-plot(rnds, all.power, col="#CC5500", type="b", pch=16, bty="n", lwd=2, axes=FALSE, xlab="", ylab="")
-axis(4, col="#CC5500", lwd=2)
-mtext("Power", 4, line=3)
-dev.off()
+## pdf(paste0("~/selection/analysis/", version,"/power/reads_robust_power_", which.test,"_seed_", seed,"_lambda.pdf"))
+## par(mar=c(5,4,4,4))
+## plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", yaxt="n", xaxt="n", ylim=c(1.2,1.4))
+## axis(1, lwd=2)
+## axis(2, col="#377EBA", lwd=2)
+## par(new=TRUE)
+## plot(rnds, all.power, col="#CC5500", type="b", pch=16, bty="n", lwd=2, axes=FALSE, xlab="", ylab="")
+## axis(4, col="#CC5500", lwd=2)
+## mtext("Power", 4, line=3)
+## dev.off()
