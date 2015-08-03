@@ -120,9 +120,9 @@ for( rndi in 1:length(rnds)){
   lambda.all[rndi] <- median(this.res[this.res[,1]>0,1])/qchisq(0.5, df=degf)
 }
 
-pdf(paste0("~/selection/analysis/",version,"/power/reads_robust_", which.test,"_seed_", seed,"_lambda.pdf"))
-plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", ylim=c(1.2, 1.4))
-dev.off()
+## pdf(paste0("~/selection/analysis/",version,"/power/reads_robust_", which.test,"_seed_", seed,"_lambda.pdf"))
+## plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", ylim=c(1.2, 1.4))
+## dev.off()
 
 ###########################################################################################
 #Now test power.
@@ -175,13 +175,13 @@ for( rndi in 1:length(rnds)){
 results <- data.frame(random=rnds, lambda=lambda.all, power=all.power)
 write.table(results, paste0("~/selection/analysis/", version,"/power/reads_robust_power_", which.test,"_seed_", seed,"_lambda.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
 
-pdf(paste0("~/selection/analysis/", version,"/power/reads_robust_power_", which.test,"_seed_", seed,"_lambda.pdf"))
-par(mar=c(5,4,4,4))
-plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", yaxt="n", xaxt="n", ylim=c(1.2,1.4))
-axis(1, lwd=2)
-axis(2, col="#377EBA", lwd=2)
-par(new=TRUE)
-plot(rnds, all.power, col="#CC5500", type="b", pch=16, bty="n", lwd=2, axes=FALSE, xlab="", ylab="")
-axis(4, col="#CC5500", lwd=2)
-mtext("Power", 4, line=3)
-dev.off()
+## pdf(paste0("~/selection/analysis/", version,"/power/reads_robust_power_", which.test,"_seed_", seed,"_lambda.pdf"))
+## par(mar=c(5,4,4,4))
+## plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", yaxt="n", xaxt="n", ylim=c(1.2,1.4))
+## axis(1, lwd=2)
+## axis(2, col="#377EBA", lwd=2)
+## par(new=TRUE)
+## plot(rnds, all.power, col="#CC5500", type="b", pch=16, bty="n", lwd=2, axes=FALSE, xlab="", ylab="")
+## axis(4, col="#CC5500", lwd=2)
+## mtext("Power", 4, line=3)
+## dev.off()
