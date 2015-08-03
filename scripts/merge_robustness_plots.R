@@ -20,7 +20,7 @@ write.table(result, paste0("~/selection/analysis/v8/power/reads_robust_power_", 
 
 pdf(paste0("~/selection/analysis/", version,"/power/reads_robust_power_",what,".pdf"))
 par(mar=c(5,4,4,4))
-plot(result[,1], result[,2], col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", yaxt="n", xaxt="n", ylim=c(1.3,1.6))
+plot(result[,1], result[,2], col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", yaxt="n", xaxt="n", ylim=c(1.2,1.6))
 axis(1, lwd=2)
 axis(2, col="#377EBA", lwd=2)
 par(new=TRUE)

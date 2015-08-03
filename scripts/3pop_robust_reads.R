@@ -16,7 +16,6 @@ source("~/selection/code/analysis/setup_populations_reads.R")
 ########################################################################
 
 if(version=="v6"){
-    lambda=1.21
     sig <- 10^-6.79                                      #genome-wide significance level
 }else if(version=="v8"){
     num.res.tag <- as.numeric(results.tag)
@@ -55,13 +54,13 @@ randomize.A <- function(A, rnd){
 add.YRI.admixture <- function(this.tf, rnd, selpops, counts, totals){
   for(i in 1:length(this.tf)){
     snp=names(this.tf)[i]
-    pop <- sample(selpops, 1)
-    this.tot <- sum(this.tf[[i]][[pop]][["counts"]])
-    this.ref.fr <- sum(this.tf[[i]][[pop]][["counts"]][1])/this.tot
-    YRI.ref.fr <- counts[snp,"YRI"]/totals[snp,"YRI"]
-    new.ref.fr <- rnd*YRI.ref.fr+(1-rnd)*this.ref.fr
-    this.ref <-  rbinom(1, this.tot, new.ref.fr)
-    this.tf[[i]][[pop]][["counts"]] <- c(this.ref, this.tot-this.ref)
+    adm <- sample(selpops,1)
+    ttfc <- this.tf[[i]][[adm]][["counts"]]
+    nt <- sum(ttfc)
+    sub.ref.alt <- round((1-rnd)* ttfc)
+    to.fill <- nt-sum(sub.ref.alt)  #total number to pick from YRI
+    fill.c <- round(to.fill*counts[which(data$ID==snp),"YRI"]/totals[which(data$ID==snp),"YRI"])
+    this.tf[[i]][[adm]][["counts"]] <- sub.ref.alt+c(fill.c, to.fill-fill.c)
   }
   return(this.tf)
 }
@@ -72,7 +71,7 @@ Npowersims <- Nlambdasims <- 1000                            #Number of replicat
 gens <- 100
 s <- 0.02
 Ne <- 14000
-min.freq <- 0.2
+min.freq <- 0.1
 
 ########################################################################
 
