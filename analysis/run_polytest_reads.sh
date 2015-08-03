@@ -31,5 +31,5 @@ done
 #    -o ${OUT}/${a}_reads -v \
 #    -g ${b} 2> ${OUT}/${a}_all_reads.log
 
-done < ~/selection/data/giant_traits.txt
+done < ~/selection/data/traits.txt
 	
