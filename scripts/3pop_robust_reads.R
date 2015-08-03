@@ -97,7 +97,7 @@ if(file.exists(tf.file)){
   cat(paste0("Loading seed file ", tf.file, "\n"))
 }else{
   tf <- sample.data(data, Nlambdasims, read.root, pops, include.reads, include.read.samples, include.counts, counts, totals, min.freq, monocheck)
-  save(tf, tf.file)
+  save(tf, file=tf.file)
 }
 
 lambda.all <- rep(0, length(rnds))
