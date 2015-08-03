@@ -24,9 +24,14 @@ if(version=="v6"){
 }
 
 ########################################################################
-which.test <- commandArgs(TRUE)[4]
+cA <- commandArgs(TRUE)
+which.test <-cA[4]
 if(!(which.test %in% c("Proportion", "Admixture"))){
   stop("Test (arg 4) must be Proportions or Admixture")
+}
+seed <- 12345
+if(length(cA>4)){
+  ssed <- cA[5]
 }
 rnds <- seq(0,1,length.out=11)                               #proportions of randomness
 if(which.test=="Admixture"){
@@ -85,8 +90,14 @@ rownames(totals) <- data$ID
 ## setup for read data. 
 include.read.samples <- read.samples(indfile, include.reads)
 
-tf <- sample.data(data, Nlambdasims, read.root, pops, include.reads, include.read.samples, include.counts, counts, totals, min.freq, monocheck)
-save(tf, file=paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_N_", Nlambdasims,".obj"))
+tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_N_", Nlambdasims,".obj")
+if(file.exists(tf.file)){
+  load(tf.file)
+  cat(paste0("Loading seed file ", tf.file, "\n"))
+}else{
+  tf <- sample.data(data, Nlambdasims, read.root, pops, include.reads, include.read.samples, include.counts, counts, totals, min.freq, monocheck)
+  save(tf, tf.file)
+}
 
 lambda.all <- rep(0, length(rnds))
 #Estimate lambda as a function of r
@@ -109,7 +120,7 @@ for( rndi in 1:length(rnds)){
   lambda.all[rndi] <- median(this.res[this.res[,1]>0,1])/qchisq(0.5, df=degf)
 }
 
-pdf(paste0("~/selection/analysis/",version,"/power/reads_robust_", which.test,"_lambda.pdf"))
+pdf(paste0("~/selection/analysis/",version,"/power/reads_robust_", which.test,"_seed_", seed,"_lambda.pdf"))
 plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", ylim=c(1.2, 1.4))
 dev.off()
 
@@ -151,9 +162,9 @@ for( rndi in 1:length(rnds)){
 }
 
 results <- data.frame(random=rnds, lambda=lambda.all, power=all.power)
-write.table(results, paste0("~/selection/analysis/", version,"/power/reads_robust_power_", which.test,"_lambda.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
+write.table(results, paste0("~/selection/analysis/", version,"/power/reads_robust_power_", which.test,"_seed_", seed,"_lambda.txt"), row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
 
-pdf(paste0("~/selection/analysis/", version,"/power/reads_robust_power_", which.test,"_lambda.pdf"))
+pdf(paste0("~/selection/analysis/", version,"/power/reads_robust_power_", which.test,"_seed_", seed,"_lambda.pdf"))
 par(mar=c(5,4,4,4))
 plot(rnds, lambda.all, col="#377EBA", type="b", pch=16, bty="n", lwd=2, xlab="Random proportion", ylab="Genomic inflation factor", yaxt="n", xaxt="n", ylim=c(1.2,1.4))
 axis(1, lwd=2)
