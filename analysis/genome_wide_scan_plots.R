@@ -49,7 +49,7 @@ cat(paste0("IGNORE: ", sum(!include), " SNPs with non-positive test statistics\n
 lambda <- median(results[neutral&include,"ChiSq"])/qchisq(0.5, df=degf)
 corrected.p <- pchisq(results[,"ChiSq"]/lambda, df=degf, lower.tail=F)
 results <- cbind(results, corrected.p)
-write.table(results, paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".corrected.txt"),
+write.table(results[include,], paste0("~/selection/analysis/",version,"/", what ,"/scan_results", results.tag, ".corrected.txt"),
             row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
 cat(paste0("LAMBDA: ", lambda, "\n"), file=logfile, append=TRUE)
 ## }else{cat("Using corrected p-values\n")}
