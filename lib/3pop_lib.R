@@ -484,7 +484,7 @@ sample.data <- function(data, N, read.root, pops, include.reads, include.read.sa
     total.inc <- sum(inc)
     inc.counts <- counts[inc,]
     inc.totals <- totals[inc,]
-    inc.data <- data[,inc]
+    inc.data <- data[inc,]
     while(k <= counts.per.chr[as.character(chr)]){
         cat(paste0("\rchr", chr, " ", k, "/", counts.per.chr[chr]))
         try <- sample(total.inc, 1)
