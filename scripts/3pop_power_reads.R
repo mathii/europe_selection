@@ -63,13 +63,19 @@ totals <- data.matrix(totals[,6:NCOL(totals)])
 ## setup for read data. 
 include.read.samples <- read.samples(indfile, include.reads)
 min.freq <- 0.2
-tf.file <- paste0("~/selection/analysis/", version,"/power/tf_power_scale_", scale, "_seed_", seed, "_minf_", min.freq, "_N_", N,".obj")
+tf.file <- paste0("~/selection/analysis/", version,"/power/tf_power", results.tag, "_scale_", scale, "_seed_", seed, "_minf_", min.freq, "_N_", N,".obj")
 if(file.exists(tf.file)){
   load(tf.file)
   cat(paste0("Loading seed file ", tf.file, "\n"))
 }else{
   tf <- sample.data(data, N, read.root, pops, include.reads, include.read.samples, include.counts, counts, totals, min.freq, monocheck)
   save(tf, file=tf.file)
+}
+
+if(scale<1){
+  stop("Downsampling not supported")
+}else if(scale>1){
+  tf <- scale.up.tf(tf)
 }
 
 results.all <- matrix(0,nrow=length(ss), ncol=length(gss))

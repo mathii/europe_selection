@@ -38,7 +38,9 @@ include.reads <- include.counts <- list()
 
 if(version=="v6" | version=="v7"){
 
-  pops <- c("WHG", "EN", "Yamnaya", "CEU", "GBR", "IBS", "TSI")
+  anc.pops <- c("WHG", "EN", "Yamnaya")
+  mod.pops <- c("CEU", "GBR", "IBS", "TSI")
+  pops <- c(anc.pops, mod.pops)
 #Check if the SNP is monomorphic in these populations. 
   monocheck <- c("CEU", "GBR", "IBS", "TSI", "HungaryGamba_HG", "Loschbour", "Stuttgart",
                "LBK_EN", "HungaryGamba_EN", "Spain_EN", "Starcevo_EN", "LBKT_EN", "Yamnaya")

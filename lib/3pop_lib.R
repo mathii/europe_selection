@@ -480,10 +480,9 @@ sample.data <- function(data, N, read.root, pops, include.reads, include.read.sa
     
     reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts.gz"), as.is=TRUE, header=FALSE)
     k=1
-    
+    inc <- data$CHR==chr
     while(k <= counts.per.chr[as.character(chr)]){
         cat(paste0("\rchr", chr, " ", k, "/", counts.per.chr[chr]))
-        inc <- data$CHR==chr
         try <- sample(sum(inc), 1)
         snp <- data[inc,][try,"ID"]
         this.reads <- reads[reads[,1]==snp,]
