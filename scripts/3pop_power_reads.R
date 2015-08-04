@@ -49,8 +49,18 @@ N <- 1000                                           #Number of replicates
 ########################################################################
 
 ## resample the ancient populations to increase the population size. 
-scale.up.tf <- function(tf, anc.pops){
-  
+scale.up.tf <- function(tf, scale, anc.pops){
+  for(i in 1:length(tf)){
+    for(anc in anc.pops){
+      n.samples <- length(tf[[i]][[anc]]$reads$samples)
+      n.new.samples <- round(scale*n.samples)
+      indexes <- sample(n.samples, n.new.samples, replace=TRUE)
+      tf[[i]][[anc]]$reads$ref <- tf[[i]][[anc]]$reads$ref[indexes]
+      tf[[i]][[anc]]$reads$alt <- tf[[i]][[anc]]$reads$alt[indexes]
+      tf[[i]][[anc]]$reads$samples <- paste0("SIM", 1:n.new.samples)
+    }
+  }
+  return(tf)
 }
 
 ########################################################################
@@ -79,10 +89,8 @@ if(file.exists(tf.file)){
   save(tf, file=tf.file)
 }
 
-if(scale<1){
-  stop("Downsampling not supported")
-}else if(scale>1){
-  tf <- scale.up.tf(tf)
+if(scale!=1){
+  tf <- scale.up.tf(tf, scale, anc.pops)
 }
 
 results.all <- matrix(0,nrow=length(ss), ncol=length(gss))
@@ -130,15 +138,15 @@ results.all <- results.all/N
 results.one <- results.one/N
 
 
-pdf(paste0("~/selection/analysis/",version,"/power/read_power", results.tag,".pdf"))
-plot(ss, results.all[,1], col="#377EBA", type="b", pch=16, bty="n", lty=2, ylim=c(0,1), log="x", xlab="Selection coefficient", ylab="power")
-lines(ss, results.all[,2], col="#E41A1C", type="b", pch=16, lty=2)
-lines(ss, results.all[,3], col="#4DAF4A", type="b", pch=16, lty=2)
-lines(ss, results.one[,1], col="#377EBA", type="b", pch=1, lty=3)
-lines(ss, results.one[,2], col="#E41A1C", type="b", pch=1, lty=3)
-lines(ss, results.one[,3], col="#4DAF4A", type="b", pch=1, lty=3)
-legend("topleft", c("Selected in all populations", "Selected in one population", "50 generations of selection", "100 generations of selection", "200 generations of selection"), col=c("black", "black", "#377EBA", "#E41A1C", "#4DAF4A"), pch=16, lty=c(2,3,1,1,1), bty="n")
-dev.off()
+## pdf(paste0("~/selection/analysis/",version,"/power/read_power", results.tag, "_scale_", scale, "_seed_", seed, "_minf_", min.freq, "_N_", N,".pdf"))
+## plot(ss, results.all[,1], col="#377EBA", type="b", pch=16, bty="n", lty=2, ylim=c(0,1), log="x", xlab="Selection coefficient", ylab="power")
+## lines(ss, results.all[,2], col="#E41A1C", type="b", pch=16, lty=2)
+## lines(ss, results.all[,3], col="#4DAF4A", type="b", pch=16, lty=2)
+## lines(ss, results.one[,1], col="#377EBA", type="b", pch=1, lty=3)
+## lines(ss, results.one[,2], col="#E41A1C", type="b", pch=1, lty=3)
+## lines(ss, results.one[,3], col="#4DAF4A", type="b", pch=1, lty=3)
+## legend("topleft", c("Selected in all populations", "Selected in one population", "50 generations of selection", "100 generations of selection", "200 generations of selection"), col=c("black", "black", "#377EBA", "#E41A1C", "#4DAF4A"), pch=16, lty=c(2,3,1,1,1), bty="n")
+## dev.off()
 
 colnames(results.all) <- colnames(results.one) <- gss
 rownames(results.all) <- rownames(results.one) <- ss
@@ -151,4 +159,4 @@ if(results.tag!=""){
 }
 mres <- cbind(mres, round(sum(rowMeans(sapply(tf,  effective.data.size)[1:3,])), 1))
 names(mres)[NCOL(mres)] <- "Eff.N"
-write.table(mres,paste0("~/selection/analysis/",version,"/power/read_power", results.tag,".txt"), col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+write.table(mres,paste0("~/selection/analysis/",version,"/power/read_power", results.tag, "_scale_", scale, "_seed_", seed, "_minf_", min.freq, "_N_", N,".txt"), col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
