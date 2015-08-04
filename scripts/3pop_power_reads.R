@@ -48,6 +48,13 @@ N <- 1000                                           #Number of replicates
 
 ########################################################################
 
+## resample the ancient populations to increase the population size. 
+scale.up.tf <- function(tf, anc.pops){
+  
+}
+
+########################################################################
+
 selpops <- c( "CEU", "GBR", "IBS", "TSI")
 #Check if the SNP is monomorphic in these populations. 
 degf <- dim(A)[2]

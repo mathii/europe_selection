@@ -481,20 +481,22 @@ sample.data <- function(data, N, read.root, pops, include.reads, include.read.sa
     reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts.gz"), as.is=TRUE, header=FALSE)
     k=1
     inc <- data$CHR==chr
+    total.inc <- sum(inc)
+    inc.counts <- counts[inc,]
+    inc.totals <- totals[inc,]
     while(k <= counts.per.chr[as.character(chr)]){
         cat(paste0("\rchr", chr, " ", k, "/", counts.per.chr[chr]))
-        try <- sample(sum(inc), 1)
+        try <- sample(total.inc, 1)
         snp <- data[inc,][try,"ID"]
         this.reads <- reads[reads[,1]==snp,]
         freq.data <- make.freq.data(pops, include.reads, include.read.samples, include.counts, this.reads, counts[inc,][try,], totals[inc,][try,], empty.data)
-
 
         ## model fit gives us frequency of ref allele. 
         fr <- 1-fit.unconstrained.model.reads(freq.data, error.prob=error.prob)$par
         if(mean(fr)>max.freq){next}
 
         ## Don't want it to me monomporphic. 
-        monomorphic <- all(counts[inc,][try,monocheck]==0)|all(counts[inc,][try,monocheck]==totals[inc,][try,monocheck])
+        monomorphic <- all(inc.counts[try,monocheck]==0)|all(inc.counts[try,monocheck]==totals[inc,][try,monocheck])
         if(monomorphic){next}
 
         tf[[i]] <- freq.data
