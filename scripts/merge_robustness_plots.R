@@ -2,7 +2,7 @@
 
 version <- "v8"
 what <- "Proportion"
-seeds <- seq(100,110)
+seeds <- seq(101,125)
 
 
 results <- list()
