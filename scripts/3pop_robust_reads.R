@@ -90,7 +90,7 @@ rownames(totals) <- data$ID
 include.read.samples <- read.samples(indfile, include.reads)
 
 min.freq <- 0
-tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_round_", round, "_N_", Nlambdasims,".obj")
+tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_minf_", min.freq, "_N_", Nlambdasims,".obj")
 if(file.exists(tf.file)){
   load(tf.file)
   cat(paste0("Loading seed file ", tf.file, "\n"))
@@ -129,7 +129,7 @@ for( rndi in 1:length(rnds)){
 ## Here we're restricting to things with a MAF < 0.1
 
 min.freq <- 0.1
-tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_round_", round, "_N_", Nlambdasims,".obj")
+tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_minf_", minf, "_N_", Nlambdasims,".obj")
 if(file.exists(tf.file)){
   load(tf.file)
   cat(paste0("Loading seed file ", tf.file, "\n"))
