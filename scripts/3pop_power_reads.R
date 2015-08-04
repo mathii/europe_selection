@@ -27,6 +27,19 @@ if(version=="v6"){
 
 ########################################################################
 
+cA <- commandArgs(TRUE)
+scale <- 1
+if(length(cA>3)){
+  scale <- as.numeric(cA[4])
+}
+seed <- 12345
+if(length(cA>4)){
+  seed <- cA[5]
+  set.seed(seed)
+}
+
+########################################################################
+
 gss <- c(50, 100, 200)                               #Generations of selection
 ## ss <- 10^(seq(log10(0.002), log10(0.1), length.out=10)) #Selection coefficient
 ss <- c(0.002, 0.003, 0.005, 0.08, 0.01, 0.02, 0.03, 0.05, 0.08, 0.1)
@@ -49,46 +62,14 @@ totals <- data.matrix(totals[,6:NCOL(totals)])
 
 ## setup for read data. 
 include.read.samples <- read.samples(indfile, include.reads)
-empty.data <- make.empty.data(pops)
-
-#Sample uniformly per chromosome. 
-counts.per.chr <- table(sample(data$CHR[data$CHR<=22], N))
-
-#Select sites with f0 < 0.2
-#Now these are lists of frequencies. 
-tf <- list()
-i=1
-for(chr in 1:22){
-    cat(paste0("\rchr", chr))
-    if(!(as.character(chr) %in% names(counts.per.chr))){
-        next
-    }
-    
-    reads <- read.table(paste0(read.root, ".chr", chr, ".readcounts.gz"), as.is=TRUE, header=FALSE)
-    k=1
-
-    while(k <= counts.per.chr[as.character(chr)]){
-        cat(paste0("\rchr", chr, " ", k, "/", counts.per.chr[chr]))
-        inc <- data$CHR==chr
-        try <- sample(sum(inc), 1)
-        snp <- data[inc,][try,"ID"]
-        this.reads <- reads[reads[,1]==snp,]
-        freq.data <- make.freq.data(pops, include.reads, include.read.samples, include.counts, this.reads, counts[inc,][try,], totals[inc,][try,], empty.data)
-
-
-        ## model fit gives us frequency of ref allele. 
-        fr <- 1-fit.unconstrained.model.reads(freq.data, error.prob=error.prob)$par
-        if(mean(fr)>0.2){next}
-
-        ## Don't want it to me monomporphic. 
-        monomorphic <- all(counts[inc,][try,monocheck]==0)|all(counts[inc,][try,monocheck]==totals[inc,][try,monocheck])
-        if(monomorphic){next}
-
-        tf[[i]] <- freq.data
-        
-        i <- i+1
-        k <- k+1
-    }
+min.freq <- 0.2
+tf.file <- paste0("~/selection/analysis/", version,"/power/tf_power_scale_", scale, "_seed_", seed, "_minf_", min.freq, "_N_", N,".obj")
+if(file.exists(tf.file)){
+  load(tf.file)
+  cat(paste0("Loading seed file ", tf.file, "\n"))
+}else{
+  tf <- sample.data(data, N, read.root, pops, include.reads, include.read.samples, include.counts, counts, totals, min.freq, monocheck)
+  save(tf, file=tf.file)
 }
 
 results.all <- matrix(0,nrow=length(ss), ncol=length(gss))
