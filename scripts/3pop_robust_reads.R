@@ -129,7 +129,7 @@ for( rndi in 1:length(rnds)){
 ## Here we're restricting to things with a MAF < 0.1
 
 max.freq <- 0.1
-tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_minf_", minf, "_N_", Nlambdasims,".obj")
+tf.file <- paste0("~/selection/analysis/", version,"/power/tf_",which.test,"_seed_", seed, "_maxf_", max.freq, "_N_", Nlambdasims,".obj")
 if(file.exists(tf.file)){
   load(tf.file)
   cat(paste0("Loading seed file ", tf.file, "\n"))
