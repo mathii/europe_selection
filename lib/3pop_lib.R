@@ -466,7 +466,7 @@ read.samples <- function(indfile, include.reads, exclude=c()){
 ## 
 #########################################################
 
-sample.data <- function(data, N, read.root, pops, include.reads, include.read.samples, include.counts, counts, totals, min.freq, monocheck){
+sample.data <- function(data, N, read.root, pops, include.reads, include.read.samples, include.counts, counts, totals, max.freq, monocheck){
   counts.per.chr <- table(sample(data$CHR[data$CHR<=22], N))
   empty.data <- make.empty.data(pops)
 
@@ -492,7 +492,7 @@ sample.data <- function(data, N, read.root, pops, include.reads, include.read.sa
 
         ## model fit gives us frequency of ref allele. 
         fr <- 1-fit.unconstrained.model.reads(freq.data, error.prob=error.prob)$par
-        if(mean(fr)>min.freq){next}
+        if(mean(fr)>max.freq){next}
 
         ## Don't want it to me monomporphic. 
         monomorphic <- all(counts[inc,][try,monocheck]==0)|all(counts[inc,][try,monocheck]==totals[inc,][try,monocheck])
