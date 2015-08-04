@@ -484,12 +484,13 @@ sample.data <- function(data, N, read.root, pops, include.reads, include.read.sa
     total.inc <- sum(inc)
     inc.counts <- counts[inc,]
     inc.totals <- totals[inc,]
+    inc.data <- data[,inc]
     while(k <= counts.per.chr[as.character(chr)]){
         cat(paste0("\rchr", chr, " ", k, "/", counts.per.chr[chr]))
         try <- sample(total.inc, 1)
-        snp <- data[inc,][try,"ID"]
+        snp <- inc.data[try,"ID"]
         this.reads <- reads[reads[,1]==snp,]
-        freq.data <- make.freq.data(pops, include.reads, include.read.samples, include.counts, this.reads, counts[inc,][try,], totals[inc,][try,], empty.data)
+        freq.data <- make.freq.data(pops, include.reads, include.read.samples, include.counts, this.reads,  counts[inc,][try,], inc.totals[try,], empty.data)
 
         ## model fit gives us frequency of ref allele. 
         fr <- 1-fit.unconstrained.model.reads(freq.data, error.prob=error.prob)$par
