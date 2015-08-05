@@ -114,12 +114,16 @@ likelihood.reads <- function(freq, data, error.prob=0.001, het.p=0.5){
     for(pop in names(data)){
         N.read.ind <- length(data[[pop]][["reads"]][["ref"]]) #Number of individuals with read information
         p <- freq[i.pop]
+        ## If the frequency is NA, and there's no data; likelihood change is zero
+        if(is.na(p) & (N.read.ind==0) & (sum(data[[pop]][["counts"]])==0)){
+          i.pop <- i.pop+1              #Have to increment though.
+          next
+        }
         if(N.read.ind){
             #Add reads
             for(i in 1:N.read.ind){
                 ref <- data[[pop]][["reads"]][["ref"]][[i]]
                 alt <- data[[pop]][["reads"]][["alt"]][[i]]
-                ## ll <- ll+log((alt==0)*p*p + (ref==0)*(1-p)*(1-p) + 2*dbinom(ref, ref+alt, 0.5)*p*(1-p))
                 ll <- ll+log(dbinom(alt, ref+alt, error.prob)*p*p + dbinom(ref, ref+alt, error.prob)*(1-p)*(1-p) + dbinom(ref, ref+alt, het.p)*2*p*(1-p))
             }
         }
@@ -206,6 +210,7 @@ fit.unconstrained.model.reads <- function(data, error.prob=0.001){
     for(i in 1:length(data)){
         subdata=list(data[[i]])
         names(subdata) <- names(data)[i]
+        if(is.null(subdata[[1]]$reads$ref)&(sum(subdata[[1]]$counts)==0)){next} #If there's no data at all. 
         opt <- optimize(likelihood.reads, data=subdata, error.prob=error.prob, maximum=TRUE, lower=EPSILON.3pop, upper=1-EPSILON.3pop)
         p[i] <- opt$maximum
     }

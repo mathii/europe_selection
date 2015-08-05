@@ -15,6 +15,8 @@ if( Sys.info()["login"]!=Sys.info()["user"]){
     verbose=FALSE
 }
 
+MIN.N.CHR <- 3
+
 ########################################################################
 #Arguments
 
@@ -42,7 +44,12 @@ thin <- 1                               #Why bother?
 
 if(length(cA)>5
 ){
-    which.map <- cA[6]
+    MIN.N.CHR <- cA[6]
+}
+
+if(length(cA)>6
+){
+    which.map <- cA[7]
 }
 
 ########################################################################
@@ -174,11 +181,22 @@ for(i in 1:NROW(data)){
 }
 
 ########################################################################
+## SNPs with sufficient data
+data.size <-  data.frame(do.call(rbind, lapply(freq.data.list, effective.data.size)))
+include <- apply(data.size, 1, min)>MIN.N.CHR
+freq.data.list <- freq.data.list[include]
+data <- data[include,]
+gwas <- gwas[include,]
+
+########################################################################
 #Mean genetic value estimate
 freq.est <- matrix(NA, nrow=NROW(data), ncol=length(pops))
 colnames(freq.est) <- pops
 for(i in 1:NROW(data)){
-    freq.est[i,] <- fit.unconstrained.model.reads(freq.data.list[[i]], error.prob=error.prob)$par
+  fr <- fit.unconstrained.model.reads(freq.data.list[[i]], error.prob=error.prob)$par
+  ## Replace missing values with the mean of the non-missing values. Shrinking towards mean
+  fr[is.na(fr)] <- mean(fr, na.rm=TRUE)
+  freq.est[i,] <- fr
 }
 
 fr.4 <- round(colSums(freq.est*gwas$BETA),4)
@@ -272,8 +290,7 @@ for(pop in pops.to.use){
     popi <- popi+1
 }
 
-ifelse(which.map=="", "", paste0(".", which.map))
-write.table(results, paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates", extag,".",snplist, ifelse(which.map=="", "", paste0(".", which.map)), ".txt"), col.names=TRUE, row.names=TRUE, quote=FALSE, sep="\t") 
+write.table(results, paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates", extag,".",snplist, ".minchr", MIN.N.CHR, ifelse(which.map=="", "", paste0(".", which.map)), ".txt"), col.names=TRUE, row.names=TRUE, quote=FALSE, sep="\t") 
 
 
 
