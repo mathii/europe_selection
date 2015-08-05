@@ -61,77 +61,99 @@ for(p in pops){
 ht <- matrix(0, nrow=ntotal, ncol=NROW(gt))
 pr <- matrix(0, nrow=ntotal, ncol=NROW(gt))
 
-i=1
+snpi=1
 poplist=c()
 indivlist=c()
-for(pop in pops){
-    if(pop %in% pops.with.reads){
-        for(indiv in ind[ind[,3]==pop,1]){
-            poplist <- c(poplist, pop)
-            indivlist <- c(indivlist, indiv)
-            j=1
-            for(snpid in gt.data[,1]){
-                select <- reads[,1]==snpid & reads[,2]==indiv
-                ref=reads[select,3]
-                alt=reads[select,4]
-                if(alt==0 & ref==0){    #No data
-                    ht[i,j] <- NA        #Using NA to mean missing. hack
-                    pr[i,j] <- 0
-                }else if(alt==0){
-                    ht[i,j] <- 2
-                    pr[i,j] <- 1-0.5^(ref-1)
-                }else if(ref==0){
-                    ht[i,j] <- 0
-                    pr[i,j] <- 1-0.5^(alt-1)
-                }else{                  #Het
-                    ht[i,j] <- 1
-                    pr[i,j] <- 1
+for(snpid in gt.data[,1]){
+    cat(paste0("\r", snpi, "/", NROW(gt.data)))
+    this.reads <- reads[reads[,1]==snpid,]
+    indivi=1
+    for(pop in pops){
+        if(pop %in% pops.with.reads){
+            for(indiv in ind[ind[,3]==pop,1]){
+                if(snpi==1){
+                    poplist <- c(poplist, pop)
+                    indivlist <- c(indivlist, indiv)
                 }
-                j=j+1
+                select <-  this.reads[,2]==indiv
+                ref=this.reads[select,3]
+                alt=this.reads[select,4]
+                if(alt==0 & ref==0){    #No data
+                    ht[indivi,snpi] <- NA        #Using NA to mean missing. 
+                    pr[indivi,snpi] <- 0
+                }else if(alt==0){
+                    ht[indivi,snpi] <- 2
+                    pr[indivi,snpi] <- 1-0.5^(ref-1)
+                }else if(ref==0){
+                    ht[indivi,snpi] <- 0
+                    pr[indivi,snpi] <- 1-0.5^(alt-1)
+                }else{                  #Het
+                    ht[indivi,snpi] <- 1
+                    pr[indivi,snpi] <- 1
+                }
+                indivi=indivi+1
             }
-            i=i+1
-        }
-    }else{
-        for(indiv in ind[ind[,3]==pop,1]){
-            poplist <- c(poplist, pop)
-            indivlist <- c(indivlist, indiv)
-            ht[i,] <- gt[,indiv]
-            pr[i,] <- 1
-            i=i+1
+        } else{
+            for(indiv in ind[ind[,3]==pop,1]){
+                if(snpi==1){
+                    poplist <- c(poplist, pop)
+                    indivlist <- c(indivlist, indiv)
+                }
+                ht[indivi,snpi] <- gt[snpi,indiv]
+                pr[indivi,snpi] <- 1
+                indivi=indivi+1
+            }
         }
     }
+    snpi=snpi+1
 }
 
 ## Flip to European alleles
-for(i in 1:NCOL(ht)){
-    if(mean(ht[poplist=="CEU",i])>1){ht[,i] <- 2-ht[,i]}
+if(what=="EDAR"){
+    for(i in 1:NCOL(ht)){
+        if(mean(ht[poplist=="CEU",i], na.rm=TRUE)>1){ht[,i] <- 2-ht[,i]}
+    }
 }
 
 if(what=="EDAR"){
     plot.order <- c("I0011", "I0012", "I0017", "I0016", "I0013", "I0014", "I0015")
 } else if(what=="LCT"){
-    plot.order <- c("I0232","I0011","I0357","Ajvide52","I0424","I0444","I0126","I0211","I0235","I0361","I0421","I0431","I0441","I0804","I1544","I1546","RISE240","RISE431","RISE435","RISE546","RISE550","RISE98","I1504","I0164","I0112","I0430","I0423")
+    plot.order <- rev(c("I0232","I0011","I0357","Ajvide52","I0424","I0444","I0126","I0211","I0235","I0361","I0421","I0431","I0441","I0804","I1544","I1546","RISE240","RISE431","RISE435","RISE546","RISE550","RISE98","I1504","I0164","I0112","I0430","I0423"))
 }
     ## No subsampling
-s.size <- sum(poplist=="CHB")
-sub <- c(which(poplist=="CHB"), which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], which(poplist=="CEU"))
-
 ## subsample 20 CEU and 20 CHB
 if(subsample){
-    s.size <- 20
-    sub <- c(sample(which(poplist=="CHB"), s.size), which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], sample(which(poplist=="CEU"), s.size))
+    if(what=="EDAR"){
+        s.size <- 20
+        sub <- c(sample(which(poplist=="CHB"), s.size), which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], sample(which(poplist=="CEU"), s.size))
+    }else{
+        s.size <- 40
+        sub <- c(which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], sample(which(poplist=="CEU"), s.size))
+    }
+}else{
+    s.size <- sum(poplist=="CHB")
+    sub <- c(which(poplist=="CHB"), which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], which(poplist=="CEU"))
 }
+
 sub.ht <- ht[sub,]
 sub.pr <- pr[sub,]
 subtotal <- length(sub)
+
+remove <- rep(FALSE, NCOL(sub.ht))
+for(i in 1:NCOL(sub.ht)){
+    remove[i] <- all(sub.ht[sub%in%which(poplist=="CEU"),i]==0)|all(sub.ht[sub%in%which(poplist=="CEU"),i]==2)
+}
+sub.ht <- sub.ht[,!remove]
+sub.pr <- sub.pr[,!remove]
+snpi <- which(gt.data[!remove,1]==snp)
+sub.ht <- 2-sub.ht
+
 
 ## cols <- c("grey", "pink", "darkred", "white")
 ## s.cols <- c("grey", "lightblue", "darkblue", "white")
 
 cols <- c("grey", "pink", "darkred", "white")
 s.cols <- c("grey", "lightblue", "darkblue", "white")
-
-snpi <- which(gt.data[,1]==snp)
 
 nsnp <- NROW(gt)
 
@@ -155,9 +177,16 @@ bc[4,] <- round(255*sub.pr[,snpi]^2)
 bc <- apply(bc, 2, function(x)do.call(rgb, as.list((x/255))))
 points(rep(snpi,subtotal), 1:subtotal, pch=21, cex=1, col=cc, bg=bc)
 
+if(what=="LCT"){
+    abline(h=subtotal-s.size+0.5, col="black")
+    abline(h=6.5, col="black")
+    abline(h=1.5, col="black")
+    abline(h=0.5, col="black")
+    abline(h=21.5, col="black")
+}
 if(what=="EDAR"){
-abline(h=s.size+0.5, col="black")
-abline(h=s.size+sum(poplist=="Motala_HG")+0.5, col="black")
-mtext(c("CHB", "Motala", "CEU"), side=2, adj=-0.25, at=c(s.size/2, s.size+sum(poplist=="Motala")/2, 1.5*s.size+sum(poplist=="Motala")), line=-2)
+    abline(h=s.size+sum(poplist=="Motala_HG")+0.5, col="black")
+    mtext(c("CHB", "Motala", "CEU"), side=2, adj=-0.25, at=c(s.size/2, s.size+sum(poplist=="Motala")/2, 1.5*s.size+sum(poplist=="Motala")), line=-2)
 }
 dev.off()
+
