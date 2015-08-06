@@ -1,9 +1,11 @@
 ## Plot the results of the power analysis.
 library(ggplot2)
 
+seed <- "12345"
+
 this.theme <- theme_bw()+theme(legend.position="none", panel.border=element_rect(colour=NA), panel.grid.major=element_line(size=1), panel.grid.minor=element_line(size=0))
 
-power <- read.table("~/selection/analysis/v8/power/read_power2.txt", as.is=TRUE, header=TRUE)
+power <- read.table(paste0("~/selection/analysis/v8/power/read_power2_scale_1_seed_",seed,"_minf_0.2_N_1000.txt"), as.is=TRUE, header=TRUE)
 names(power) <- c("Tag", "Pops", "s", "Generations", "Power", "Eff.N.chr")
 power$Generations <- as.factor(power$Generations)
 power$Pops <- as.factor(power$Pops)
