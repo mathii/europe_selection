@@ -21,7 +21,7 @@ if(version=="v6"){
     sig <- 10^-6.79                                      #genome-wide significance level
 }else if(version=="v8"){
     num.res.tag <- as.numeric(results.tag)
-    lambda=c(1.3, 1.3, 1.3)[num.res.tag]
+    lambda=1.35
     sig <- 10^-7.30                                      #genome-wide significance level
 }
 
