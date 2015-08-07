@@ -115,9 +115,11 @@ done
 
 for scale in 0.5 1 2 5 10
 do
-bsub -q reich -W12:00 "R --vanilla --args x $V 2 $scale 12345  \< 3pop_power_reads.R"
+bsub -q reich -W12:00 "R --vanilla --args x $V 2 $scale 12345 \
+ \< ~/selection/code/power/3pop_power_reads.R"
 done
 
 for scale in 1 2 2.5
-do bsub -q reich -W12:00 "R --vanilla --args $V v8 1 $scale 12345  \< 3pop_power_reads.R"
+do bsub -q reich -W12:00 "R --vanilla --args $V v8 1 $scale 12345 \
+ \< ~/selection/code/power/3pop_power_reads.R"
 done

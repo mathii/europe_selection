@@ -60,7 +60,7 @@ include.counts <- list(                 #Include these populations as hard calls
     "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
 }
 
-monocheck <- c("CEU", "IBS", "GBR", "IBS", "TSI")
+monocheck <- c("CEU", "IBS", "GBR", "FIN", "TSI", "YRI")
 ########################################################################
 
 include.reads <- list()

@@ -505,7 +505,7 @@ sample.data <- function(data, N, read.root, pops, include.reads, include.read.sa
 
         ## model fit gives us frequency of ref allele. 
         fr <- 1-fit.unconstrained.model.reads(freq.data, error.prob=error.prob)$par
-        if(mean(fr)>max.freq){next}
+        if(mean(fr, na.rm=TRUE)>max.freq){next}
 
         ## Don't want it to me monomporphic. 
         monomorphic <- all(inc.counts[try,monocheck]==0)|all(inc.counts[try,monocheck]==inc.totals[try,monocheck])
