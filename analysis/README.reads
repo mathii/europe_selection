@@ -85,7 +85,7 @@ done
 what=lango_allen  #wood? lango_allen?
 
 while read pop; do
-bsub -q reich "R --vanilla --args $V ${what} $pop 100000 200000 \
+bsub -q reich "R --vanilla --args $V ${what} $pop 100000 200000\
 \< ~/selection/code/analysis/estimate_height_series.R"
 done < ~/selection/code/files/${V}/height_series_list.txt
 
