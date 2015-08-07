@@ -84,16 +84,27 @@ done
 #estimate height series
 what=lango_allen  #wood? lango_allen?
 
+for mc in 0 1 3 5
+do
 while read pop; do
-bsub -q reich "R --vanilla --args $V ${what} $pop 100000 200000\
+bsub -q reich "R --vanilla --args $V ${what} $pop 10000 50000 ${mc}\
 \< ~/selection/code/analysis/estimate_height_series.R"
 done < ~/selection/code/files/${V}/height_series_list.txt
+done
 
 SD=~/selection/analysis/${V}/series
-mc=minchr3
+for mc in minchr1 minchr3 minchr5
+do
 head -n1 ${SD}/height_series_mcmc_estimates_HG.${what}.${mc}.txt > ${SD}/height_series_mcmc_estimates.${what}.${mc}.txt
 tail -qn+2 ${SD}/height_series_mcmc_estimates_*.${what}.${mc}.txt >> ${SD}/height_series_mcmc_estimates.${what}.${mc}.txt
 rm ${SD}/height_series_mcmc_estimates_*.${what}.${mc}.txt
+done 
+
+for mc in minchr0 minchr1 minchr3 minchr5
+do
+	R --vanilla --args $V ${what}.${mc} < ~/selection/code/analysis/height_series_plot.R
+done
+
 
 #Power simulations. 
 for what in Admixture Proportion
@@ -104,9 +115,9 @@ done
 
 for scale in 0.5 1 2 5 10
 do
-bsub -q reich -W12:00 "R --vanilla --args x v8 2 $scale 12345  \< 3pop_power_reads.R"
+bsub -q reich -W12:00 "R --vanilla --args x $V 2 $scale 12345  \< 3pop_power_reads.R"
 done
 
 for scale in 1 2 2.5
-do bsub -q reich -W12:00 "R --vanilla --args x v8 1 $scale 12345  \< 3pop_power_reads.R"
+do bsub -q reich -W12:00 "R --vanilla --args $V v8 1 $scale 12345  \< 3pop_power_reads.R"
 done

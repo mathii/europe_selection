@@ -21,7 +21,7 @@ if(version=="v6"){
     sig <- 10^-6.79                                      #genome-wide significance level
 }else if(version=="v8"){
     num.res.tag <- as.numeric(results.tag)
-    lambda=1.35
+    lambda=1.38
     sig <- 10^-7.30                                      #genome-wide significance level
 }
 
@@ -79,7 +79,7 @@ totals <- data.matrix(totals[,6:NCOL(totals)])
 
 ## setup for read data. 
 include.read.samples <- read.samples(indfile, include.reads)
-min.freq <- 0.2
+min.freq <- 0.1
 tf.file <- paste0("~/selection/analysis/", version,"/power/tf_power", results.tag, "_scale_", scale, "_seed_", seed, "_minf_", min.freq, "_N_", N,".obj")
 if(file.exists(tf.file)){
   load(tf.file)

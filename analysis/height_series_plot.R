@@ -18,7 +18,6 @@ out <-  paste0("~/selection/analysis/", version, "/series/heightseries.",snplist
 height.values <-  paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates.",snplist,".txt")
 dates <- paste0("~/selection/code/files/",version,"/population_dates.txt")
 ang <- 20
-ylim <- c(-0,0.5)
 
 ########################################################################
 ## Details
@@ -34,6 +33,11 @@ data <- data[order(data$MPOP, data$END, data$START),]
 
 cols <- brewer.pal( length(pops), "Set1")
 cols[6] <- "darkgrey"
+
+
+a.i <- c(data[,"Post.5"], data[,"Post.95"], data[,"MLE"])
+ylim <- c(floor(min(a.i)*10)/10, max(a.i)*10/10)
+
 
 pdf(out, width=12, height=6)
 plot(0,0, col="white", xlim=c(-8500, 0), ylim=ylim, bty="n", xlab="Years before present", ylab="Genetic height", xaxt="n")
