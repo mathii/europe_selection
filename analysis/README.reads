@@ -30,14 +30,14 @@ gzip -f ${ED}/effsize_reads.txt
 R --vanilla --args ${V} < ~/selection/code/analysis/effective_sample_size.R
 
 #3Genome-wide scan for selction
-for i in {1..3} 
+for i in {1..2} 
 do for chr in {1..22}
 do bsub -q short -W12:00 "R --vanilla --args $chr $V $i \< ~/selection/code/analysis/genome_wide_scan_reads.R"
 done
 done
 
 GD=~/selection/analysis/${V}/gscan
-for i in {1..3};
+for i in {1..2};
 do
 head -n1 ${GD}/scan_results_read${i}.chr1.txt > ${GD}/scan_results_read${i}.txt
 tail -qn+2 ${GD}/scan_results_read${i}.chr+([0-9]).txt >> ${GD}/scan_results_read${i}.txt
@@ -46,9 +46,9 @@ gzip -f ${GD}/scan_results_read${i}.txt
 done
 
 #3b Manhattan and qq plots
-for i in {1..3};
+for i in {1..2};
 do
-R --vanilla --args _read${i} ${V} 4 < ~/selection/code/analysis/genome_wide_scan_plots.R
+R --vanilla --args _read${i} ${V} 4 HLA,CHR11,CHR15 < ~/selection/code/analysis/genome_wide_scan_plots.R
 done
 
 #3c generate locuszoom plots (see ./locuszoom_commands).
@@ -90,8 +90,23 @@ bsub -q reich "R --vanilla --args $V ${what} $pop 100000 200000 \
 done < ~/selection/code/files/${V}/height_series_list.txt
 
 SD=~/selection/analysis/${V}/series
-head -n1 ${SD}/height_series_mcmc_estimates_HG.${what}.txt > ${SD}/height_series_mcmc_estimates.${what}.txt
-tail -qn+2 ${SD}/height_series_mcmc_estimates_*.${what}.txt >> ${SD}/height_series_mcmc_estimates.${what}.txt
-rm ${SD}/height_series_mcmc_estimates_*.${what}.txt
+mc=minchr3
+head -n1 ${SD}/height_series_mcmc_estimates_HG.${what}.${mc}.txt > ${SD}/height_series_mcmc_estimates.${what}.${mc}.txt
+tail -qn+2 ${SD}/height_series_mcmc_estimates_*.${what}.${mc}.txt >> ${SD}/height_series_mcmc_estimates.${what}.${mc}.txt
+rm ${SD}/height_series_mcmc_estimates_*.${what}.${mc}.txt
 
-for chr in {1..22}; do bsub -q short -W12:00 "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_freq.R"; done
+#Power simulations. 
+for what in Admixture Proportion
+do for s in {101..125}
+do bsub -q short -W12:00 "R --vanilla --args x v8 2 $what $s \< 3pop_robust_reads.R"
+done
+done
+
+for scale in 0.5 1 2 5 10
+do
+bsub -q reich -W12:00 "R --vanilla --args x v8 2 $scale 12345  \< 3pop_power_reads.R"
+done
+
+for scale in 1 2 2.5
+do bsub -q reich -W12:00 "R --vanilla --args x v8 1 $scale 12345  \< 3pop_power_reads.R"
+done
