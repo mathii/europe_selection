@@ -85,7 +85,7 @@ done
 what=lango_allen  #wood? lango_allen?
 
 while read pop; do
-bsub -q reich "R --vanilla --args $V ${what} $pop 100000 200000 \
+bsub -q reich "R --vanilla --args $V ${what} $pop 100000 200000\
 \< ~/selection/code/analysis/estimate_height_series.R"
 done < ~/selection/code/files/${V}/height_series_list.txt
 
@@ -95,3 +95,5 @@ tail -qn+2 ${SD}/height_series_mcmc_estimates_*.${what}.txt >> ${SD}/height_seri
 rm ${SD}/height_series_mcmc_estimates_*.${what}.txt
 
 for chr in {1..22}; do bsub -q short -W12:00 "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_freq.R"; done
+
+

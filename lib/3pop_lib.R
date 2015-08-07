@@ -243,6 +243,12 @@ ci.unconstrained.model.reads <- function(data, error.prob=0.001, alpha=0.95){
     for(i in 1:length(data)){
         subdata=list(data[[i]])
         names(subdata) <- names(data)[i]
+
+        #If there's no data at all. 
+        if(is.null(subdata[[1]]$reads$ref)&(sum(subdata[[1]]$counts)==0)){
+          ll[i] <- 0
+          next
+        }
         opt <- optimize(likelihood.reads, data=subdata, error.prob=error.prob, maximum=TRUE, lower=EPSILON.3pop, upper=1-EPSILON.3pop)
         f[i] <- opt$maximum
         ll[i] <- likelihood.reads(f[i], subdata, error.prob=error.prob)
