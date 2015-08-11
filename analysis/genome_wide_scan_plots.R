@@ -201,7 +201,8 @@ if(any(grepl("CHR", extra.plots))){
 for(c in extra.chrs){
     png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".chr", c, ".png"), width=250, height=250)
     par(mar=c(1,2,1,1))
-    MH.plot(res[res$CHR==c,], color.loci=data.frame(), chr.labels=FALSE)
+    MH.plot(clean.res[clean.res$CHR==c,], color.loci=data.frame(), chr.labels=FALSE)
+    MH.plot(dirty.res[dirty.res$CHR==c,], color.scheme=list(all.chr.col="#CCCCCC80"), add=TRUE, original.data=clean.res[clean.res$CHR==c,])
     abline(h=sig.level, col="red", lty=2)
     dev.off()
 }
