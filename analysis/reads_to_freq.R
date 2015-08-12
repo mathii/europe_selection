@@ -39,6 +39,7 @@ if(which.map!=""){
 error.prob <- 0.01
 ########################################################################
 #Include these populations as hard calls
+always.include.counts <- c("Loschbour", "Stuttgart")
 include.counts <- list(                 #Include these populations as hard calls. 
     "WHG"="Loschbour",
     "Germany_EN"="Stuttgart",
@@ -55,8 +56,6 @@ include.extra <- list("SpanishMesolithic"="WHG")         #High coverage LaBrana
 
 if(version=="v8"){
 include.counts <- list(                 #Include these populations as hard calls. 
-    "HG"="Loschbour",
-    "CEM"="Stuttgart",
     "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI" )
 }
 
@@ -67,8 +66,14 @@ include.reads <- list()
 polymap <- read.table(polymap, as.is=TRUE, header=FALSE)
 for(i in 1:NROW(polymap)){
     if(polymap[i,2] %in% exclude){next}
-    
-    if(polymap[i,2] %in% names(include.reads)){
+
+    if( polymap[i,1] %in% always.include.counts ){
+        if(polymap[i,2] %in% names(include.counts)){
+            include.counts[[polymap[i,2]]] <- c(include.counts[[polymap[i,2]]], polymap[i,1])
+        } else{
+            include.counts[[polymap[i,2]]] <- polymap[i,1]
+        }
+    } else if(polymap[i,2] %in% names(include.reads)){
         include.reads[[polymap[i,2]]] <- c(include.reads[[polymap[i,2]]], polymap[i,1])
     } else{
         include.reads[[polymap[i,2]]] <- polymap[i,1]
@@ -106,7 +111,6 @@ rownames(freq) <- rownames(ci.low) <- rownames(ci.up) <- data$ID
 include.read.samples <- read.samples(indfile, include.reads, c(exclude, unlist(include.counts)))
 
 ########################################################################
-
 
 empty.data <- make.empty.data(pops)
 

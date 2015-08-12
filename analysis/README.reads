@@ -69,15 +69,16 @@ R --vanilla --args figure2 c ${V} < ~/selection/code/analysis/allele_frequency_p
 #5 Polygenic selection scans
 #Estimate allele frequncies in polypops
 for chr in {1..22}; do bsub -q reich "R --vanilla --args $chr $V \< ~/selection/code/analysis/reads_to_freq.R"; done
+for chr in {1..22}; do bsub -q reich "R --vanilla --args $chr $V 3pop \< ~/selection/code/analysis/reads_to_freq.R"; done
 
 CDIR=~/selection/counts/${V}
+for who in . .3pop.
+do
 for what in freq lowCI.freq highCI.freq;
 do
-for who in .
-do
-grep ^ID ${CDIR}/all.reads.chr1${who}${what} > ${CDIR}/all.reads${who}${what}
-grep -hv ^ID ${CDIR}/all.reads.chr+([0-9])${who}${what} >> ${CDIR}/all.reads${who}${what}
-rm  ${CDIR}/all.reads.chr+([0-9])${who}${what}
+grep ^ID ${CDIR}/all.reads${who}chr1.${what} > ${CDIR}/all.reads${who}${what}
+grep -hv ^ID ${CDIR}/all.reads${who}chr+([0-9]).${what} >> ${CDIR}/all.reads${who}${what}
+# rm  ${CDIR}/all.reads${who}chr+([0-9]).${what}
 done
 done
 
@@ -107,7 +108,6 @@ for mc in minchr0 minchr1 minchr3 minchr5
 do
 	R --vanilla --args $V ${what}.${mc} < ~/selection/code/analysis/height_series_plot.R
 done
-
 
 #Power simulations. 
 for what in Admixture Proportion
