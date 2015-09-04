@@ -3,25 +3,32 @@ source("~/selection/code/lib/readlib.R")
 library(RColorBrewer)
 
 ############################################################
-snp <- "rs3827760"
+## snp <- "rs3827760"
+## flank <- 150000
+## what<-"EDAR"
+## pops <- c("CHB", "Motala_HG", "CEU")
+## pops.with.reads <- "Motala_HG"
+
+############################################################
+snp <- "rs1426654"
 flank <- 150000
-root <- "~/data/v8/use/v81kg_europe2names"
+what<-"SLC24A5"
 pops <- c("CHB", "Motala_HG", "CEU")
-read.root <- "~/data/v8/reads/jj2"
-subsample <- TRUE
 pops.with.reads <- "Motala_HG"
-cols <- brewer.pal(3, "Set1")
-what<-"EDAR"
+
 ############################################################
 ## snp <- "rs4988235"
 ## flank <- 150000
-## root <- "~/data/v8/use/v81kg_europe2names"
-## read.root <- "~/data/v8/reads/jj2"
-## subsample <- TRUE
-## cols <- brewer.pal(3, "Set1")
 ## what <- "LCT"
 ## pops.with.reads <- c("Motala_HG","Yamnaya_Samara", "Sweden_PWC", "Srubnaya", "Poltavka", "EHG", "Srubnaya_1d_rel_I0430", "Central_LNBA", "Bell_Beaker_LN", "Yamnaya_Kalmykia","Northern_LNBA", "Hungary_BA")
 ## pops <- c("CEU", pops.with.reads)
+############################################################
+
+root <- "~/data/v8/use/v81kg_europe2names"
+read.root <- "~/data/v8/reads/jj2"
+subsample <- TRUE
+cols <- brewer.pal(3, "Set1")
+
 ############################################################
 
 out <- paste0("~/selection/analysis/v8/", what,"/",what ,"_haplotype")
@@ -35,17 +42,11 @@ data <- data[include,]
 write.table(data, paste0(out, ".snp"), col.names=FALSE, row.names=FALSE, quote=FALSE)
 
 ## At this point, stop and run the following command to pull out the CHB haploypes:
-## python ~/spindrift/Freq.py -d ~/data/v6/use/v61kg_europe2names -p CHB,CEU -o CHB_CEU_EDAR_haps -s EDAR_haplotype -g
+## python ~/spindrift/Freq.py -d ~/data/v6/use/v61kg_europe2names -p CHB,CEU -o test_haps -s ${what}_haplotype -g
 
 ind <- read.table(paste0(root, ".ind"), as.is=TRUE)
-if(what=="EDAR"){
-    ## Add this ignored sample back in - is it really contaminated?
-    ## ind[ind[,3]=="Motala_HG_IGNORE",3]<-"Motala_HG"
-    ## ind[ind[,3]=="Motala_HG_contam",3]<-"Motala_HG"
-gt <- read.table(paste0("~/selection/analysis/v8/",what,"/CHB_CEU_",what,"_haps.gt"), as.is=TRUE, header=TRUE)
-} else{
-    gt <- read.table(paste0("~/selection/analysis/v8/",what,"/CEU_",what,"_haps.gt"), as.is=TRUE, header=TRUE)
-}
+gt <- read.table(paste0("~/selection/analysis/v8/",what,"/test_haps.gt"), as.is=TRUE, header=TRUE)
+
 gt.data <- gt[,1:5]
 gt <- gt[,6:NCOL(gt)]
 
@@ -119,11 +120,13 @@ if(what=="EDAR"){
     plot.order <- c("I0011", "I0012", "I0017", "I0013", "I0014", "I0015")
 } else if(what=="LCT"){
     plot.order <- rev(c("I0232","I0011","I0357","Ajvide52","I0424","I0444","I0126","I0211","I0235","I0361","I0421","I0431","I0441","I0804","I1544","I1546","RISE240","RISE431","RISE435","RISE546","RISE550","RISE98","I1504","I0164","I0112","I0430","I0423"))
+} else{
+    plot.order <- indivlist[poplist %in% pops.with.reads]
 }
     ## No subsampling
 ## subsample 20 CEU and 20 CHB
 if(subsample){
-    if(what=="EDAR"){
+    if(what!="LCT"){
         s.size <- 20
         sub <- c(sample(which(poplist=="CHB"), s.size), which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], sample(which(poplist=="CEU"), s.size))
     }else{
@@ -185,7 +188,7 @@ if(what=="LCT"){
     abline(h=0.5, col="black")
     abline(h=21.5, col="black")
 }
-if(what=="EDAR"){
+if(what!="LCT"){
     abline(h=s.size+sum(poplist=="Motala_HG")+0.5, col="black")
     abline(h=s.size+0.5, col="black")
     mtext(c("CHB", "Motala_HG", "CEU"), side=2, at=c(s.size/2, s.size+sum(poplist=="Motala_HG")/2, 1.5*s.size+sum(poplist=="Motala_HG")), line=-2, las=2)
