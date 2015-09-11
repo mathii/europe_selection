@@ -148,7 +148,8 @@ cat.data$TAG <- paste(cat.data$CHR, cat.data$POS, sep=":")
 ## legend("topleft", cats, col=cols, pch=16, bty="n")
 ## dev.off()
 
-png(paste0("~/selection/analysis/",version,"/", what ,"/qq_plot_both", results.tag, ".png"), width=400, height=400)
+## png(paste0("~/selection/analysis/",version,"/", what ,"/qq_plot_both", results.tag, ".png"), width=400, height=400)
+tiff(paste0(path.expand("~"), "/selection/analysis/",version,"/", what ,"/qq_plot_both", results.tag, ".tiff"), width=2, height=2, units="in", res=150, compression = "lzw", pointsize=6)
 par(mar=c(4.1,4.1,1,1))
 cats <- c("GWAS", "CMS", "HiDiff", "Immune", "HLA", "eQTL")
 cats <- cats[cats %in% colnames(cat.data)]
@@ -182,9 +183,11 @@ cat(paste0("REMOVE: ", length(to.remove), "\n"),file=logfile, append=TRUE)
 clean.res <- res
 clean.res <- res[!(res$ID %in% to.remove),]
 dirty.res <- res[res$ID %in% to.remove,]
-png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned.png"), width=800, height=400)
+## png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned.png"), width=800, height=400)
+tiff(paste0(path.expand("~"), "/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned.tiff"), width=7.20472, height=3.58268, units="in", res=150, compression = "lzw", pointsize=10)
+
 par(mar=c(2,4,1,1))
-MH.plot(clean.res)
+MH.plot(clean.res, chr.cex=0.9)
 MH.plot(dirty.res, color.scheme=list(all.chr.col="#CCCCCC80"), add=TRUE, original.data=clean.res)
 abline(h=sig.level, col="red", lty=2)
 csig <- isig[isig$n.gw.sig>2,]
