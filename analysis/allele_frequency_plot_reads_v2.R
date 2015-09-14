@@ -69,18 +69,28 @@ if(version=="v8"){
                                "CEM"="Stuttgart")
     }else{
         int.names <- c("HG", "AEN", "CEM", "INC", "CLB", "STP")
+        leg.names <- c("Hunter-gatherer (HG)", "Early Farmer (AN)", "Early Farmer (CEM)", "Early Farmer (INC)", "Steppe Ancestry (CLB)", "Steppe Ancestry (STP)")
         cols <- c("#4DAF4A", "#377EB8", "#377EB8", "#377EB8",  "#E41A1C",  "#E41A1C")
         include.counts <- list(                 #Include these populations as hard calls. 
                                "HG"="Loschbour",
                                "CEM"="Stuttgart"
                                )
+        ## pch.list <- c(16,16,16,16,16,16)
+        pch.list <- c(16,16,15,17,16,15)
+        ## pch.list <- c(79,15,16,17,88,72)
     }
+    cols <- brewer.pal(length(int.names), "Set1")
+    cols[6] <- "darkgrey"
+
+    cols <- c("#4DAF4A", "#377EB8", "#377EB8", "#377EB8", "#E41A1C", "#E41A1C")
+    
     names(cols) <- int.names
     include.reads <- list()
     for(nm in int.names){include.reads[[nm]] <- names(int.include[int.include==nm])}
 
     
     mod.pops <- c("CEU", "GBR", "IBS", "TSI")
+    mod.names <- c("Northwest Europe (CEU)", "Great Britain (GBR)", "Spain (IBS)", "Tuscan (TSI)")
 }
 
 ########################################################################
@@ -91,7 +101,7 @@ data <- counts[,1:5]
 counts <- counts[,6:NCOL(counts)]
 totals <- totals[,6:NCOL(totals)]
 
-## Readme data and filter count data
+## ## Readme data and filter count data
 readme <- read.table(readmefile, as.is=TRUE)
 rownames(readme) <- readme[,2]
 rownames(data) <- data[,1]
@@ -108,15 +118,15 @@ include.read.samples <- read.samples(indfile, include.reads)
 
 n.plot.row <- floor((NROW(data)+1)/2)
 n.plot.col <- ifelse(NROW(data)>1, 2,1)
-pdf(paste0(out, outname), width=4*n.plot.col, height=3*n.plot.row+0.5*(n.plot.row==1))
+pdf(paste0(out, outname), width=1.8*n.plot.col, height=1.2*n.plot.row+0.5*(n.plot.row==1))
 par(mfrow=c(n.plot.row, n.plot.col))
-
+par(mar=c(0.8,3.1,0.8,1.1))
 mod.cols <- brewer.pal(4, "Set2")
 
 for(i in 1:NROW(data)){
-  plot(0,0, col="white", xlim=c(0.5, length(int.names)+0.5 ), ylim=ylim, bty="n", xlab="", ylab="Derived allele frequency", main=paste0(readme[i,1], " (", data$ID[i], ")"),xaxt="n", cex.axis=1.2, cex.main=1.2)
   cat(paste0("\r", readme[i,2]))
   chr <- data[i,"CHR"]
+  
   read.data <- read.table(paste0(read.root, "jj2.chr", chr, ".readcounts.gz"), as.is=TRUE)
   read.data <- read.data[read.data[,1]==data[i,"ID"],]
     
@@ -126,7 +136,7 @@ for(i in 1:NROW(data)){
   names(f) <- int.names
   eff.totals <- round(effective.data.size(freq.data),1)
 
-  ## mod.f=range(counts[i,mod.pops]/totals[i,mod.pops])
+  mod.f=range(counts[i,mod.pops]/totals[i,mod.pops])
   mod.f=counts[i,mod.pops]/totals[i,mod.pops]
 
   ci <- ci.unconstrained.model.reads(freq.data, error.prob, alpha=0.95)
@@ -141,17 +151,29 @@ for(i in 1:NROW(data)){
     lci=1-lci
   }
 
-  ## Plot
-  segments(1:length(lci), lci, 1:length(uci), uci, lwd=4, col=cols)
-  points(f, pch=16, cex=2, col=cols)
-  text(f, labels=eff.totals, pos=2, cex=1.4)
+  # Plot72
+  ## plot(0,0, col="white", xlim=c(0.5, length(int.names)+0.5 ), ylim=ylim, bty="n", xlab="", ylab="Derived allele frequency", main=paste0(readme[i,1], " (", data$ID[i], ")"),xaxt="n", cex=06, cex.main=0.8, cex.lab=0.8)
+    plot(0,0, col="white", xlim=c(0.5, length(int.names)+0.5 ), ylim=ylim, bty="n", xlab="", ylab="",xaxt="n", cex=0.6, cex.main=0.8, cex.lab=0.8, yaxt="n")
+  axis(2, at=c(0,0.5,1))
+  mtext(paste0(readme[i,1], " (", data$ID[i], ")"), 2, line=2, cex=0.5)
+  segments(1:length(lci), lci, 1:length(uci), uci, lwd=3, col=cols)
+  points(f, pch=pch.list, cex=2, col=cols)
+  ## text(f, labels=eff.totals, pos=2, cex=1.4)
   for(k in 1:length(mod.f)){
     abline(h=mod.f[k], lty=2, lwd=2, col=mod.cols[k])
-    text( length(int.names)+0.5, mod.f[k], mod.pops[k], cex=1.4)
+    ## text( length(int.names)+0.5, mod.f[k], mod.pops[k], cex=1.4)
   }
 
-  mtext(int.names, side=1, cex=1, line=1, at=1:length(int.names), las=2)
+  ## mtext(int.names, side=1, cex=1, line=1, at=1:length(int.names), las=2)
 }
-  
+
+## Add a legend at the bottom - need a spare panel here.
+par(mar=c(0.6,2.1,0.6,0))
+plot(0,0, col="white",  bty="n", xaxt="n", yaxt="n", ylab="", xlab="")
+leg.cols <- c(cols, mod.cols)
+leg.leg <- c(leg.names, mod.names)
+legend("topleft", leg.leg, bty="n", lwd=2, lty=c(rep(1, length(int.names)), rep(2, length(mod.pops))), pch=c(pch.list, rep(-1, length(mod.pops))), col=leg.cols, seg.len=4, cex=0.65, pt.cex=1.4, y.intersp=1.1)
+
+
 dev.off()
 
