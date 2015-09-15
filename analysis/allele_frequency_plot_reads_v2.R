@@ -63,10 +63,14 @@ if(version=="v8"){
 
     if("WHG" %in% int.include){
         int.names <- c("WHG", "SHG", "AEN", "CEM", "INC", "CLB", "STP")
+        leg.names <- c("Western hunter-gatherer (WHG)", "Scandinavian hunter-gatherer (SHG)", "Early Farmer (AN)", "Early Farmer (CEM)", "Early Farmer (INC)", "Steppe Ancestry (CLB)", "Steppe Ancestry (STP)")
         cols <- c("#4DAF4A","#4DAF4A", "#377EB8", "#377EB8", "#377EB8",  "#E41A1C",  "#E41A1C")
         include.counts <- list(                 #Include these populations as hard calls. 
                                "WHG"="Loschbour",
                                "CEM"="Stuttgart")
+        pch.list <- c(15,17,16,15,17,16,15)
+        cols <- c("#4DAF4A", "#4DAF4A","#377EB8", "#377EB8", "#377EB8", "#E41A1C", "#E41A1C")
+        names(cols) <- int.names
     }else{
         int.names <- c("HG", "AEN", "CEM", "INC", "CLB", "STP")
         leg.names <- c("Hunter-gatherer (HG)", "Early Farmer (AN)", "Early Farmer (CEM)", "Early Farmer (INC)", "Steppe Ancestry (CLB)", "Steppe Ancestry (STP)")
@@ -78,13 +82,12 @@ if(version=="v8"){
         ## pch.list <- c(16,16,16,16,16,16)
         pch.list <- c(16,16,15,17,16,15)
         ## pch.list <- c(79,15,16,17,88,72)
+        cols <- c("#4DAF4A", "#377EB8", "#377EB8", "#377EB8", "#E41A1C", "#E41A1C")
+        names(cols) <- int.names
     }
-    cols <- brewer.pal(length(int.names), "Set1")
-    cols[6] <- "darkgrey"
+    ## cols <- brewer.pal(length(int.names), "Set1")
+    ## cols[6] <- "darkgrey"
 
-    cols <- c("#4DAF4A", "#377EB8", "#377EB8", "#377EB8", "#E41A1C", "#E41A1C")
-    
-    names(cols) <- int.names
     include.reads <- list()
     for(nm in int.names){include.reads[[nm]] <- names(int.include[int.include==nm])}
 
@@ -118,6 +121,8 @@ include.read.samples <- read.samples(indfile, include.reads)
 
 n.plot.row <- floor((NROW(data)+1)/2)
 n.plot.col <- ifelse(NROW(data)>1, 2,1)
+## n.plot.row <- 3
+## n.plot.col <- 1
 pdf(paste0(out, outname), width=1.8*n.plot.col, height=1.2*n.plot.row+0.5*(n.plot.row==1))
 par(mfrow=c(n.plot.row, n.plot.col))
 par(mar=c(0.8,3.1,0.8,1.1))

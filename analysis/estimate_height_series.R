@@ -206,7 +206,7 @@ fr.4 <- round(colSums(freq.est*gwas$BETA),4)
 ## write.table(dsrs, "~/selection/analysis/v6/poly/Height/pred_height.txt", col.names=FALSE, row.names=FALSE, sep ="\t", quote=FALSE)
 
 ########################################################################
-#MCMC confidence interval estimate.
+#MCMC posterior interval estimate.
 
 ## proposal <- function(x, sd=0.001){return(rtruncnorm(length(x), mean=x, sd=sd, a=0, b=1))}
 ## proposal <- function(x, sd=0.001){return(rnorm(length(x), mean=x, sd=sd))}
