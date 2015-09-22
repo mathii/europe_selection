@@ -99,7 +99,7 @@ if(version=="peru"){
   mix.dir <- "~/selection/code/files/peru/mixtures/"
   
   if(results.tag==""){stop("Must specify results tag for v8 analysis")}
-  include.counts <- list( "CEU"="CEU", "YRI"="YRI", "MXL"="MXL", "CLM"="CLM", "PEL"="PEL", "PUR"="PUR")
+  include.counts <- list( "IBS"="IBS", "YRI"="YRI", "MXL"="MXL", "CLM"="CLM", "PEL"="PEL", "PUR"="PUR")
   always.counts <- c()
 
   group <- results.tag
@@ -117,7 +117,7 @@ if(version=="peru"){
   rownames(mix.mat) <- mix.mat[,1]
   mix.mat <- mix.mat[,2:NCOL(mix.mat)]
   
-  anc.pops <- c("Native", "CEU", "YRI")
+  anc.pops <- c("Native", "IBS", "YRI")
   mod.pops <- c("CLM", "MXL", "PEL", "PUR")
   pops <- c(anc.pops, mod.pops)
   A <- t(mix.mat)[anc.pops,mod.pops]
@@ -125,7 +125,7 @@ if(version=="peru"){
   ## monocheck <- c(unlist(include.reads), unlist(include.counts))
   ## names(monocheck) <- NULL
 
-  monocheck <-  c("CEU", "YRI", "PEL", "PUR", "MXL", "CLM")
+  monocheck <-  c("IBS", "YRI", "PEL", "PUR", "MXL", "CLM")
   
   cat("Monocheck\n")
   print(monocheck)
