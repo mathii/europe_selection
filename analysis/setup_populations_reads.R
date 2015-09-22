@@ -95,4 +95,38 @@ if(version=="v8"){
   cat("Monocheck\n")
   print(monocheck)
 }
+if(version=="peru"){
+  mix.dir <- "~/selection/code/files/peru/mixtures/"
+  
+  if(results.tag==""){stop("Must specify results tag for v8 analysis")}
+  include.counts <- list( "CEU"="CEU", "YRI"="YRI", "MXL"="MXL", "CLM"="CLM", "PEL"="PEL", "PUR"="PUR")
+  
+  group <- results.tag
+  choice <- read.table(paste0(mix.dir, "Choice", results.tag), as.is=TRUE, header=FALSE)
+  include.reads <- list(c(), c(), c())
+  names(include.reads) <- unique(choice[,2])
+  for(i in 1:NROW(choice)){
+    if(choice[i,1] %in% always.counts){
+      include.counts[[choice[i,2]]] <- choice[i,1]
+    } else{
+      include.reads[[choice[i,2]]] <- c(include.reads[[choice[i,2]]], choice[i,1])
+    }
+  }
+  mix.mat <- read.table(paste0(mix.dir, "Proportion", results.tag), as.is=TRUE, header=TRUE)
+  rownames(mix.mat) <- mix.mat[,1]
+  mix.mat <- mix.mat[,2:NCOL(mix.mat)]
+  
+  anc.pops <- c("Native", "CEU", "YRI")
+  mod.pops <- c("CLM", "MXL", "PEL", "PUR")
+  pops <- c(anc.pops, mod.pops)
+  A <- t(mix.mat)[anc.pops,mod.pops]
+
+  ## monocheck <- c(unlist(include.reads), unlist(include.counts))
+  ## names(monocheck) <- NULL
+
+  monocheck <-  c("CEU", "YRI", "PEL", "PUR", "MXL", "CLM")
+  
+  cat("Monocheck\n")
+  print(monocheck)
+}
 
