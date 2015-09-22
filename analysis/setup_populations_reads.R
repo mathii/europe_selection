@@ -100,7 +100,8 @@ if(version=="peru"){
   
   if(results.tag==""){stop("Must specify results tag for v8 analysis")}
   include.counts <- list( "CEU"="CEU", "YRI"="YRI", "MXL"="MXL", "CLM"="CLM", "PEL"="PEL", "PUR"="PUR")
-  
+  always.counts <- c()
+
   group <- results.tag
   choice <- read.table(paste0(mix.dir, "Choice", results.tag), as.is=TRUE, header=FALSE)
   include.reads <- list(c(), c(), c())
