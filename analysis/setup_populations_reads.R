@@ -129,7 +129,7 @@ if(version=="peru"){
   ## monocheck <- c(unlist(include.reads), unlist(include.counts))
   ## names(monocheck) <- NULL
 
-  monocheck <-  pops
+  monocheck <-  names(include.counts)
   
   cat("Monocheck\n")
   print(monocheck)
