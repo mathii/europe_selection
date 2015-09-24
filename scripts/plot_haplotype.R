@@ -5,53 +5,81 @@ library(RColorBrewer)
 ############################################################
 ## snp <- "rs3827760"
 ## flank <- 150000
+## range <- NA
 ## what<-"EDAR"
 ## pops <- c("CHB", "Motala_HG", "CEU")
 ## pops.with.reads <- "Motala_HG"
+## mod.pops <- "CHB<CEU"
 
 ############################################################
-snp <- "rs1426654"
-flank <- 150000
-what<-"SLC24A5"
-pops <- c("CHB", "Motala_HG", "CEU")
-pops.with.reads <- "Motala_HG"
+## snp <- "rs1426654"
+## flank <- 150000
+## range <- NA
+## what<-"SLC24A5"
+## pops <- c("CHB", "Motala_HG", "CEU")
+## pops.with.reads <- "Motala_HG"
+## version <- "v8"
+## mod.pops <- c("CHB","CEU")
 
 ############################################################
 ## snp <- "rs4988235"
 ## flank <- 150000
+## range <- NA
 ## what <- "LCT"
 ## pops.with.reads <- c("Motala_HG","Yamnaya_Samara", "Sweden_PWC", "Srubnaya", "Poltavka", "EHG", "Srubnaya_1d_rel_I0430", "Central_LNBA", "Bell_Beaker_LN", "Yamnaya_Kalmykia","Northern_LNBA", "Hungary_BA")
 ## pops <- c("CEU", pops.with.reads)
+## mod.pops <- "CEU"
+
 ############################################################
 
-root <- "~/data/v8/use/v81kg_europe2names"
-read.root <- "~/data/v8/reads/jj2"
+snp <- NA
+flank <- 150000
+range <- c(2,46524541,46613842)
+what<-"EPAS1"
+pops.with.reads <- c("Botigiriayocc_LIP","Huaca_Prieta_IP","Inca_LH","Lauricocha_EMA","Lauricocha_IP","Lauricocha_LA","Lima_EIP","Nasca_EIP","Pacapaccari_LIP","Tiwanaku_MH","Wari_Coast_MH","Wari_Highlands_MH","Ychsma_LIP")
+version <- "peru"
+mod.pops <- c("CHB","PEL")
+pops <- c(mod.pops[1], pops.with.reads, mod.pops[2])
+
+############################################################
+
+root <- paste0("~/data/",version,"/use/",version,"1kg_europe2names")
+read.root <- paste0("~/data/",version,"/reads/jj2")
 subsample <- TRUE
 cols <- brewer.pal(3, "Set1")
 
 ############################################################
 
-out <- paste0("~/selection/analysis/v8/", what,"/",what ,"_haplotype")
+out <- paste0("~/selection/analysis/",version,"/", what,"/",what ,"_haplotype")
 
 ## Load all snp info and select SNPs to be used 
 data <- read.table(paste0(root, ".snp"))
-this.snpinfo <- data[data[,1]==snp,]
-include <- (data[,2]==this.snpinfo[,2])&(abs(data[,4]-this.snpinfo[,4])<flank)
+if(all(is.na(range))){
+    this.snpinfo <- data[data[,1]==snp,]
+    include <- (data[,2]==this.snpinfo[,2])&(abs(data[,4]-this.snpinfo[,4])<flank)
+    this.chr <- this.snpinfo[,2]
+}else{
+    include <- data[,2]==range[1] & data[,4]>range[2] & data[,4]<range[3]
+    this.chr <- range[1]
+}
 data <- data[include,]
 
 write.table(data, paste0(out, ".snp"), col.names=FALSE, row.names=FALSE, quote=FALSE)
 
 ## At this point, stop and run the following command to pull out the CHB haploypes:
-## python ~/spindrift/Freq.py -d ~/data/v6/use/v61kg_europe2names -p CHB,CEU -o test_haps -s ${what}_haplotype -g
+## python ~/spindrift/Freq.py -d ~/data/${V}/use/${V}1kg_europe2names -p ${mod.pops} -o test_haps -s ${what}_haplotype -g
+if(!file.exists(paste0("~/selection/analysis/",version,"/",what,"/test_haps.gt"))){
+    stop("At this point...")
+}
 
 ind <- read.table(paste0(root, ".ind"), as.is=TRUE)
-gt <- read.table(paste0("~/selection/analysis/v8/",what,"/test_haps.gt"), as.is=TRUE, header=TRUE)
+gt <- read.table(paste0("~/selection/analysis/",version,"/",what,"/test_haps.gt"), as.is=TRUE, header=TRUE)
 
 gt.data <- gt[,1:5]
 gt <- gt[,6:NCOL(gt)]
 
 ## Load reads
-reads <- read.table(paste0(read.root, ".chr", this.snpinfo[,2], ".readcounts.gz"), as.is=TRUE, header=FALSE)
+reads <- read.table(paste0(read.root, ".chr", this.chr, ".readcounts.gz"), as.is=TRUE, header=FALSE)
 reads <- reads[reads[,1] %in% gt.data[,1],]
 
 ntotal <- 0
@@ -126,18 +154,27 @@ if(what=="EDAR"){
     ## No subsampling
 ## subsample 20 CEU and 20 CHB
 if(subsample){
-    if(what!="LCT"){
-        s.size <- 20
-        sub <- c(sample(which(poplist=="CHB"), s.size), which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], sample(which(poplist=="CEU"), s.size))
-    }else{
+    if(length(mod.pops)==1){
         s.size <- 40
-        sub <- c(which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], sample(which(poplist=="CEU"), s.size))
+        sub <- c(which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], sample(which(poplist==mod.pops[1]), s.size))
+    }else if(length(mod.pops)==2){
+        s.size <- 20
+        sub <- c(sample(which(poplist==mod.pops[1]), s.size), which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], sample(which(poplist==mod.pops[2]), s.size))
+    }else{
+        stop("px1")
     }
 }else{
-    s.size <- sum(poplist=="CHB")
-    sub <- c(which(poplist=="CHB"), which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], which(poplist=="CEU"))
+    if(length(mod.pops)==1){
+        s.size <- sum(poplist==mod.pops[1])
+        sub <- c(which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], sample(which(poplist==mod.pops[1]), s.size))
+    }else if(lengt(mod.pops)==2){
+        s.size.1 <- sum(poplist==mod.pops[1])
+        s.size.2 <- sum(poplist==mod.pops[2])
+        sub <- c(sample(which(poplist==mod.pops[1]), s.size.1), which(poplist %in% pops.with.reads)[match(plot.order, indivlist[poplist %in% pops.with.reads])], sample(which(poplist==mod.pops[2]), s.size.2))
+    } else{
+        stop("px2")
+    }
 }
-
 sub.ht <- ht[sub,]
 sub.pr <- pr[sub,]
 subtotal <- length(sub)
@@ -150,8 +187,11 @@ remove <- rep(FALSE, NCOL(sub.ht))
 
 sub.ht <- sub.ht[,!remove]
 sub.pr <- sub.pr[,!remove]
-snpi <- which(gt.data[!remove,1]==snp)
-
+if(!(is.na(snp))) {
+    snpi <- which(gt.data[!remove,1]==snp)
+} else{
+    snpi <- NA
+}
 
 ## cols <- c("grey", "pink", "darkred", "white")
 ## s.cols <- c("grey", "lightblue", "darkblue", "white")
@@ -162,24 +202,27 @@ s.cols <- c("grey", "lightblue", "darkblue", "white")
 nsnp <- NROW(gt)
 
 if(subsample){
-    pdf(paste0(out, "_subsampled.pdf"), width=12, height=6)
+    pdf(paste0(out, "_subsampled.pdf"), width=round(nsnp/10), height=round(subtotal/10))
 }else{
     pdf(paste0(out, ".pdf"), width=12, height=24)
 }
 plot(0,0, col="white", bty="n", xaxt="n", yaxt="n", xlim=c(0,nsnp), ylim=c(0,subtotal), xlab="", ylab="")
 
-for(i in 1:subtotal){
+   for(i in 1:subtotal){
     cc <- cols[sub.ht[i,]+1]
     bc=col2rgb(cols[sub.ht[i,]+1], alpha=TRUE)
     bc[4,] <- round(255*sub.pr[i,]^2)
     bc <- apply(bc, 2, function(x)do.call(rgb, as.list((x/255))))
     points(1:nsnp, rep(i,nsnp), pch=21, cex=1, col=cc, bg=bc)
 }
+
+if(!is.na(snpi)){
 cc=s.cols[sub.ht[,snpi]+1]
 bc=col2rgb(s.cols[sub.ht[,snpi]+1], alpha=TRUE)
 bc[4,] <- round(255*sub.pr[,snpi]^2)
 bc <- apply(bc, 2, function(x)do.call(rgb, as.list((x/255))))
 points(rep(snpi,subtotal), 1:subtotal, pch=21, cex=1, col=cc, bg=bc)
+}
 
 if(what=="LCT"){
     abline(h=subtotal-s.size+0.5, col="black")
@@ -189,9 +232,11 @@ if(what=="LCT"){
     abline(h=21.5, col="black")
 }
 if(what!="LCT"){
-    abline(h=s.size+sum(poplist=="Motala_HG")+0.5, col="black")
+    abline(h=s.size+sum(!(poplist %in% mod.pops))+0.5, col="black")
     abline(h=s.size+0.5, col="black")
-    mtext(c("CHB", "Motala_HG", "CEU"), side=2, at=c(s.size/2, s.size+sum(poplist=="Motala_HG")/2, 1.5*s.size+sum(poplist=="Motala_HG")), line=-2, las=2)
+    mtext(mod.pops, side=2, at=c(s.size/2, 1.5*s.size+sum(!(poplist %in% mod.pops))), line=-1, las=2)
+    mtext("Ancient", side=2, at=c( s.size+0.5*sum(!(poplist %in% mod.pops))), line=-1, las=2)
+
 }
 dev.off()
 
