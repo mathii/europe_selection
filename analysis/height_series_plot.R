@@ -40,7 +40,7 @@ if(file.exists(colfile)){
   if(length(pops)<=9){
     cols <- brewer.pal( length(pops), "Set1")
     cols[6] <- "darkgrey"
-  else{
+  } else{
     cols <- c(brewer.pal( length(pops), "Set1"), brewer.pal( length(pops), "Set2"))
     cols[6] <- "darkgrey"
   }
