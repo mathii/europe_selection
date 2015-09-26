@@ -16,6 +16,8 @@ if(length(cA)){
 out <-  paste0("~/selection/analysis/", version, "/series/heightseries.",snplist,".pdf")
 height.values <-  paste0("~/selection/analysis/", version, "/series/height_series_mcmc_estimates.",snplist,".txt")
 dates <- paste0("~/selection/code/files/",version,"/population_dates.txt")
+colfile <- paste0("~/selection/code/files/",version,"/population_cols.txt")
+
 ang <- 20
 
 ########################################################################
@@ -30,9 +32,15 @@ data[,1] <- gsub("_", " ", data[,"MPOP"])
 pops <- unique(data[,"MPOP"])
 data <- data[order(data$MPOP, data$END, data$START),]
 
-cols <- brewer.pal( length(pops), "Set1")
-cols[6] <- "darkgrey"
-
+if(file.exists(colfile)){
+  cc <- read.table(colfile, as.is=TRUE, comment.char="")
+  cols <- cc[,2]
+  names(cols) <- cc[,1]
+} else{
+  cols <- brewer.pal( length(pops), "Set1")
+  cols[6] <- "darkgrey"
+  names(cols) <- pops
+}
 
 a.i <- c(data[,"Post.5"], data[,"Post.95"], data[,"MLE"])
 ylim <- c(floor(min(a.i)*10)/10, max(a.i)*10/10)
@@ -49,14 +57,13 @@ for(i in 1:length(pops)){
     int.ends <- data[kk,"START"]
     ht <- data[kk,"Post.Mn"]
     ## rect(-int.starts, ht-0.02, -int.ends, ht+0.02, col=cols[i], density=20, angle=ang*i, border=cols[i])
-    rect(-int.starts, data[kk,"Post.5"], -int.ends, data[kk,"Post.95"], col=cols[i], density=20, angle=ang*i, border=cols[i])
+    rect(-int.starts, data[kk,"Post.5"], -int.ends, data[kk,"Post.95"], col=cols[pop], density=20, angle=ang*i, border=cols[pop])
 
-    points(-0.5*(int.starts+int.ends), data[kk,"MLE"], cex=2, pch=16, col=cols[i])
+    points(-0.5*(int.starts+int.ends), data[kk,"MLE"], cex=2, pch=16, col=cols[pop])
                 
-    ln <- length(int.ends)
-
-    if(ln>1 & pop!="Hunter_Gatherers"){
-        segments(-int.ends[1:(ln-1)], ht[1:(ln-1)], -int.starts[2:ln], ht[2:ln], col=cols[i], lwd=2)
+    ## ln <- length(int.ends)
+    ## if(ln>1 & pop!="Hunter_Gatherers"){
+    ##     segments(-int.ends[1:(ln-1)], ht[1:(ln-1)], -int.starts[2:ln], ht[2:ln], col=cols[i], lwd=2)
     }
 }
 legend("bottomright", pops, col=cols,lwd=2, bty="n")
