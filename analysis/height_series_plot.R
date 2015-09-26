@@ -58,15 +58,15 @@ for(i in 1:length(pops)){
     ht <- data[kk,"Post.Mn"]
     ## rect(-int.starts, ht-0.02, -int.ends, ht+0.02, col=cols[i], density=20, angle=ang*i, border=cols[i])
     rect(-int.starts, data[kk,"Post.5"], -int.ends, data[kk,"Post.95"], col=cols[pop], density=20, angle=ang*i, border=cols[pop])
-
+    text(-int.ends, data[kk,"Post.95"], data[kk,"POP"], adj=c(0,-0.2))
     points(-0.5*(int.starts+int.ends), data[kk,"MLE"], cex=2, pch=16, col=cols[pop])
                 
     ## ln <- length(int.ends)
     ## if(ln>1 & pop!="Hunter_Gatherers"){
     ##     segments(-int.ends[1:(ln-1)], ht[1:(ln-1)], -int.starts[2:ln], ht[2:ln], col=cols[i], lwd=2)
-    }
+  ## }
 }
-legend("bottomright", pops, col=cols,lwd=2, bty="n")
+## legend("bottomright", pops, col=cols[pops],lwd=2, bty="n")
 axis(1, at=-seq(8,0,-2)*1000, labels=format(seq(8,0,-2)*1000, big.mark=","))
 
 dev.off()
