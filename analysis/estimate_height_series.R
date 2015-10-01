@@ -90,11 +90,17 @@ include.counts <- list(                 #Include these populations as hard calls
 }
 
 if(version=="sard"){
-include.counts <- list(                 #Include these populations as hard calls. 
+  include.counts <- list(                 #Include these populations as hard calls. 
     "HG"="Loschbour",
     "CEM"="Stuttgart",
     "CEU"="CEU", "GBR"="GBR", "IBS"="IBS", "TSI"="TSI", "Sardinian"="Sardinian" )
 }
+
+if(version=="bell"){
+include.counts <- list(                 #Include these populations as hard calls. 
+    "CEU"="CEU", "IBS"="IBS" )
+}
+
 
 ########################################################################
 #Standard setup

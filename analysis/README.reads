@@ -99,7 +99,7 @@ done
 SD=~/selection/analysis/${V}/series
 for mc in minchr1 minchr3 minchr5
 do
-head -n1 ${SD}/height_series_mcmc_estimates_HG.${what}.${mc}.txt > ${SD}/height_series_mcmc_estimates.${what}.${mc}.txt
+head -n1 ${SD}/height_series_mcmc_estimates_CEU.${what}.${mc}.txt > ${SD}/height_series_mcmc_estimates.${what}.${mc}.txt
 tail -qn+2 ${SD}/height_series_mcmc_estimates_*.${what}.${mc}.txt >> ${SD}/height_series_mcmc_estimates.${what}.${mc}.txt
 rm ${SD}/height_series_mcmc_estimates_*.${what}.${mc}.txt
 done 
