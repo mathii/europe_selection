@@ -63,9 +63,8 @@ R --vanilla --args _reads ${V} 1 < ~/selection/code/analysis/genome_wide_scan_pl
 
 
 #4 Time series and allele frequency plots
-R --vanilla --args figure2 ${V} < ~/selection/code/analysis/time_series_plot_reads.R
-R --vanilla --args figure2 b ${V} < ~/selection/code/analysis/allele_frequency_plot_reads.R
-R --vanilla --args figure2 c ${V} < ~/selection/code/analysis/allele_frequency_plot_reads.R
+R --vanilla --args ${V} Figure2 2 < ~/selection/code/analysis/allele_frequency_plot_reads_v2.R
+R --vanilla --args ${V} Figure2ext 2 < ~/selection/code/analysis/allele_frequency_plot_reads_v2.R
 
 #5 Polygenic selection scans
 #Estimate allele frequncies in polypops

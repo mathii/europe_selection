@@ -119,10 +119,8 @@ include.read.samples <- read.samples(indfile, include.reads)
 
 ########################################################################
 
-n.plot.row <- floor((NROW(data)+1)/2)
-n.plot.col <- ifelse(NROW(data)>1, 2,1)
-## n.plot.row <- 3
-## n.plot.col <- 1
+n.plot.col <- ceiling(sqrt(NROW(data)+1))
+n.plot.row <- ceiling((NROW(data)+1)/n.plot.col)
 pdf(paste0(out, outname), width=1.8*n.plot.col, height=1.2*n.plot.row+0.5*(n.plot.row==1))
 par(mfrow=c(n.plot.row, n.plot.col))
 par(mar=c(0.8,3.1,0.8,1.1))
