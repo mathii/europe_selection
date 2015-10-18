@@ -1,4 +1,4 @@
-#Which version - v6, v7, v8?
+#Which version - published version is v8?
 #Data should be in the directory ~/data/$VERSION/{use,reads} 
 #Output will be in ~/selection/analysis/$VERSION/
 #uses bsub to submit jobs to cluster - modify for your own use, or 
@@ -59,10 +59,7 @@ done
 for chr in {1..23};do R --vanilla --args $chr $V HG-EN < ~/selection/code/analysis/scan_freq_differences.R; done
 R --vanilla --args _reads ${V} 1 < ~/selection/code/analysis/genome_wide_scan_plots.R
 
-#3e Allele frequency plots
-
-
-#4 Time series and allele frequency plots
+#4 Allele frequency plots
 R --vanilla --args ${V} Figure2 2 < ~/selection/code/analysis/allele_frequency_plot_reads_v2.R
 R --vanilla --args ${V} Figure2ext 2 < ~/selection/code/analysis/allele_frequency_plot_reads_v2.R
 
@@ -78,17 +75,17 @@ for what in freq lowCI.freq highCI.freq;
 do
 grep ^ID ${CDIR}/all.reads${who}chr1.${what} > ${CDIR}/all.reads${who}${what}
 grep -hv ^ID ${CDIR}/all.reads${who}chr+([0-9]).${what} >> ${CDIR}/all.reads${who}${what}
-# rm  ${CDIR}/all.reads${who}chr+([0-9]).${what}
+rm  ${CDIR}/all.reads${who}chr+([0-9]).${what}
 done
 done
 
 #Run polygenic selection tests
 ~/selection/code/analysis/run_polytest_reads.sh
 
-#estimate height series
+#estimate height series - data in ~/selection/data/gwas/lango_allen_snps.gwas
 what=lango_allen  #wood? lango_allen?
 
-for mc in 0 1 3 5
+mc=1
 do
 while read pop; do
 bsub -q reich "R --vanilla --args $V ${what} $pop 10000 50000 ${mc} \
@@ -97,17 +94,13 @@ done < ~/selection/code/files/${V}/height_series_list.txt
 done
 
 SD=~/selection/analysis/${V}/series
-for mc in minchr1 minchr3 minchr5
-do
+mc=minchr1
 head -n1 ${SD}/height_series_mcmc_estimates_CEU.${what}.${mc}.txt > ${SD}/height_series_mcmc_estimates.${what}.${mc}.txt
 tail -qn+2 ${SD}/height_series_mcmc_estimates_*.${what}.${mc}.txt >> ${SD}/height_series_mcmc_estimates.${what}.${mc}.txt
 rm ${SD}/height_series_mcmc_estimates_*.${what}.${mc}.txt
-done 
 
-for mc in minchr0 minchr1 minchr3 minchr5
-do
-	R --vanilla --args $V ${what}.${mc} < ~/selection/code/analysis/height_series_plot.R
-done
+mc=minchr1
+R --vanilla --args $V ${what}.${mc} < ~/selection/code/analysis/height_series_plot.R
 
 #Power simulations. 
 for what in Admixture Proportion

@@ -1,6 +1,6 @@
 ## Library of functions for plotting genome-wide scan results. 
 
-MH.plot <- function(data, flip=FALSE, add=FALSE, original.data=NA, chr.labels=TRUE, shift = 0, cap = 100, color.scheme=list(), color.loci=data.frame(),range.shift=2, log10=TRUE, ylab="-log10 p-value", .ylim=NA, chr.cex=1, ...){
+MH.plot <- function(data, flip=FALSE, add=FALSE, original.data=NA, chr.labels=TRUE, chr.labels.skip=c(), shift = 0, cap = 100, color.scheme=list(), color.loci=data.frame(),range.shift=2, log10=TRUE, ylab=expression(-log[10](P-value)), .ylim=NA, chr.cex=1, thin=FALSE, thin.below=2, thin.thin=100, ...){
 
   ## Deal with X chromosome
   if(typeof(data$CHR)=="character"){
@@ -30,8 +30,17 @@ MH.plot <- function(data, flip=FALSE, add=FALSE, original.data=NA, chr.labels=TR
   
   locX = trunc(pos/100) + x[chr]
   locY = -log10(obspval)
-  plot.sym <- ifelse( locY>cap, 17, 20 )
 
+  ## Thin points below some p value level, since they'll get overplotted anyway
+  if(thin){
+      include <- c(TRUE, rep(FALSE,thin.thin-1))|locY>=thin.below
+      locX <- locX[include]
+      locY <- locY[include]
+      chr <- chr[include]
+  }
+
+  plot.sym <- ifelse( locY>cap, 17, 20 )
+  
   ## Set colours - alternating per chromosome and red for off the scale
   col1=rgb(0,0,108,maxColorValue=255)
   if("odd.chr.col" %in% names(color.scheme)){col1=rep(color.scheme$odd.chr.col, length(col1))}
@@ -65,7 +74,7 @@ MH.plot <- function(data, flip=FALSE, add=FALSE, original.data=NA, chr.labels=TR
     if(all(is.na(.ylim))){
         ylim=ylim=c(-obsmax/20,obsmax)
     }
-    plot(locX,locY,pch=plot.sym,col=curcol,axes=F,ylab=ylab,xlab="",bty="n",ylim=ylim,cex=0.8, ...)
+    plot(locX,locY,pch=plot.sym,col=curcol,axes=F,ylab=ylab,xlab="",bty="n",ylim=ylim,cex=0.8,...)
     axis(2,las=1)
     mtext("Chromosome",1,at=x[22]/2,cex=1,line=1)
   }
@@ -77,6 +86,7 @@ MH.plot <- function(data, flip=FALSE, add=FALSE, original.data=NA, chr.labels=TR
       if( chr.labels ){
           for (i in 1:21)
               {
+                  if(i %in% chr.labels.skip){next}
                   labpos = (x[i+1] + x[i]) / 2
                   text(labpos,put.text.at,i,cex=0.8*chr.cex)
               }
@@ -202,16 +212,24 @@ genomic.inflation <- function(pvals){
   return( median(qchisq(pvals, 1, lower.tail=FALSE)) / qchisq(0.5,1) )
 }
 
-draw.qq.ci <- function(N, fill.col="lightgrey", border.col="grey"){
+draw.qq.ci <- function(N, fill.col="lightgrey", border.col="grey", thin=FALSE, thin.below=2, thin.thin=100){
     lo <- -log10(sapply(1:N,function(x) qbeta(.025,x,N-x+1)))
     up <- -log10(sapply(1:N,function(x) qbeta(.975,x,N-x+1)))
     e = -log10(((1:N)-0.5)/N)
+
+    if(thin){
+        include <-  c(TRUE, rep(FALSE,thin.thin-1))|e>=thin.below
+        e <- e[include]
+        lo <- lo[include]
+        up <- up[include]
+    }
+    
     polygon(c(e,rev(e)),c(lo,rev(up)),col=fill.col,border=border.col)
 
 
 }
 
-qqPlotOfPValues <- function( pvals, gi = NULL, add=FALSE, BW=FALSE, jitter=FALSE, col="blue", linecol="red", ci=TRUE, cex.pts=1, ... ){
+qqPlotOfPValues <- function( pvals, gi = NULL, add=FALSE, BW=FALSE, jitter=FALSE, col="blue", linecol="red", ci=TRUE, cex.pts=1,  thin=FALSE, thin.below=2, thin.thin=100,... ){
 ##   p <- sort(unique(pvals))
 
   if(length(col)==1){
@@ -228,13 +246,18 @@ qqPlotOfPValues <- function( pvals, gi = NULL, add=FALSE, BW=FALSE, jitter=FALSE
   o = -log10(p)
 
   if(jitter){o <-  jitter(o)}
-
+  if(thin){
+      include <-  c(TRUE, rep(FALSE,thin.thin-1))|o>=thin.below
+      e <- e[include]
+      o <- o[include]
+  }
+  
   if(add){
-    points( e, o, pch= 20, bty = "n", cex=0.3, col=col, ... )
+    points( e, o, pch= 20, bty = "n", cex=0.3*cex.pts, col=col, ... )
   }
   else{
 
-    plot( e, o, xlab = "Expected -log10(p-values)", ylab = "Observed -log10(p-values)", pch= 20, bty = "n", cex=0.3, type="n", ... )
+    plot( e, o, xlab = expression("Expected "-log[10](P-values)), ylab = expression("Observed "-log[10](P-values)), pch= 20, bty = "n", cex=0.3, type="n", ... )
     if(!BW & ci){
         draw.qq.ci(length(p))
     }

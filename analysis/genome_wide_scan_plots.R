@@ -149,20 +149,24 @@ cat.data$TAG <- paste(cat.data$CHR, cat.data$POS, sep=":")
 ## dev.off()
 
 ## png(paste0("~/selection/analysis/",version,"/", what ,"/qq_plot_both", results.tag, ".png"), width=400, height=400)
-tiff(paste0(path.expand("~"), "/selection/analysis/",version,"/", what ,"/qq_plot_both", results.tag, ".tiff"), width=2, height=2, units="in", res=150, compression = "lzw", pointsize=6)
-par(mar=c(4.1,4.1,1,1))
-cats <- c("GWAS", "CMS", "HiDiff", "Immune", "HLA", "eQTL")
-cats <- cats[cats %in% colnames(cat.data)]
-cols <- brewer.pal(length(cats), "Set1")
-qqPlotOfPValues(neutral$PVAL, col="#404040", linecol="black", ci=FALSE, xlim=c(0,6), ylim=c(0,30))
-draw.qq.ci(NROW(neutral), border.col="#40404020", fill.col="#40404020")
-for(i in 1:length(cats)){
-    this.lot <- res[res$TAG %in% cat.data$TAG[cat.data[,cats[i]]==1],]
-    qqPlotOfPValues(this.lot$PVAL, col=cols[i], ci=FALSE, add=TRUE, xlim=c(0,4), ylim=c(0,20),  linecol="black" )
-    draw.qq.ci(NROW(this.lot), border.col=paste0(cols[i],"20"), fill.col=paste0(cols[i],"20"))
+## tiff(paste0(path.expand("~"), "/selection/analysis/",version,"/", what ,"/qq_plot_both", results.tag, ".tiff"), width=2, height=2, units="in", res=150, compression = "lzw", pointsize=6)
+
+for(thin in c(TRUE,FALSE)){
+    pdf(paste0("~/selection/analysis/",version,"/", what ,"/qq_plot_both", results.tag,  ifelse(thin, ".thinned",""),".pdf"), width=4, height=4 )
+    par(mar=c(4.1,4.1,1,1))
+    cats <- c("GWAS", "CMS", "HiDiff", "Immune", "HLA", "eQTL")
+    cats <- cats[cats %in% colnames(cat.data)]
+    cols <- brewer.pal(length(cats), "Set1")
+    qqPlotOfPValues(neutral$PVAL, col="#404040", linecol="black", ci=FALSE, xlim=c(0,6), ylim=c(0,30), thin=thin, cex.pts=2)
+    draw.qq.ci(NROW(neutral), border.col="#40404020", fill.col="#40404020", thin=thin)
+    for(i in 1:length(cats)){
+        this.lot <- res[res$TAG %in% cat.data$TAG[cat.data[,cats[i]]==1],]
+        qqPlotOfPValues(this.lot$PVAL, col=cols[i], ci=FALSE, add=TRUE, xlim=c(0,4), ylim=c(0,20), thin=FALSE, linecol="black", cex.pts=2 )
+        draw.qq.ci(NROW(this.lot), border.col=paste0(cols[i],"20"), fill.col=paste0(cols[i],"20"), thin=thin)
+    }
+    legend("topleft", c("Neutral", cats), col=c("#404040", cols), pch=16, bty="n")
+    dev.off()
 }
-legend("topleft", c("Neutral", cats), col=c("#404040", cols), pch=16, bty="n")
-dev.off()
 
 isig.data <- indep.signals(res, 10^(-sig.level), 10^(-sig.level), 1e6, remove.level=3)
 isig <- isig.data$signals
@@ -184,14 +188,17 @@ clean.res <- res
 clean.res <- res[!(res$ID %in% to.remove),]
 dirty.res <- res[res$ID %in% to.remove,]
 ## png(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned.png"), width=800, height=400)
-tiff(paste0(path.expand("~"), "/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned.tiff"), width=7.20472, height=3.58268, units="in", res=150, compression = "lzw", pointsize=10)
+## tiff(paste0(path.expand("~"), "/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned.tiff"), width=7.20472, height=3.58268, units="in", res=150, compression = "lzw", pointsize=10)
 
+for(thin in c(TRUE, FALSE)){
+pdf(paste0("~/selection/analysis/",version,"/", what ,"/mh_plot", results.tag ,".cleaned",ifelse(thin, ".thinned", ""),".pdf"), width=7.2, height=3.6)
 par(mar=c(2,4,1,1))
-MH.plot(clean.res, chr.cex=0.9)
+MH.plot(clean.res, chr.cex=0.9, thin=thin, chr.labels.skip=c(19,21))
 MH.plot(dirty.res, color.scheme=list(all.chr.col="#CCCCCC80"), add=TRUE, original.data=clean.res)
 abline(h=sig.level, col="red", lty=2)
 csig <- isig[isig$n.gw.sig>2,]
 dev.off()
+}
 
 ## Per-chromosome Manhattan plots
 extra.chrs <- c()
