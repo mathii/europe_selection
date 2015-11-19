@@ -1,4 +1,4 @@
-#Which version - published version is v8?
+#Which version - published version is v8
 #Data should be in the directory ~/data/$VERSION/{use,reads} 
 #Output will be in ~/selection/analysis/$VERSION/
 #uses bsub to submit jobs to cluster - modify for your own use, or 

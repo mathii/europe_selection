@@ -91,7 +91,7 @@ MH.plot <- function(data, flip=FALSE, add=FALSE, original.data=NA, chr.labels=TR
                   text(labpos,put.text.at,i,cex=0.8*chr.cex)
               }
           labpos = (x[22]+((x[22]-x[21])/2))
-          text(labpos,put.text.at,"22",cex=0.8)
+          text(labpos,put.text.at,"22",cex=0.8*chr.cex)
           if(23 %in% chr){
               labpos = (x[23]+750000)            #Midpoint of the X chromosome
               text(labpos,put.text.at,"X",cex=0.8*chr.cex)
